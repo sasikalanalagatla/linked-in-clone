@@ -1,11 +1,10 @@
 package com.org.linkedin.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,5 +28,6 @@ public class Education {
 
     private String extraCurricularActivity;
 
-    private String skills;
+    @ManyToMany
+    private List<Skill> skills;
 }
