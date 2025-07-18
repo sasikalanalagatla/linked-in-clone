@@ -48,7 +48,7 @@ public class JobPost {
     private boolean isJobPostEdited;
 
     @ManyToMany
-    private List<String> requiredSkills;
+    private List<Skill> requiredSkills;
 
     @ManyToOne
     private User user;

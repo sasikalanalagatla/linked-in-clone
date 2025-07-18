@@ -17,7 +17,7 @@ public class Experience {
 
     private String title;
 
-    private String enploymentType;
+    private String employmentType;
 
     private String companyName;
 
@@ -32,5 +32,5 @@ public class Experience {
     private String description;
 
     @ManyToMany
-    private List<String> skills;
+    private List<Skill> skills;
 }
