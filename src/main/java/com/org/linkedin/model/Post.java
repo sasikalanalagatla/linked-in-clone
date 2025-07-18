@@ -1,7 +1,6 @@
 package com.org.linkedin.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 public class Post {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
     private String postDescription;
@@ -27,5 +28,6 @@ public class Post {
 
     private Boolean isEdited;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 }

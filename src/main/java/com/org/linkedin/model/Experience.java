@@ -17,7 +17,7 @@ public class Experience {
 
     private String title;
 
-    private String enploymentType;
+    private String employmentType;
 
     private String companyName;
 
