@@ -32,5 +32,5 @@ public class Experience {
     private String description;
 
     @ManyToMany
-    private List<String> skills;
+    private List<Skill> skills;
 }
