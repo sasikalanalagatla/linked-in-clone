@@ -26,7 +26,7 @@ public class Post {
     @UpdateTimestamp
     private LocalDateTime editedAt;
 
-    private Boolean isEdited;
+    private Boolean edited;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
