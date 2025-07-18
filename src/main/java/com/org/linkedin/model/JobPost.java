@@ -35,8 +35,6 @@ public class JobPost {
     @Enumerated(EnumType.STRING)
     private JobType jobTypes;
 
-    private boolean isRemoteAvailable;
-
     @CreationTimestamp
     private LocalDateTime jobCreatedAt;
 
