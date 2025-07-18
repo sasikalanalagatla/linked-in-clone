@@ -3,7 +3,6 @@ package com.org.linkedin.model;
 import com.org.linkedin.enums.JobType;
 import com.org.linkedin.enums.WorkPlaceType;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;

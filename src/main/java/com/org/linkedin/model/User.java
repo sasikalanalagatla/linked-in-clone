@@ -23,7 +23,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private List<ApplyJob> applyJobs;
+    private List<ApplyJob> appliedJobs;
 
     @OneToMany(mappedBy = "user")
     private List<JobPost> jobPosts;
@@ -33,4 +33,15 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_following",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    private List<User> following;
+
+    @ManyToMany(mappedBy = "following")
+    private List<User> followers;
 }

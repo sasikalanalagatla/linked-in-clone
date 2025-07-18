@@ -28,6 +28,4 @@ public class Education {
 
     private String extraCurricularActivity;
 
-    @ManyToMany
-    private List<Skill> skills;
 }

@@ -47,7 +47,6 @@ public class UserProfile {
     @ManyToMany
     private List<Skill> skills;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private AboutUser aboutUser;
+    private String about;
 
 }

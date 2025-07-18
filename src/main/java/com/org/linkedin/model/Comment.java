@@ -34,5 +34,5 @@ public class Comment {
     @UpdateTimestamp
     private LocalDateTime commentUpdatedAt;
 
-    private boolean isCommentEdited;
+    private boolean commentEdited;
 }
