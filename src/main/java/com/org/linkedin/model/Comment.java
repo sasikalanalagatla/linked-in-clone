@@ -1,20 +1,31 @@
 package com.org.linkedin.model;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Getter
+@Setter
 public class Comment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
+    @Column(nullable = false)
     private String commentContent;
 
-    private String userName; // put string as user
+    private String userName;
 
+    @CreationTimestamp
     private LocalDateTime commentCreatedAt;
 
+    @UpdateTimestamp
     private LocalDateTime commentUpdatedAt;
 
     private boolean isCommentEdited;

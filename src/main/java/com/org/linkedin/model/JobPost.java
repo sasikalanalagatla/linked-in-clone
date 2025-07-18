@@ -1,38 +1,44 @@
 package com.org.linkedin.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.org.linkedin.enums.JobType;
+import com.org.linkedin.enums.WorkPlaceType;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class JobPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String jobTitle;
 
+    @Column(nullable = false)
     private String company;
 
     private String jobDescription;
 
     private String jobLocation;
 
-    private List<String> jobWorkPlaceTypes;
+    @Enumerated(EnumType.STRING)
+    private List<WorkPlaceType> jobWorkPlaceTypes;
 
-    private List<String> jobTypes;
+    @Enumerated(EnumType.STRING)
+    private List<JobType> jobTypes;
 
     private boolean isRemoteAvailable;
 
-    private List<String> requiredSkills;
-
+    @CreationTimestamp
     private LocalDateTime jobCreatedAt;
 
     private LocalDateTime applicationDeadline;
@@ -40,4 +46,6 @@ public class JobPost {
     private String recruiterEmail;
 
     private boolean isJobPostEdited;
+
+    private List<String> requiredSkills;
 }
