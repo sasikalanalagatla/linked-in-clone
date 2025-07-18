@@ -31,10 +31,10 @@ public class JobPost {
     private String jobLocation;
 
     @Enumerated(EnumType.STRING)
-    private List<WorkPlaceType> jobWorkPlaceTypes;
+    private WorkPlaceType jobWorkPlaceTypes;
 
     @Enumerated(EnumType.STRING)
-    private List<JobType> jobTypes;
+    private JobType jobTypes;
 
     private boolean isRemoteAvailable;
 
@@ -47,5 +47,9 @@ public class JobPost {
 
     private boolean isJobPostEdited;
 
+    @ManyToMany
     private List<String> requiredSkills;
+
+    @ManyToOne
+    private User user;
 }

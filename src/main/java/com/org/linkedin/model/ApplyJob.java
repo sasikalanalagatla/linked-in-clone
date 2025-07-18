@@ -23,5 +23,5 @@ public class ApplyJob {
 
     private String additionalQuestions;
 
-    private String resume;
+    private String resumeUrl;
 }

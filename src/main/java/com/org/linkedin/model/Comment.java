@@ -20,7 +20,8 @@ public class Comment {
     @Column(nullable = false)
     private String commentContent;
 
-    private String userName;
+    @ManyToOne
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime commentCreatedAt;
