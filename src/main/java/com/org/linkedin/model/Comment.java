@@ -20,7 +20,13 @@ public class Comment {
     @Column(nullable = false)
     private String commentContent;
 
-    private String userName;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @CreationTimestamp
     private LocalDateTime commentCreatedAt;
@@ -28,5 +34,5 @@ public class Comment {
     @UpdateTimestamp
     private LocalDateTime commentUpdatedAt;
 
-    private boolean isCommentEdited;
+    private boolean commentEdited;
 }

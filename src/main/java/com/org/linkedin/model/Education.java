@@ -1,14 +1,31 @@
 package com.org.linkedin.model;
 
-public class Education {
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.List;
+
+@Getter
+@Setter
+@Entity
+public class Education {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long educationId;
-    private String schholName;
+
+    private String schoolName;
+
     private String degree;
+
     private String fieldOfStudy;
+
     private String startDate;
+
     private String endDate;
+
     private String grade;
+
     private String extraCurricularActivity;
-    private String skills;
+
 }

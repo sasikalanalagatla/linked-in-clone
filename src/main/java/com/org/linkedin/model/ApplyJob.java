@@ -23,5 +23,9 @@ public class ApplyJob {
 
     private String additionalQuestions;
 
-    private String resume;
+    private String resumeUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
