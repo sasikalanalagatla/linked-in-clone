@@ -11,11 +11,9 @@ public class ApplyJob {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long applyJobId;
 
-    @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
-    private String emailId;
+    private String email;
 
     private Long mobileNumber;
 
@@ -44,11 +42,11 @@ public class ApplyJob {
     }
 
     public String getEmailId() {
-        return emailId;
+        return email;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setEmailId(String email) {
+        this.email = email;
     }
 
     public Long getMobileNumber() {

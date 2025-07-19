@@ -14,7 +14,8 @@ public interface JobService {
 
     List<Job> getAllJobs();
 
+    String deleteJobById(Long jobId);
 
-    List<Job> searchJobsByTitleOrCompany(String keyword); // Optional: for search bar
+    List<Job> searchJobsByTitleOrCompany(String keyword);
 
 }

@@ -1,90 +1,184 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Job Feed</title>
     <meta charset="UTF-8">
+    <title>Job Feed</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background-color: #f9f9f9;
+            background-color: #f0f2f5;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0a66c2;
+        }
+
+        .navbar input {
+            flex: 1;
+            margin: 0 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .nav-items a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .nav-items a:hover {
+            color: #0a66c2;
+        }
+
+        .profile-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .container {
             display: flex;
-            height: 100vh;
+            height: calc(100vh - 70px);
         }
 
         .left-panel {
             width: 35%;
-            background-color: #f3f2ef;
-            border-right: 1px solid #ccc;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
             overflow-y: auto;
-            padding: 16px;
-        }
-
-        .job-item {
-            padding: 12px;
-            margin-bottom: 10px;
-            background-color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .job-item:hover,
-        .job-item.active {
-            border-color: #0a66c2;
-            background-color: #e7f3ff;
         }
 
         .right-panel {
-            flex: 1;
-            padding: 24px;
-            background-color: #ffffff;
+            width: 65%;
+            background-color: #fff;
+            padding: 30px;
             overflow-y: auto;
         }
 
+        .job-item {
+            background-color: #f5f8fa;
+            border: 1px solid transparent;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, border 0.3s;
+        }
+
+        .job-item:hover, .job-item.active {
+            background-color: #e3f2fd;
+            border-color: #0a66c2;
+        }
+
         .job-title {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             color: #0a66c2;
         }
 
         .company {
-            font-size: 18px;
-            margin-top: 4px;
+            font-size: 16px;
+            margin-top: 8px;
         }
 
         .location {
-            color: #666;
-            margin-bottom: 16px;
-        }
-
-        .skills {
-            margin-top: 16px;
+            font-size: 14px;
+            color: #777;
         }
 
         .skills span {
-            background-color: #eef3f8;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-right: 6px;
             display: inline-block;
-            margin-bottom: 4px;
+            background-color: #dfe9f3;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 4px 4px 0 0;
+            font-size: 13px;
+        }
+
+        .button-container {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .apply-button, .delete-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .apply-button {
+            background-color: #0a66c2;
+            color: white;
+        }
+
+        .apply-button:hover {
+            background-color: #004182;
+        }
+
+        .delete-button {
+            background-color: #e53935;
+            color: white;
+        }
+
+        .delete-button:hover {
+            background-color: #b71c1c;
         }
 
         .user-info {
-            font-size: 14px;
-            margin-bottom: 16px;
+            font-size: 13px;
             color: #888;
+            margin-bottom: 10px;
         }
+
+        .details p {
+            margin: 10px 0;
+            font-size: 15px;
+        }
+
     </style>
 </head>
 <body>
 
+<div class="navbar">
+    <div class="logo">LinkedIn</div>
+    <input type="text" placeholder="Search">
+    <div class="nav-items">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/network}">Network</a>
+        <a th:href="@{/job/feed}">Jobs</a>
+        <a th:href="@{/messaging}">Messaging</a>
+        <a th:href="@{/notifications}">Notifications</a>
+        <a th:href="@{/profile}">
+            <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile">
+        </a>
+        <a th:href="@{/job/add}">Add Jobs</a>
+    </div>
+</div>
+
 <div class="container">
-    <!-- Left Panel - List of Jobs -->
     <div class="left-panel">
         <h2>Job Feed</h2>
         <div th:each="job : ${jobs}"
@@ -92,17 +186,17 @@
             <a th:href="@{'/job/feed'(jobId=${job.id})}" style="text-decoration: none; color: inherit;">
                 <div>
                     <div class="job-title" th:text="${job.jobTitle}"></div>
-                    <div class="location" th:text="${job.jobLocation}"></div> <!-- ✅ FIXED -->
+                    <div class="location" th:text="${job.jobLocation}"></div>
                 </div>
             </a>
         </div>
     </div>
 
-    <!-- Right Panel - Job Details -->
     <div class="right-panel" th:if="${selectedJob != null}">
         <div class="user-info">
             Viewing as: <span th:text="${user.email}"></span>
         </div>
+
         <div class="job-title" th:text="${selectedJob.jobTitle}"></div>
         <div class="company" th:text="${selectedJob.company}"></div>
         <div class="location" th:text="${selectedJob.jobLocation}"></div>
@@ -111,8 +205,7 @@
             <p><strong>Description:</strong> <span th:text="${selectedJob.jobDescription}"></span></p>
             <p><strong>Workplace Type:</strong> <span th:text="${selectedJob.jobWorkPlaceTypes}"></span></p>
             <p><strong>Job Type:</strong> <span th:text="${selectedJob.jobTypes}"></span></p>
-            <p><strong>Created At:</strong> <span th:text="${#temporals.format(selectedJob.jobCreatedAt, 'dd-MM-yyyy HH:mm')}"></span></p>
-            <p><strong>Deadline:</strong> <span th:text="${#temporals.format(selectedJob.applicationDeadline, 'dd-MM-yyyy')}"></span></p>
+            <p><strong>Created At:</strong> <span th:text="${#temporals.format(selectedJob.jobCreatedAt,'dd-MM-yyyy HH:mm')}"></span></p>
             <p><strong>Recruiter Email:</strong> <span th:text="${selectedJob.recruiterEmail}"></span></p>
             <p><strong>Edited:</strong> <span th:text="${selectedJob.jobPostEdited} ? 'Yes' : 'No'"></span></p>
         </div>
@@ -122,6 +215,13 @@
             <div th:each="skill : ${selectedJob.requiredSkills}">
                 <span th:text="${skill.name}"></span>
             </div>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{'/job/apply/' + ${selectedJob.id}}" class="apply-button">Apply</a>
+            <form th:action="@{'/job/delete/' + ${selectedJob.id}}" method="post">
+                <button type="submit" class="delete-button">Delete</button>
+            </form>
         </div>
     </div>
 </div>

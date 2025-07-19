@@ -1,11 +1,9 @@
 package com.org.linkedin.repository;
 
-import com.org.linkedin.model.User;
+import com.org.linkedin.model.ApplyJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Long> {
-
-    User findByEmail(String email);
+public interface ApplyJobRepository extends JpaRepository<ApplyJob, Long> {
 }

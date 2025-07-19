@@ -1,8 +1,10 @@
 package com.org.linkedin.controller;
 
 import com.org.linkedin.model.AdditionalQuestion;
+import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.model.User;
+import com.org.linkedin.repository.ApplyJobRepository;
 import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
@@ -20,19 +22,31 @@ public class JobController {
     private final JobServiceImpl jobServiceImpl;
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
+    private final ApplyJobRepository applyJobRepository;
 
     public JobController(SkillRepository skillRepository, JobServiceImpl jobServiceImpl, JobRepository jobRepository,
-                         UserRepository userRepository) {
+                         UserRepository userRepository, ApplyJobRepository applyJobRepository) {
         this.skillRepository = skillRepository;
         this.jobServiceImpl = jobServiceImpl;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
+        this.applyJobRepository = applyJobRepository;
     }
 
     @GetMapping("/job/feed")
     public String showJobFeed(@RequestParam(required = false) Long jobId, Model model) {
         List<Job> jobs = jobServiceImpl.getAllJobs();
-        Job selectedJob = (jobId != null) ? jobServiceImpl.getJobById(jobId) : (!jobs.isEmpty() ? jobs.get(0) : null);
+        Job selectedJob;
+
+        if (jobId != null) {
+            selectedJob = jobServiceImpl.getJobById(jobId);
+        } else {
+            if (!jobs.isEmpty()) {
+                selectedJob = jobs.get(0);
+            } else {
+                selectedJob = null;
+            }
+        }
         User user = userRepository.findById(1L).orElseThrow();
 
         model.addAttribute("jobs", jobs);
@@ -82,4 +96,28 @@ public class JobController {
         return "home-page";
     }
 
+    @GetMapping("/job/apply/{jobId}")
+    public String showApplyForm(@PathVariable Long jobId, Model model) {
+        Job job = jobServiceImpl.getJobById(jobId);
+        ApplyJob applyJob = new ApplyJob();
+        model.addAttribute("applyJob", applyJob);
+        model.addAttribute("job", job);
+        return "job-apply-form";
+    }
+
+    @PostMapping("/job/apply/{jobId}")
+    public String submitApplyForm(@PathVariable Long jobId,
+                                  @ModelAttribute ApplyJob applyJob) {
+        Job job = jobServiceImpl.getJobById(jobId);
+        User user = userRepository.findByEmail(applyJob.getEmailId());
+        applyJob.setUser(user);
+        applyJobRepository.save(applyJob);
+        return "redirect:/job/feed?jobId=" + jobId;
+    }
+
+    @PostMapping("/job/delete/{jobId}")
+    public String deleteJobById(@PathVariable("jobId") Long jobId){
+        jobServiceImpl.deleteJobById(jobId);
+        return "redirect:/job/feed";
+    }
 }
