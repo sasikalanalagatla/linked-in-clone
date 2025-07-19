@@ -29,6 +29,12 @@ public class JobServiceImpl implements JobService {
     public Job editJobById(Long jobId){
         return null;
     }
+
+    @Override
+    public List<Job> getAllJobs() {
+        return List.of();
+    }
+
     @Override
     public Page<Job> getAllJobs(Pageable pageable) {
         return jobRepository.findAll(pageable);

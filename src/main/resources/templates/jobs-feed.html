@@ -453,7 +453,6 @@
 </head>
 <body>
 
-<!-- Navigation Bar -->
 <div class="navbar">
     <div class="navbar-content">
         <div class="logo">in</div>
@@ -499,9 +498,7 @@
 </div>
 
 <div class="container">
-    <!-- Left Panel - Job Listings -->
     <div class="left-panel">
-        <!-- Job Filters -->
         <div class="job-filters">
             <div class="filter-pill active">Jobs</div>
             <div class="filter-pill">Date posted</div>
@@ -516,7 +513,6 @@
             <span class="results-count" th:text="${totalElements + ' results'}">1,000+ results</span>
         </div>
 
-        <!-- Job List -->
         <div class="job-list" th:if="${jobs != null and !jobs.isEmpty()}">
             <a th:each="job : ${jobs}"
                th:href="@{/job/feed(jobId=${job.id}, page=${currentPage}, keyword=${param.keyword})}"
@@ -537,7 +533,6 @@
             </a>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination-container" th:if="${jobs != null and !jobs.isEmpty() and totalPages > 1}">
             <div class="pagination">
                 <!-- Previous Button -->
@@ -568,7 +563,6 @@
         </div>
     </div>
 
-    <!-- Right Panel - Job Details -->
     <div class="right-panel" th:if="${selectedJob != null}">
         <div class="job-details-header">
             <div class="company-logo-large" th:text="${selectedJob.company.substring(0,1).toUpperCase()}">M</div>
@@ -590,7 +584,6 @@
             <a th:href="@{/job/edit/{id}(id=${selectedJob.id})}" class="edit-button">Edit</a>
         </div>
 
-        <!-- Job Insights -->
         <div class="job-insights">
             <div class="insights-header">
                 <strong>Job Details</strong>
@@ -603,14 +596,12 @@
             </div>
         </div>
 
-        <!-- Job Description -->
         <div class="job-description">
             <h4>About the job</h4>
             <p th:text="${selectedJob.jobDescription}">
                 We are looking for a Senior Software Engineer to join our dynamic team...
             </p>
 
-            <!-- Skills Required -->
             <div class="skills-container" th:if="${selectedJob.requiredSkills != null and !selectedJob.requiredSkills.isEmpty()}">
                 <h4>Skills Required</h4>
                 <div class="skills-list">
@@ -622,7 +613,6 @@
         </div>
     </div>
 
-    <!-- Empty state when no job is selected -->
     <div class="right-panel" th:if="${selectedJob == null}">
         <div style="text-align: center; padding: 60px 20px; color: #666;">
             <h3>Select a job to view details</h3>
