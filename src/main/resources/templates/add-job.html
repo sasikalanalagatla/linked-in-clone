@@ -55,7 +55,7 @@
 <body>
 <div class="container">
     <h2>Enter your job description</h2>
-    <form th:action="@{/jobs/add}" th:object="${jobPost}" method="post">
+    <form th:action="@{/job/create}" th:object="${job}" method="post">
 
         <label for="jobTitle">Job Title</label>
         <input type="text" id="jobTitle" th:field="*{jobTitle}" placeholder="e.g. Java Developer" required>

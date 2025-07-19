@@ -26,7 +26,7 @@ public class User {
     private List<ApplyJob> appliedJobs;
 
     @OneToMany(mappedBy = "user")
-    private List<JobPost> jobPosts;
+    private List<Job> jobs;
 
     @OneToOne(cascade = CascadeType.ALL)
     private UserProfile userProfile;

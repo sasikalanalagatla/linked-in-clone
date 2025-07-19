@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class JobPost {
+public class Job {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
