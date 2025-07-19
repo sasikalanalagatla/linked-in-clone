@@ -62,10 +62,6 @@ public class JobController {
     }
 
     @GetMapping("/job/add")
-    public String showAddJobForm(Model model) {
-        model.addAttribute("job", new Job());
-
-    @GetMapping("/job/add")
     public String showForm(Model model) {
         Job job = new Job();
         job.getAdditionalQuestions().add(new AdditionalQuestion());

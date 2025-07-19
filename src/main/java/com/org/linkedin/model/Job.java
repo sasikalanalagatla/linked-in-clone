@@ -45,6 +45,12 @@ public class Job {
 
     private boolean isJobPostEdited;
 
+    private Long applicationsCount;
+
+    private String experienceLevel;
+
+    private Long companyId;
+
     @ManyToMany
     private List<Skill> requiredSkills;
 
