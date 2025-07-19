@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Add Job</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,6 +45,7 @@
             border-radius: 50px;
             font-size: 16px;
             cursor: pointer;
+            margin-right: 10px;
         }
         button:hover {
             background-color: #004182;
@@ -67,13 +67,15 @@
         <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Mumbai, India">
 
         <label for="jobTypes">Job Type</label>
-        <select id="jobTypes" th:field="*{jobTypes}">
+        <select id="jobTypes" th:field="*{jobTypes}" required>
+            <option value="" disabled selected>Select job type</option>
             <option th:each="type : ${T(com.org.linkedin.enums.JobType).values()}"
                     th:value="${type}" th:text="${type}">Job Type</option>
         </select>
 
         <label for="jobWorkPlaceTypes">Workplace Type</label>
-        <select id="jobWorkPlaceTypes" th:field="*{jobWorkPlaceTypes}">
+        <select id="jobWorkPlaceTypes" th:field="*{jobWorkPlaceTypes}" required>
+            <option value="" disabled selected>Select workplace type</option>
             <option th:each="type : ${T(com.org.linkedin.enums.WorkPlaceType).values()}"
                     th:value="${type}" th:text="${type}">Workplace</option>
         </select>
@@ -97,7 +99,6 @@
         <button type="submit" name="addQuestion">Add Question</button>
         <button type="submit" name="submitJob">Continue</button>
     </form>
-
 </div>
 </body>
 </html>
