@@ -1,6 +1,8 @@
 package com.org.linkedin.service;
 
 import com.org.linkedin.model.Job;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -16,8 +18,9 @@ public interface JobService {
 
     String deleteJobById(Long jobId);
 
-    List<Job> searchJobsByTitleOrCompany(String keyword);
+    Page<Job> getAllJobs(Pageable pageable);
 
     void updateJob(Job job);
 
+    Page<Job> searchJobs(String keyword, Pageable pageable);
 }

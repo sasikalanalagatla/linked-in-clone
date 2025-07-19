@@ -9,6 +9,10 @@ import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.impl.JobServiceImpl;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,24 +38,37 @@ public class JobController {
     }
 
     @GetMapping("/job/feed")
-    public String showJobFeed(@RequestParam(required = false) Long jobId, Model model) {
-        List<Job> jobs = jobServiceImpl.getAllJobs();
-        Job selectedJob;
+    public String jobFeed(@RequestParam(value = "keyword", required = false) String keyword,
+                          @RequestParam(value = "jobId", required = false) Long jobId,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "size", defaultValue = "5") int size,
+                          Model model) {
 
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Job> jobPage;
+
+        if (keyword != null && !keyword.isEmpty()) {
+            jobPage = jobServiceImpl.searchJobs(keyword, pageable);
+        } else {
+            jobPage = jobServiceImpl.getAllJobs(pageable);
+        }
+
+        List<Job> jobs = jobPage.getContent();
+        model.addAttribute("jobs", jobs);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", jobPage.getTotalPages());
+        model.addAttribute("size", size);
+
+        Job selectedJob = null;
         if (jobId != null) {
             selectedJob = jobServiceImpl.getJobById(jobId);
-        } else {
-            if (!jobs.isEmpty()) {
-                selectedJob = jobs.get(0);
-            } else {
-                selectedJob = null;
-            }
+        } else if (!jobs.isEmpty()) {
+            selectedJob = jobs.get(0);
         }
-        User user = userRepository.findById(1L).orElseThrow();
 
-        model.addAttribute("jobs", jobs);
         model.addAttribute("selectedJob", selectedJob);
-        model.addAttribute("user", user);
+
         return "jobs-feed";
     }
 

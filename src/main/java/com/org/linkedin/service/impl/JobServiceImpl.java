@@ -3,6 +3,8 @@ package com.org.linkedin.service.impl;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.service.JobService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +30,13 @@ public class JobServiceImpl implements JobService {
         return null;
     }
     @Override
-    public List<Job> searchJobsByTitleOrCompany(String keyword) {
-        return jobRepository.findByJobTitleContainingIgnoreCaseOrCompanyContainingIgnoreCase(keyword, keyword);
+    public Page<Job> getAllJobs(Pageable pageable) {
+        return jobRepository.findAll(pageable);
     }
 
     @Override
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
+    public Page<Job> searchJobs(String keyword, Pageable pageable) {
+        return jobRepository.searchJobsByTitleOrSkill(keyword, pageable);
     }
 
     @Override
