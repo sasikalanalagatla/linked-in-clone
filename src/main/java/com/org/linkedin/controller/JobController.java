@@ -52,7 +52,7 @@ public class JobController {
         model.addAttribute("jobs", jobs);
         model.addAttribute("selectedJob", selectedJob);
         model.addAttribute("user", user);
-        return "/jobs-feed";
+        return "jobs-feed";
     }
 
     @PostMapping("/job/create")
