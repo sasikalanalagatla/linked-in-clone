@@ -88,8 +88,16 @@
         <textarea id="jobDescription" th:field="*{jobDescription}" rows="8"
                   placeholder="Describe the responsibilities, qualifications..."></textarea>
 
-        <button type="submit">Continue</button>
+        <label>Additional Questions</label>
+        <div th:each="q, stat : *{additionalQuestions}">
+            <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
+            <input type="text" th:field="*{additionalQuestions[__${stat.index}__].question}" placeholder="Enter a question">
+        </div>
+
+        <button type="submit" name="addQuestion">Add Question</button>
+        <button type="submit" name="submitJob">Continue</button>
     </form>
+
 </div>
 </body>
 </html>

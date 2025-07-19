@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Get Job By ID</title>
+</head>
+<body>
+
+<h2>Find Job By ID</h2>
+
+<form th:action="@{/job/find}" method="get">
+    <label for="jobId">Enter Job ID:</label>
+    <input type="number" id="jobId" name="id" required>
+    <button type="submit">Get Job</button>
+</form>
+
+<hr>
+
+<div th:if="${job != null}">
+    <h3>Job Details</h3>
+    <p><strong>Job ID:</strong> <span th:text="${job.id}"></span></p>
+    <p><strong>Title:</strong> <span th:text="${job.jobTitle}"></span></p>
+    <p><strong>Company:</strong> <span th:text="${job.company}"></span></p>
+    <p><strong>Description:</strong> <span th:text="${job.jobDescription}"></span></p>
+    <p><strong>Location:</strong> <span th:text="${job.jobLocation}"></span></p>
+    <p><strong>Workplace Type:</strong> <span th:text="${job.jobWorkPlaceTypes}"></span></p>
+    <p><strong>Job Type:</strong> <span th:text="${job.jobTypes}"></span></p>
+    <p><strong>Posted On:</strong> <span th:text="${job.jobCreatedAt}"></span></p>
+    <p><strong>Deadline:</strong> <span th:text="${job.applicationDeadline}"></span></p>
+    <p><strong>Recruiter Email:</strong> <span th:text="${job.recruiterEmail}"></span></p>
+</div>
+
+<div th:if="${job == null && searched}">
+    <p>No job found with the given ID.</p>
+</div>
+
+</body>
+</html>

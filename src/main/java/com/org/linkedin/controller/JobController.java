@@ -1,5 +1,6 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.model.AdditionalQuestion;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.JobRepository;
@@ -8,13 +9,10 @@ import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.impl.JobServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/job")
 @Controller
 public class JobController {
 
@@ -23,7 +21,8 @@ public class JobController {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
 
-    public JobController(SkillRepository skillRepository, JobServiceImpl jobServiceImpl, JobRepository jobRepository, UserRepository userRepository) {
+    public JobController(SkillRepository skillRepository, JobServiceImpl jobServiceImpl, JobRepository jobRepository,
+                         UserRepository userRepository) {
         this.skillRepository = skillRepository;
         this.jobServiceImpl = jobServiceImpl;
         this.jobRepository = jobRepository;
@@ -39,17 +38,46 @@ public class JobController {
         return "/jobs-feed";
     }
 
-    @PostMapping("/create")
-    public String createPost(Job job){
+    @PostMapping("/job/create")
+    public String createPost(@ModelAttribute("job") Job job,
+                             @RequestParam(required = false) String addQuestion,
+                             Model model) {
+
+        if (addQuestion != null) {
+            job.getAdditionalQuestions().add(new AdditionalQuestion());
+            model.addAttribute("job", job);
+            model.addAttribute("skills", skillRepository.findAll());
+            return "add-job";
+        }
+
+        for (AdditionalQuestion question : job.getAdditionalQuestions()) {
+            question.setJob(job);
+        }
+
         jobServiceImpl.createJob(job);
-        return "/add-job";
+        return "redirect:/job/feed";
     }
 
-    @GetMapping("/add")
+
+    @GetMapping("/job/add")
     public String showForm(Model model) {
-        model.addAttribute("job", new Job());
+        Job job = new Job();
+        job.getAdditionalQuestions().add(new AdditionalQuestion());
+        model.addAttribute("job", job);
         model.addAttribute("skills", skillRepository.findAll());
-        return "/add-job";
+        return "add-job";
+    }
+
+    @GetMapping("/job/get/{jobId}")
+    public String getJobById(@PathVariable("jobId") Long jobId, Model model){
+        Job job = jobServiceImpl.getJobById(jobId);
+        model.addAttribute("job",job);
+        return "single-job";
+    }
+
+    @GetMapping("/")
+    public String getHomePage(){
+        return "home-page";
     }
 
 }

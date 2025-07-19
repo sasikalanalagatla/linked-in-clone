@@ -12,8 +12,18 @@ public class JobServiceImpl implements JobService {
     public JobServiceImpl(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
     }
-
+    @Override
     public Job createJob(Job job){
         return jobRepository.save(job);
+    }
+
+    @Override
+    public Job getJobById(Long jobId) {
+        return jobRepository.getById(jobId);
+    }
+
+    @Override
+    public Job editJobById(Long jobId){
+        return null;
     }
 }

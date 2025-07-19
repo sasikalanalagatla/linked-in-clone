@@ -4,5 +4,9 @@ import com.org.linkedin.model.Job;
 
 public interface JobService {
 
-    public Job createJob(Job job);
+     Job createJob(Job job);
+
+     Job getJobById(Long jobId);
+
+     Job editJobById(Long jobId);
 }
