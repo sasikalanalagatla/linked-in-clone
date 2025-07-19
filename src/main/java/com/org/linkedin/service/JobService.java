@@ -2,6 +2,8 @@ package com.org.linkedin.service;
 
 import com.org.linkedin.model.Job;
 
+import java.util.List;
+
 public interface JobService {
 
      Job createJob(Job job);
@@ -9,4 +11,10 @@ public interface JobService {
      Job getJobById(Long jobId);
 
      Job editJobById(Long jobId);
+
+    List<Job> getAllJobs();
+
+
+    List<Job> searchJobsByTitleOrCompany(String keyword); // Optional: for search bar
+
 }

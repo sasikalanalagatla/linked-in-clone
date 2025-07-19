@@ -30,10 +30,13 @@ public class JobController {
     }
 
     @GetMapping("/job/feed")
-    public String showJobFeed(Model model){
-        List<Job> jobs = jobRepository.findAll();
+    public String showJobFeed(@RequestParam(required = false) Long jobId, Model model) {
+        List<Job> jobs = jobServiceImpl.getAllJobs();
+        Job selectedJob = (jobId != null) ? jobServiceImpl.getJobById(jobId) : (!jobs.isEmpty() ? jobs.get(0) : null);
         User user = userRepository.findById(1L).orElseThrow();
+
         model.addAttribute("jobs", jobs);
+        model.addAttribute("selectedJob", selectedJob);
         model.addAttribute("user", user);
         return "/jobs-feed";
     }
@@ -58,6 +61,9 @@ public class JobController {
         return "redirect:/job/feed";
     }
 
+    @GetMapping("/job/add")
+    public String showAddJobForm(Model model) {
+        model.addAttribute("job", new Job());
 
     @GetMapping("/job/add")
     public String showForm(Model model) {
