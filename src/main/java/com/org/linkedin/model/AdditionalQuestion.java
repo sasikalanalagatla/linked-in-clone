@@ -1,11 +1,7 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
 public class AdditionalQuestion {
 
@@ -13,9 +9,11 @@ public class AdditionalQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String question;
+    @Column(nullable = false)
+    private String questionText;
 
     @ManyToOne
+    @JoinColumn(name = "job_id")
     private Job job;
 
     public Long getId() {
@@ -26,19 +24,19 @@ public class AdditionalQuestion {
         this.id = id;
     }
 
+    public String getQuestionText() {
+        return questionText;
+    }
+
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
+
     public Job getJob() {
         return job;
     }
 
     public void setJob(Job job) {
         this.job = job;
-    }
-
-    public String getQuestion() {
-        return question;
-    }
-
-    public void setQuestion(String question) {
-        this.question = question;
     }
 }

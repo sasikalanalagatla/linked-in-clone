@@ -1,36 +1,32 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ApplyJob {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long applyJobId;
+    private Long id;
 
     private String userName;
-
     private String email;
-
-    private Long mobileNumber;
-
-    private String additionalQuestions;
-
+    private String mobileNumber;
     private String resumeUrl;
 
+    @ElementCollection
+    private List<String> additionalQuestionAnswers = new ArrayList<>();
+
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
-    public Long getApplyJobId() {
-        return applyJobId;
-    }
+    @ManyToOne
+    private Job job;
 
-    public void setApplyJobId(Long applyJobId) {
-        this.applyJobId = applyJobId;
+    public Long getId() {
+        return id;
     }
 
     public String getUserName() {
@@ -41,28 +37,20 @@ public class ApplyJob {
         this.userName = userName;
     }
 
-    public String getEmailId() {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmailId(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public Long getMobileNumber() {
+    public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(Long mobileNumber) {
+    public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
-    }
-
-    public String getAdditionalQuestions() {
-        return additionalQuestions;
-    }
-
-    public void setAdditionalQuestions(String additionalQuestions) {
-        this.additionalQuestions = additionalQuestions;
     }
 
     public String getResumeUrl() {
@@ -73,11 +61,27 @@ public class ApplyJob {
         this.resumeUrl = resumeUrl;
     }
 
+    public List<String> getAdditionalQuestionAnswers() {
+        return additionalQuestionAnswers;
+    }
+
+    public void setAdditionalQuestionAnswers(List<String> additionalQuestionAnswers) {
+        this.additionalQuestionAnswers = additionalQuestionAnswers;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
     }
 }

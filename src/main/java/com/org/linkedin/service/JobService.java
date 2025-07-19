@@ -18,4 +18,6 @@ public interface JobService {
 
     List<Job> searchJobsByTitleOrCompany(String keyword);
 
+    void updateJob(Job job);
+
 }

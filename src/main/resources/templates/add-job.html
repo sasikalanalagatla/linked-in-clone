@@ -33,6 +33,7 @@
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 14px;
         }
         .checkbox-group {
             margin-bottom: 15px;
@@ -50,21 +51,30 @@
         button:hover {
             background-color: #004182;
         }
+        .question-box {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .question-box input[type="text"] {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Enter your job description</h2>
+    <h2>Enter Your Job Details</h2>
     <form th:action="@{/job/create}" th:object="${job}" method="post">
 
         <label for="jobTitle">Job Title</label>
         <input type="text" id="jobTitle" th:field="*{jobTitle}" placeholder="e.g. Java Developer" required>
 
-        <label for="company">Company Name </label>
-        <input type="text" id="company" th:field="*{company}" placeholder="e.g. TCS" required>
+        <label for="company">Company Name</label>
+        <input type="text" id="company" th:field="*{company}" placeholder="e.g. Infosys" required>
 
-        <label for="jobLocation">Location </label>
-        <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Mumbai, India">
+        <label for="jobLocation">Location</label>
+        <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India">
 
         <label for="jobTypes">Job Type</label>
         <select id="jobTypes" th:field="*{jobTypes}" required>
@@ -80,20 +90,18 @@
                     th:value="${type}" th:text="${type}">Workplace</option>
         </select>
 
-        <label for="applicationDeadline">Application Deadline</label>
-        <input type="datetime-local" id="applicationDeadline" th:field="*{applicationDeadline}">
-
         <label for="recruiterEmail">Recruiter Email</label>
-        <input type="email" id="recruiterEmail" th:field="*{recruiterEmail}" placeholder="e.g. hr@example.com">
+        <input type="email" id="recruiterEmail" th:field="*{recruiterEmail}" placeholder="e.g. hr@company.com">
 
         <label for="jobDescription">Job Description</label>
         <textarea id="jobDescription" th:field="*{jobDescription}" rows="8"
-                  placeholder="Describe the responsibilities, qualifications..."></textarea>
+                  placeholder="Describe the responsibilities, qualifications, etc."></textarea>
 
         <label>Additional Questions</label>
-        <div th:each="q, stat : *{additionalQuestions}">
+        <div th:each="q, stat : *{additionalQuestions}" class="question-box">
             <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
-            <input type="text" th:field="*{additionalQuestions[__${stat.index}__].question}" placeholder="Enter a question">
+            <input type="text" th:field="*{additionalQuestions[__${stat.index}__].questionText}"
+                   placeholder="Enter a question">
         </div>
 
         <button type="submit" name="addQuestion">Add Question</button>

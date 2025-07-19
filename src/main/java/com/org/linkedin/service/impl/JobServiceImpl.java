@@ -42,4 +42,9 @@ public class JobServiceImpl implements JobService {
         jobRepository.deleteById(jobId);
         return "post deleted";
     }
+
+    @Override
+    public void updateJob(Job job) {
+        jobRepository.save(job);
+    }
 }

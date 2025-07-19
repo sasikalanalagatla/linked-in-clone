@@ -2,29 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Apply Job</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        form {
+            background-color: #ffffff;
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0073b1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005b91;
+        }
+    </style>
 </head>
 <body>
-<h2 th:text="'Apply to ' + ${job.jobTitle}"></h2>
 
 <form th:action="@{'/job/apply/' + ${job.id}}" th:object="${applyJob}" method="post">
+    <h2 th:text="'Apply to ' + ${job.jobTitle}"></h2>
+
     <label>Name:</label>
-    <input type="text" th:field="*{userName}" required/><br><br>
+    <input type="text" th:field="*{userName}" required/>
 
     <label>Email:</label>
-    <input type="email" th:field="*{emailId}" required/><br><br>
+    <input type="email" th:field="*{email}" required/>
 
     <label>Mobile Number:</label>
-    <input type="text" th:field="*{mobileNumber}"/><br><br>
+    <input type="text" th:field="*{mobileNumber}"/>
 
-    <div th:if="${job.additionalQuestions != null}">
-        <label>Answer (Additional Questions):</label><br>
-        <textarea th:field="*{additionalQuestions}" rows="4" cols="40"></textarea><br><br>
+    <div th:if="${job.additionalQuestions != null and !job.additionalQuestions.isEmpty()}">
+        <div th:each="question, iterStat : ${job.additionalQuestions}">
+            <label th:text="${question.questionText}"></label>
+            <textarea th:field="*{additionalQuestionAnswers[__${iterStat.index}__]}" rows="3"></textarea>
+        </div>
     </div>
 
     <label>Resume URL:</label>
-    <input type="text" th:field="*{resumeUrl}"/><br><br>
+    <input type="text" th:field="*{resumeUrl}"/>
 
     <button type="submit">Submit Application</button>
 </form>
+
 </body>
 </html>

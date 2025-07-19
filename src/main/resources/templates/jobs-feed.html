@@ -222,6 +222,7 @@
             <form th:action="@{'/job/delete/' + ${selectedJob.id}}" method="post">
                 <button type="submit" class="delete-button">Delete</button>
             </form>
+            <a th:href="@{/job/edit/{id}(id=${selectedJob.id})}" class="edit-button">Edit</a>
         </div>
     </div>
 </div>

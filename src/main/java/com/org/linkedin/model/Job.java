@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 public class Job {
 
     @Id
@@ -55,7 +53,7 @@ public class Job {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<AdditionalQuestion> additionalQuestions = new ArrayList<>();
 
     public Long getId() {

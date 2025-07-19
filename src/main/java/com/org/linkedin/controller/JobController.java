@@ -100,6 +100,13 @@ public class JobController {
     public String showApplyForm(@PathVariable Long jobId, Model model) {
         Job job = jobServiceImpl.getJobById(jobId);
         ApplyJob applyJob = new ApplyJob();
+
+        if (job.getAdditionalQuestions() != null) {
+            for (int i = 0; i < job.getAdditionalQuestions().size(); i++) {
+                applyJob.getAdditionalQuestionAnswers().add("");
+            }
+        }
+
         model.addAttribute("applyJob", applyJob);
         model.addAttribute("job", job);
         return "job-apply-form";
@@ -109,15 +116,31 @@ public class JobController {
     public String submitApplyForm(@PathVariable Long jobId,
                                   @ModelAttribute ApplyJob applyJob) {
         Job job = jobServiceImpl.getJobById(jobId);
-        User user = userRepository.findByEmail(applyJob.getEmailId());
+        User user = userRepository.findByEmail(applyJob.getEmail());
+
         applyJob.setUser(user);
+        applyJob.setJob(job);
         applyJobRepository.save(applyJob);
+
         return "redirect:/job/feed?jobId=" + jobId;
     }
 
     @PostMapping("/job/delete/{jobId}")
     public String deleteJobById(@PathVariable("jobId") Long jobId){
         jobServiceImpl.deleteJobById(jobId);
+        return "redirect:/job/feed";
+    }
+
+    @GetMapping("/job/edit/{id}")
+    public String editJobForm(@PathVariable Long id, Model model) {
+        Job job = jobServiceImpl.getJobById(id);
+        model.addAttribute("job", job);
+        return "edit-job";
+    }
+
+    @PostMapping("/job/update")
+    public String updateJob(@ModelAttribute("job") Job updatedJob) {
+        jobServiceImpl.updateJob(updatedJob);
         return "redirect:/job/feed";
     }
 }
