@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Job</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f2ee;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 750px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input[type="text"], input[type="email"], textarea, select, input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .checkbox-group {
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #0a66c2;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #004182;
+        }
+        .question-box {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .question-box input[type="text"] {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Enter Your Job Details</h2>
+    <form th:action="@{/job/create}" th:object="${job}" method="post">
+
+        <label for="jobTitle">Job Title</label>
+        <input type="text" id="jobTitle" th:field="*{jobTitle}" placeholder="e.g. Java Developer" required>
+
+        <label for="company">Company Name</label>
+        <input type="text" id="company" th:field="*{company}" placeholder="e.g. Infosys" required>
+
+        <label for="jobLocation">Location</label>
+        <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India">
+
+        <label for="jobTypes">Job Type</label>
+        <select id="jobTypes" th:field="*{jobTypes}" required>
+            <option value="" disabled selected>Select job type</option>
+            <option th:each="type : ${T(com.org.linkedin.enums.JobType).values()}"
+                    th:value="${type}" th:text="${type}">Job Type</option>
+        </select>
+
+        <label for="jobWorkPlaceTypes">Workplace Type</label>
+        <select id="jobWorkPlaceTypes" th:field="*{jobWorkPlaceTypes}" required>
+            <option value="" disabled selected>Select workplace type</option>
+            <option th:each="type : ${T(com.org.linkedin.enums.WorkPlaceType).values()}"
+                    th:value="${type}" th:text="${type}">Workplace</option>
+        </select>
+
+        <label for="recruiterEmail">Recruiter Email</label>
+        <input type="email" id="recruiterEmail" th:field="*{recruiterEmail}" placeholder="e.g. hr@company.com">
+
+        <label for="jobDescription">Job Description</label>
+        <textarea id="jobDescription" th:field="*{jobDescription}" rows="8"
+                  placeholder="Describe the responsibilities, qualifications, etc."></textarea>
+
+        <label>Additional Questions</label>
+        <div th:each="q, stat : *{additionalQuestions}" class="question-box">
+            <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
+            <input type="text" th:field="*{additionalQuestions[__${stat.index}__].questionText}"
+                   placeholder="Enter a question">
+        </div>
+
+        <button type="submit" name="addQuestion">Add Question</button>
+        <button type="submit" name="submitJob">Continue</button>
+    </form>
+</div>
+</body>
+</html>
