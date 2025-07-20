@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface JobService {
 
-     Job createJob(Job job);
+    Job createJob(Job job);
 
-     Job getJobById(Long jobId);
+    Job getJobById(Long jobId);
 
-     Job editJobById(Long jobId);
+    Job editJobById(Long jobId);
 
     List<Job> getAllJobs();
 
