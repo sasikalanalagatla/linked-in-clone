@@ -5,104 +5,267 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background-color: #f4f2ee;
+            line-height: 1.33;
         }
         .navbar {
             display: flex;
             align-items: center;
             background-color: white;
-            padding: 10px 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0 24px;
+            height: 52px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.2);
             position: sticky;
             top: 0;
             z-index: 1000;
+            justify-content: space-between;
+        }
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .navbar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0a66c2;
-            margin-right: 20px;
+            height: 34px;
+            width: 34px;
         }
         .navbar input {
-            flex: 1;
-            padding: 8px 15px;
-            border-radius: 20px;
+            width: 280px;
+            padding: 6px 8px 6px 40px;
+            border-radius: 2px;
             border: 1px solid #ccc;
-            margin-right: 30px;
+            background-color: #eef3f8;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23666"><path d="M15.5 14l-4-4a6 6 0 10-1.5 1.5l4 4a1 1 0 001.5-1.5zM6 10a4 4 0 110-8 4 4 0 010 8z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            font-size: 14px;
+        }
+        .navbar input::placeholder {
+            color: #666;
         }
         .navbar .nav-items {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 0;
         }
         .navbar .nav-items a {
             text-decoration: none;
-            color: #555;
-            font-size: 14px;
+            color: #666;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-weight: 400;
+            padding: 6px 12px;
+            min-width: 80px;
+            text-align: center;
+            border-radius: 4px;
         }
         .navbar .nav-items a:hover {
             color: #0a66c2;
+            background-color: rgba(0,0,0,0.08);
+        }
+        .navbar .nav-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: cover;
         }
         .navbar .profile-pic {
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .container {
             display: flex;
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
+            max-width: 1128px;
+            margin: 24px auto 0;
+            padding: 0 24px;
+            gap: 24px;
         }
 
-        .sidebar, .main {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
         .sidebar {
-            flex: 1;
-            margin-right: 20px;
-            max-width: 220px;
+            flex: 0 0 225px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            height: fit-content;
         }
-        .main {
-            flex: 3;
+
+        .sidebar-header {
+            position: relative;
+            height: 54px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 0 0;
         }
-        .profile-name {
-            font-weight: bold;
+
+        .sidebar .profile-pic-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            object-fit: cover;
+        }
+
+        .sidebar-content {
+            padding: 36px 12px 16px;
             text-align: center;
-            margin: 10px 0;
         }
-        .post-box input {
-            width: 100%;
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #000;
+            margin-bottom: 4px;
+            line-height: 1.25;
+        }
+
+        .profile-headline {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .profile-stats {
+            border-top: 1px solid #e0e0e0;
             padding: 12px;
-            border: 1px solid lightgray;
-            border-radius: 25px;
-            margin-top: 10px;
+            text-align: left;
         }
-        .post-box h3 {
-            margin-bottom: 10px;
-        }
-        .post-card {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-        .post-card h4 {
-            margin: 0;
-        }
-        .post-card p {
-            color: #333;
-        }
-        .actions {
+
+        .stat-item {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
-            font-size: 14px;
+            font-size: 12px;
+            margin-bottom: 8px;
             color: #666;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .main {
+            flex: 1;
+            max-width: 540px;
+        }
+
+        .post-box {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .post-box h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .post-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #f3f2ef;
+        }
+
+        .post-input::placeholder {
+            color: #666;
+        }
+
+        .post-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .post-author-pic {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: #0a66c2;
+        }
+
+        .post-author-info h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .post-author-info p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .post-content {
+            font-size: 14px;
+            color: #000;
+            line-height: 1.5;
+            margin: 8px 0 12px 0;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 8px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #f3f2ef;
+        }
+
+        .right-sidebar {
+            flex: 0 0 300px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            height: fit-content;
+            padding: 16px;
+        }
+
+        .right-sidebar h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000;
         }
     </style>
 </head>
@@ -110,18 +273,35 @@
 
 <!-- Navbar -->
 <div class="navbar">
-    <div class="logo">LinkedIn</div>
-    <input type="text" placeholder="Search">
+    <div class="left-section">
+        <img class="logo" th:src="@{/logos/linkedin.svg}" alt="LinkedIn" style="height: 32px; width: auto;">
+        <input type="text" placeholder="Search">
+    </div>
     <div class="nav-items">
-        <a href="#" th:href="@{/home}">Home</a>
-        <a href="#" th:href="@{/network}">Network</a>
-        <a href="#" th:href="@{/job/feed}">Jobs</a>
-        <a href="#" th:href="@{/messaging}">Messaging</a>
-        <a href="#" th:href="@{/notifications}">Notifications</a>
+        <a href="#" th:href="@{/home}">
+            <img class="nav-icon" th:src="@{/logos/home.jpeg}" alt="Home">
+            Home
+        </a>
+        <a href="#" th:href="@{/network}">
+            <img class="nav-icon" th:src="@{/logos/network.jpeg}" alt="Network">
+            My Network
+        </a>
+        <a href="#" th:href="@{/job/feed}">
+            <img class="nav-icon" th:src="@{/logos/jobs.jpeg}" alt="Jobs">
+            Jobs
+        </a>
+        <a href="#" th:href="@{/messaging}">
+            <img class="nav-icon" th:src="@{/logos/messages.jpeg}" alt="Messaging">
+            Messaging
+        </a>
+        <a href="#" th:href="@{/notifications}">
+            <img class="nav-icon" th:src="@{/logos/notifications.jpeg}" alt="Notifications">
+            Notifications
+        </a>
         <a href="#" th:href="@{/profile}">
             <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile">
+            Me
         </a>
-        <a href="#" th:href="@{/job/add}">Add Jobs</a>
     </div>
 </div>
 
