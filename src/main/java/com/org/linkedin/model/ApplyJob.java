@@ -23,10 +23,16 @@ public class ApplyJob {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "job_id")
     private Job job;
+
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUserName() {

@@ -108,14 +108,13 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
     <div class="logo">LinkedIn</div>
     <input type="text" placeholder="Search">
     <div class="nav-items">
-        <a href="#" th:href="@{/home}">Home</a>
+        <a  th:href="@{'/'}">Home</a>
         <a href="#" th:href="@{/network}">Network</a>
-        <a href="#" th:href="@{/job/feed}">Jobs</a>
+        <a th:href="@{'/job/feed'}">Jobs</a>
         <a href="#" th:href="@{/messaging}">Messaging</a>
         <a href="#" th:href="@{/notifications}">Notifications</a>
         <a href="#" th:href="@{/profile}">
@@ -124,34 +123,6 @@
         <a href="#" th:href="@{/job/add}">Add Jobs</a>
     </div>
 </div>
-
-<!--<div class="container">-->
-<!--    <div class="sidebar">-->
-<!--        <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile" style="width:100%; border-radius: 10px;">-->
-<!--        <div class="profile-name" th:text="${user.name}">Sanjeet Kumar</div>-->
-<!--        <p style="text-align:center;" th:text="${user.headline}">Student at ..</p>-->
-<!--        <hr>-->
-<!--        <p>Profile viewers: <span th:text="${user.profileViews}">0</span></p>-->
-<!--        <p>Connections: <span th:text="${user.connectionCount}">0</span></p>-->
-<!--    </div>-->
-
-<!--    <div class="main">-->
-<!--        <div class="post-box">-->
-<!--            <h3>Start a post</h3>-->
-<!--            <input type="text" placeholder="What do you want to talk about?">-->
-<!--        </div>-->
-<!--        <div class="post-card" th:each="post : ${posts}">-->
-<!--            <h4 th:text="${post.author}">John Doe</h4>-->
-<!--            <p th:text="${post.content}">Sample post content goes here...</p>-->
-<!--            <div class="actions">-->
-<!--                <span>Like</span>-->
-<!--                <span>Comment</span>-->
-<!--                <span>Repost</span>-->
-<!--                <span>Send</span>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
 
 </body>
 </html>

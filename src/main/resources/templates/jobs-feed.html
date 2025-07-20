@@ -469,7 +469,7 @@
         </div>
 
         <div class="nav-items">
-            <a href="#" class="nav-item">
+            <a th:href="@{'/'}" class="nav-item">
                 <div class="nav-icon"></div>
                 Home
             </a>
@@ -477,7 +477,7 @@
                 <div class="nav-icon"></div>
                 My Network
             </a>
-            <a href="#" class="nav-item">
+            <a th:href="@{/job/feed}" class="nav-item">
                 <div class="nav-icon"></div>
                 Jobs
             </a>
@@ -508,11 +508,6 @@
             <div class="filter-pill">In my network</div>
         </div>
 
-        <!-- Results Header -->
-        <div class="job-results-header" th:if="${jobs != null and !jobs.isEmpty()}">
-            <span class="results-count" th:text="${totalElements + ' results'}">1,000+ results</span>
-        </div>
-
         <div class="job-list" th:if="${jobs != null and !jobs.isEmpty()}">
             <a th:each="job : ${jobs}"
                th:href="@{/job/feed(jobId=${job.id}, page=${currentPage}, keyword=${param.keyword})}"
@@ -522,7 +517,7 @@
                 <div class="job-header">
                     <div class="company-logo" th:text="${job.company.substring(0,1).toUpperCase()}">M</div>
                     <div class="job-info">
-                        <div class="job-title" th:text="${job.jobTitle}">Senior Software Engineer</div>
+                        <div class="job-title" th:text="${job.jobTitle}"> </div>
                         <div class="company-name" th:text="${job.company}">Microsoft</div>
                         <div class="job-location" th:text="${job.jobLocation}">Sikkim, India (Hybrid)</div>
                         <div class="job-meta">
@@ -541,7 +536,6 @@
                    th:classappend="${currentPage == 0} ? 'disabled'"
                    th:if="${currentPage > 0}">Previous</a>
 
-                <!-- Page Numbers -->
                 <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                           th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
                     <a th:href="@{/job/feed(page=${i}, keyword=${param.keyword})}"
@@ -550,7 +544,6 @@
                        th:text="${i + 1}">1</a>
                 </th:block>
 
-                <!-- Next Button -->
                 <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword})}"
                    class="page-btn"
                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
@@ -567,7 +560,13 @@
         <div class="job-details-header">
             <div class="company-logo-large" th:text="${selectedJob.company.substring(0,1).toUpperCase()}">M</div>
             <div class="job-details-info">
-                <h1 th:text="${selectedJob.jobTitle}">Senior Software Engineer</h1>
+                <h1 >
+                    <a th:href="@{'/job/get/' + ${selectedJob.id}}"
+                       th:text="${selectedJob.jobTitle}"
+                       style="color: inherit; text-decoration: none; cursor: pointer;">
+                        Senior Software Engineer
+                    </a>
+                </h1>
                 <div class="job-details-company" th:text="${selectedJob.company}">Microsoft</div>
                 <div class="job-details-location" th:text="${selectedJob.jobLocation}">Sikkim, India • 2 weeks ago</div>
             </div>

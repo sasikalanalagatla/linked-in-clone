@@ -8,14 +8,15 @@ import com.org.linkedin.repository.ApplyJobRepository;
 import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
+import com.org.linkedin.service.CloudinaryService;
 import com.org.linkedin.service.impl.JobServiceImpl;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,14 +28,16 @@ public class JobController {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final ApplyJobRepository applyJobRepository;
+    private final CloudinaryService cloudinaryService;
 
     public JobController(SkillRepository skillRepository, JobServiceImpl jobServiceImpl, JobRepository jobRepository,
-                         UserRepository userRepository, ApplyJobRepository applyJobRepository) {
+                         UserRepository userRepository, ApplyJobRepository applyJobRepository, CloudinaryService cloudinaryService) {
         this.skillRepository = skillRepository;
         this.jobServiceImpl = jobServiceImpl;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.applyJobRepository = applyJobRepository;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @GetMapping("/job/feed")
@@ -131,16 +134,26 @@ public class JobController {
 
     @PostMapping("/job/apply/{jobId}")
     public String submitApplyForm(@PathVariable Long jobId,
-                                  @ModelAttribute ApplyJob applyJob) {
-        Job job = jobServiceImpl.getJobById(jobId);
-        User user = userRepository.findByEmail(applyJob.getEmail());
+                                  @ModelAttribute ApplyJob applyJob,
+                                  @RequestParam("resumeFile") MultipartFile resumeFile) {
+        try {
+            Job job = jobServiceImpl.getJobById(jobId);
+            String resumeUrl = cloudinaryService.uploadFile(resumeFile);
+            applyJob.setResumeUrl(resumeUrl);
+            User user = userRepository.findByEmail(applyJob.getEmail());
+            applyJob.setUser(user);
 
-        applyJob.setUser(user);
-        applyJob.setJob(job);
-        applyJobRepository.save(applyJob);
+            applyJob.setJob(job);
+            applyJobRepository.save(applyJob);
 
-        return "redirect:/job/feed?jobId=" + jobId;
+            return "redirect:/job/feed?jobId=" + jobId;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/job/apply/" + jobId + "?error=true";
+        }
     }
+
 
     @PostMapping("/job/delete/{jobId}")
     public String deleteJobById(@PathVariable("jobId") Long jobId){
