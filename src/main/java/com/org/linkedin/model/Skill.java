@@ -1,8 +1,6 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 public class Skill {
@@ -12,6 +10,9 @@ public class Skill {
     private Long skillId;
 
     private String skillName;
+
+    public Skill() {
+    }
 
     public Long getSkillId() {
         return skillId;
