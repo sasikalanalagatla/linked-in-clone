@@ -1,9 +1,9 @@
 package com.org.linkedin.controller;
 
 import com.org.linkedin.model.Post;
-import com.org.linkedin.model.UserProfile;
+import com.org.linkedin.model.User;
 import com.org.linkedin.repository.PostRepository;
-import com.org.linkedin.repository.UserProfileRepository;
+import com.org.linkedin.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +17,7 @@ public class PostController {
     private PostRepository postRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserRepository userRepository;
 
     @GetMapping("/create")
     public String showCreatePostForm(Model model) {
@@ -28,8 +28,8 @@ public class PostController {
 
     @PostMapping("/create")
     public String createPost(@ModelAttribute("post") Post post) {
-        String dummyUserName = "sasikala"; // Simulate user
-        UserProfile user = userProfileRepository.findByFullName(dummyUserName);
+        String dummyUserName = "sasikala";
+        User user = userRepository.findByFullName(dummyUserName);
 
         if (user != null) {
             post.setAuthorName(user.getFullName());
@@ -60,7 +60,7 @@ public class PostController {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
 
         post.setPostDescription(updatedPost.getPostDescription());
-        post.setEdited(true); // mark as edited
+        post.setEdited(true);
 
         postRepository.save(post);
         return "redirect:/post/list";
