@@ -1,10 +1,6 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 public class Education {
@@ -25,6 +21,10 @@ public class Education {
     private String grade;
 
     private String extraCurricularActivity;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Long getEducationId() {
         return educationId;
@@ -88,5 +88,13 @@ public class Education {
 
     public void setExtraCurricularActivity(String extraCurricularActivity) {
         this.extraCurricularActivity = extraCurricularActivity;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
