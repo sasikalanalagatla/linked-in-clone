@@ -111,12 +111,7 @@ public class JobController {
         return "single-job";
     }
 
-    @GetMapping("/")
-    public String getHomePage(){
-        return "home-page";
-    }
-
-    @GetMapping("/job/apply/{jobId}")
+     @GetMapping("/job/apply/{jobId}")
     public String showApplyForm(@PathVariable Long jobId, Model model) {
         Job job = jobServiceImpl.getJobById(jobId);
         ApplyJob applyJob = new ApplyJob();

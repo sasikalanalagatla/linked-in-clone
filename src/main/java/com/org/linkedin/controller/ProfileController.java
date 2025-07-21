@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class ProfileController {
 
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
 
-    @Autowired
-    private EducationServiceImpl educationServiceImpl;
+    private final EducationServiceImpl educationServiceImpl;
+
+    public ProfileController(UserServiceImpl userService, EducationServiceImpl educationServiceImpl) {
+        this.userService = userService;
+        this.educationServiceImpl = educationServiceImpl;
+    }
 
     @GetMapping("/profile/{userId}")
     public String showProfile(@PathVariable("userId") Long userId,

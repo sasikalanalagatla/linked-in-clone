@@ -35,17 +35,15 @@
         }
 
         .logo {
-            background-color: #0a66c2;
-            color: white;
             width: 34px;
             height: 34px;
-            border-radius: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 20px;
             margin-right: 8px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .search-container {
@@ -99,7 +97,12 @@
             width: 24px;
             height: 24px;
             margin-bottom: 4px;
-            background-color: currentColor;
+        }
+
+        .nav-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .container {
@@ -331,7 +334,7 @@
             background-color: #004182;
         }
 
-        .save-button, .delete-button {
+        .save-button, .delete-button, .edit-button {
             background-color: transparent;
             color: #0a66c2;
             padding: 12px 24px;
@@ -455,7 +458,9 @@
 
 <div class="navbar">
     <div class="navbar-content">
-        <div class="logo">in</div>
+        <div class="logo">
+            <img th:src="@{/logos/linkedin.svg}" alt="LinkedIn" />
+        </div>
 
         <div class="search-container">
             <form th:action="@{/job/feed}" method="get" style="position: relative;">
@@ -470,27 +475,39 @@
 
         <div class="nav-items">
             <a th:href="@{'/'}" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/home.jpeg}" alt="Home" />
+                </div>
                 Home
             </a>
             <a href="#" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/network.jpeg}" alt="My Network" />
+                </div>
                 My Network
             </a>
             <a th:href="@{/job/feed}" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/jobs.jpeg}" alt="Jobs" />
+                </div>
                 Jobs
             </a>
             <a href="#" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/messages.jpeg}" alt="Messaging" />
+                </div>
                 Messaging
             </a>
             <a href="#" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/notifications.jpeg}" alt="Notifications" />
+                </div>
                 Notifications
             </a>
             <a th:href="@{/job/add}" class="nav-item">
-                <div class="nav-icon"></div>
+                <div class="nav-icon">
+                    <img th:src="@{/logos/jobs.jpeg}" alt="Add Jobs" />
+                </div>
                 Add Jobs
             </a>
         </div>
@@ -619,8 +636,6 @@
         </div>
     </div>
 </div>
-
-
 
 </body>
 </html>
