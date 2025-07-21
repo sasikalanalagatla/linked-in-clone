@@ -61,18 +61,69 @@
             border-radius: 30px;
             font-size: 14px;
         }
+        .action-buttons {
+            margin-left: auto;
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        .action-buttons a,
+        .action-buttons button {
+            background-color:#0a66c2;
+            color:white;
+            padding:6px 12px;
+            border-radius:4px;
+            font-size:14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
 
-    <div style="margin-left: auto; text-align: right;">
-        <a th:href="@{/profile/edit/{id}(id=${user.userId})}"
-           style="background-color:#0a66c2; color:white; padding:6px 12px; border-radius:4px; text-decoration:none; font-size:14px;">
-            ✏ Edit Profile
+
+    <div class="action-buttons">
+        <a th:href="@{/profile/edit/{id}(id=${user.userId})}">✏ Edit Profile</a>
+
+        <div th:if="${user.userId != 2}">
+            <form th:action="@{'/profile/' + ${user.userId} + '/follow'}" method="post">
+                <button type="submit"
+                        style="padding: 8px 16px; background-color: #0073b1; color: white;
+                         border: none; border-radius: 4px;">
+                    Follow
+                </button>
+            </form>
+        </div>
+
+
+        <a th:if="${user.userId == 2}" th:href="@{'/profile/' + ${user.userId} + '/followers'}">
+            👥 Followers (<span th:text="${user.followers.size()}">0</span>)
         </a>
+
+        <a th:if="${user.userId == 2}" th:href="@{'/profile/' + ${user.userId} + '/following'}">
+            ➕ Following (<span th:text="${user.following.size()}">0</span>)
+        </a>
+        <div th:if="${user.userId != 2}">
+            <form th:action="@{'/connect/' + ${user.userId}}" method="post">
+                <button type="submit"
+                        style="padding: 8px 16px; background-color: #0a66c2; color: white;
+                       border: none; border-radius: 4px; margin-top: 8px;">
+                    Connect
+                </button>
+            </form>
+        </div>
+
     </div>
+
+    <a th:href="@{/connections}">
+        <button style="padding: 8px 12px; background-color: #0a66c2; color: white; border: none; border-radius: 4px;">
+            All Connections
+        </button>
+    </a>
+
 
     <div class="profile-header">
         <img th:src="${user.profilePictureUrl}" alt="Profile Picture">
@@ -104,7 +155,7 @@
     <div class="section">
         <h2>Experience</h2>
         <div th:each="exp : ${user.experiences}" class="section-item">
-            <strong th:text="${exp.jobTitle}">Title</strong>
+            <strong th:text="${exp.title}">Title</strong>
             <p th:text="${exp.companyName}">Company</p>
             <p th:text="${exp.startDate} + ' - ' + ${exp.endDate}">Dates</p>
         </div>
@@ -113,7 +164,7 @@
     <div class="section">
         <h2>Projects</h2>
         <div th:each="project : ${user.projects}" class="section-item">
-            <strong th:text="${project.title}">Title</strong>
+            <strong th:text="${project.name}">Title</strong>
             <p th:text="${project.description}">Description</p>
         </div>
     </div>
@@ -121,9 +172,10 @@
     <div class="section">
         <h2>Skills</h2>
         <div class="skills">
-            <span th:each="skill : ${user.skills}" th:text="${skill.name}">Skill</span>
+            <span th:each="skill : ${user.skills}" th:text="${skill.skillName}">Skill</span>
         </div>
     </div>
+
 </div>
 
 </body>

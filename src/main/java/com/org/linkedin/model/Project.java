@@ -14,8 +14,20 @@ public class Project {
 
     private String description;
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @ManyToMany
     private List<Skill> skills;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     public Long getProjectId() {
         return projectId;

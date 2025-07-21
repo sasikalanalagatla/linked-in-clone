@@ -7,7 +7,6 @@
 
 <div style="background-color: white; width: 600px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); padding: 20px; position: relative;">
     <form th:action="@{/post/create}" method="post" th:object="${post}">
-        <!-- Header -->
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="font-weight: bold; font-size: 18px;" th:text="${authorName}">
                 Sasikala Nalagatla
@@ -15,11 +14,9 @@
             <a href="/" style="text-decoration: none; font-size: 20px; font-weight: bold; color: black;">&times;</a>
         </div>
 
-        <!-- Textarea for jobDescription -->
         <textarea th:field="*{postDescription}" placeholder="What do you want to talk about?"
                   style="width: 100%; margin-top: 20px; border: none; outline: none; resize: none; font-size: 16px; height: 150px;"></textarea>
 
-        <!-- Bottom Icons -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
             <div>
                 <label style="margin-right: 10px; font-size: 20px; cursor: pointer;">😀</label>

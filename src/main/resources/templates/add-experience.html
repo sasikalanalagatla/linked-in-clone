@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Experience</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 32px;
+            width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #2c3e50;
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        input, textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .btn-submit {
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background-color: #084c91;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Add Experience</h2>
+    <form th:action="@{'/add/experience/' + 2}" th:object="${experience}" method="post">
+        <div>
+            <label>Company Name</label>
+            <input type="text" th:field="*{companyName}" required>
+        </div>
+        <div>
+            <label>Title</label>
+            <input type="text" th:field="*{title}" required>
+        </div>
+        <div>
+            <label>Location</label>
+            <input type="text" th:field="*{location}">
+        </div>
+        <div>
+            <label>Start Date</label>
+            <input type="date" th:field="*{startDate}">
+        </div>
+        <div>
+            <label>End Date</label>
+            <input type="date" th:field="*{endDate}">
+        </div>
+        <div>
+            <label>Description</label>
+            <textarea th:field="*{description}" rows="3"></textarea>
+        </div>
+        <button class="btn-submit" type="submit">Save</button>
+    </form>
+</div>
+</body>
+</html>

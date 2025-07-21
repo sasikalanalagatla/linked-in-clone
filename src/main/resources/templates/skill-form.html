@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add/Edit Skill</title>
+</head>
+<body>
+<h2 th:text="${skill.skillId != null ? 'Edit Skill' : 'Add Skill'}"></h2>
+<form th:action="@{/skills/save}" th:object="${skill}" method="post">
+    <input type="hidden" th:field="*{skillId}" />
+    <label>Skill Name:</label>
+    <input type="text" th:field="*{skillName}" required />
+    <button type="submit" th:text="${skill.skillId != null ? 'Update' : 'Add'}"></button>
+</form>
+<a href="/profile">Back to Profile</a>
+</body>
+</html>

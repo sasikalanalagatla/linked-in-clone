@@ -7,20 +7,16 @@
 
 <div style="background-color: white; width: 600px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); padding: 20px; position: relative;">
 
-    <!-- Form to update the post -->
     <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="post" th:object="${post}">
 
-        <!-- Header with Author Name -->
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="font-weight: bold; font-size: 18px;" th:text="${authorName}">Author Name</div>
             <a href="/" style="text-decoration: none; font-size: 20px; font-weight: bold; color: black;">&times;</a>
         </div>
 
-        <!-- Post Description Text Area -->
         <textarea th:field="*{postDescription}" placeholder="Edit your post"
                   style="width: 100%; margin-top: 20px; border: none; outline: none; resize: none; font-size: 16px; height: 150px;"></textarea>
 
-        <!-- Action Buttons -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
             <div>
                 <label style="margin-right: 10px; font-size: 20px; cursor: pointer;">😀</label>

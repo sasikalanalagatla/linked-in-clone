@@ -271,7 +271,6 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
     <div class="left-section">
         <img class="logo" th:src="@{/logos/linkedin.svg}" alt="LinkedIn" style="height: 32px; width: auto;">
@@ -298,40 +297,13 @@
             <img class="nav-icon" th:src="@{/logos/notifications.jpeg}" alt="Notifications">
             Notifications
         </a>
-        <a href="#" th:href="@{/profile}">
+        <a href="#" th:href="@{'/profile/' +2}">
             <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile">
             Me
         </a>
     </div>
 </div>
 
-<!--<div class="container">-->
-<!--    <div class="sidebar">-->
-<!--        <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile" style="width:100%; border-radius: 10px;">-->
-<!--        <div class="profile-name" th:text="${user.name}">Sanjeet Kumar</div>-->
-<!--        <p style="text-align:center;" th:text="${user.headline}">Student at ..</p>-->
-<!--        <hr>-->
-<!--        <p>Profile viewers: <span th:text="${user.profileViews}">0</span></p>-->
-<!--        <p>Connections: <span th:text="${user.connectionCount}">0</span></p>-->
-<!--    </div>-->
-
-<!--    <div class="main">-->
-<!--        <div class="post-box">-->
-<!--            <h3>Start a post</h3>-->
-<!--            <input type="text" placeholder="What do you want to talk about?">-->
-<!--        </div>-->
-<!--        <div class="post-card" th:each="post : ${posts}">-->
-<!--            <h4 th:text="${post.author}">John Doe</h4>-->
-<!--            <p th:text="${post.content}">Sample post content goes here...</p>-->
-<!--            <div class="actions">-->
-<!--                <span>Like</span>-->
-<!--                <span>Comment</span>-->
-<!--                <span>Repost</span>-->
-<!--                <span>Send</span>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
 
 </body>
 </html>
