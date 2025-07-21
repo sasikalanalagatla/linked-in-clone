@@ -3,106 +3,428 @@
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f2ee;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f3f2ef;
+            line-height: 1.33;
+            color: #000000e6;
+        }
+
+        /* Updated Navbar Styles */
         .navbar {
             display: flex;
             align-items: center;
-            background-color: white;
-            padding: 10px 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+            padding: 0;
+            height: 52px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
             z-index: 1000;
+            border-bottom: 1px solid #00000017;
         }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            max-width: 1128px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            justify-content: space-between;
+        }
+
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .navbar .logo {
-            font-size: 24px;
+            height: 34px;
+            width: 34px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0a66c2;
+            border-radius: 2px;
+        }
+
+        .navbar .logo-text {
+            color: white;
             font-weight: bold;
-            color: #0a66c2;
-            margin-right: 20px;
+            font-size: 16px;
         }
-        .navbar input {
-            flex: 1;
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
-            margin-right: 30px;
+
+        .search-container {
+            position: relative;
+            width: 280px;
         }
+
+        .search-input {
+            width: 100%;
+            padding: 6px 8px 6px 40px;
+            border-radius: 4px;
+            border: none;
+            background-color: #edf3f8;
+            font-size: 14px;
+            height: 34px;
+        }
+
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #666;
+        }
+
         .navbar .nav-items {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 0;
         }
-        .navbar .nav-items a {
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 12px;
             text-decoration: none;
-            color: #555;
-            font-size: 14px;
+            color: #666;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: color 0.2s;
+            min-width: 80px;
+            position: relative;
         }
-        .navbar .nav-items a:hover {
-            color: #0a66c2;
+
+        .nav-item:hover {
+            color: #000;
         }
-        .navbar .profile-pic {
-            width: 30px;
-            height: 30px;
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
+            background-color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .nav-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .profile-nav {
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 2px;
+        }
+
+        .work-divider {
+            height: 24px;
+            width: 1px;
+            background-color: #00000017;
+            margin: 0 12px;
+        }
+
+        .premium-link {
+            color: #915907;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 8px;
+        }
+
+        /* Container and Layout */
+        .container {
+            display: flex;
+            max-width: 1128px;
+            margin: 24px auto 0;
+            padding: 0 24px;
+            gap: 24px;
+            min-height: calc(100vh - 90px);
+        }
+
+        .sidebar {
+            flex: 0 0 225px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #00000017;
+            height: fit-content;
+        }
+
+        .sidebar-header {
+            position: relative;
+            height: 54px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .sidebar .profile-pic-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid white;
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             object-fit: cover;
         }
 
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
+        .sidebar-content {
+            padding: 36px 12px 16px;
+            text-align: center;
         }
 
-        .sidebar, .main {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .sidebar {
-            flex: 1;
-            margin-right: 20px;
-            max-width: 220px;
-        }
-        .main {
-            flex: 3;
-        }
         .profile-name {
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
+            font-weight: 600;
+            font-size: 16px;
+            color: #000;
+            margin-bottom: 4px;
+            line-height: 1.25;
         }
-        .post-box input {
-            width: 100%;
+
+        .profile-headline {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .profile-stats {
+            border-top: 1px solid #00000017;
             padding: 12px;
-            border: 1px solid lightgray;
-            border-radius: 25px;
-            margin-top: 10px;
+            text-align: left;
         }
-        .post-box h3 {
-            margin-bottom: 10px;
-        }
-        .post-card {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
-        }
-        .post-card h4 {
-            margin: 0;
-        }
-        .post-card p {
-            color: #333;
-        }
-        .actions {
+
+        .stat-item {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
-            font-size: 14px;
+            font-size: 12px;
+            margin-bottom: 8px;
             color: #666;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .main {
+            flex: 1;
+            max-width: 540px;
+        }
+
+        .post-box {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #00000017;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .post-box h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .post-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #f3f2ef;
+        }
+
+        .post-input::placeholder {
+            color: #666;
+        }
+
+        .post-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #00000017;
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .post-author-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .post-author-pic {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .post-author-info h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .post-author-info p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .post-action-link {
+            color: #0A66C2;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .post-action-link:hover {
+            background-color: #f3f2ef;
+        }
+
+        .post-action-link.delete {
+            color: #cc1016;
+        }
+
+        .post-content {
+            font-size: 14px;
+            color: #000;
+            line-height: 1.5;
+            margin: 8px 0 12px 0;
+            white-space: pre-wrap;
+        }
+
+        .post-timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #00000017;
+            padding-top: 8px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: #f3f2ef;
+        }
+
+        .right-sidebar {
+            flex: 0 0 300px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #00000017;
+            height: fit-content;
+            padding: 24px;
+        }
+
+        .right-sidebar h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .no-posts {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 16px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #00000017;
+            margin-bottom: 8px;
+        }
+
+        .posts-container {
+            margin-top: 8px;
         }
     </style>
 </head>
@@ -110,48 +432,184 @@
 
 <!-- Navbar -->
 <div class="navbar">
-    <div class="logo">LinkedIn</div>
-    <input type="text" placeholder="Search">
-    <div class="nav-items">
-        <a href="#" th:href="@{/home}">Home</a>
-        <a href="#" th:href="@{/network}">Network</a>
-        <a href="#" th:href="@{/job/feed}">Jobs</a>
-        <a href="#" th:href="@{/messaging}">Messaging</a>
-        <a href="#" th:href="@{/notifications}">Notifications</a>
-        <a href="#" th:href="@{/profile}">
-            <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile">
-        </a>
-        <a href="#" th:href="@{/job/add}">Add Jobs</a>
+    <div class="navbar-container">
+        <div class="left-section">
+            <div class="logo">
+                <span class="logo-text">in</span>
+            </div>
+            <div class="search-container">
+                <form th:action="@{/job/feed}" method="get" style="position: relative;">
+                    <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                    <input type="text" name="keyword" class="search-input" placeholder="Search" th:value="${param.keyword}">
+                </form>
+            </div>
+        </div>
+
+        <div class="nav-items">
+            <a href="#" th:href="@{/home}" class="nav-item active">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
+                    </svg>
+                </div>
+                Home
+            </a>
+            <a href="#" th:href="@{/network}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                    </svg>
+                </div>
+                My Network
+            </a>
+            <a href="#" th:href="@{/job/feed}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                    </svg>
+                </div>
+                Jobs
+            </a>
+            <a href="#" th:href="@{/messaging}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
+                    </svg>
+                </div>
+                Messaging
+            </a>
+            <a href="#" th:href="@{/notifications}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22a2.02 2.02 0 002-2H10a2.02 2.02 0 002 2zm7-7.5V9c0-3.07-1.64-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 3.36 7 5.92 7 9v5.5l-2 2V18h14v-1.5l-2-2z"></path>
+                    </svg>
+                </div>
+                Notifications
+            </a>
+            <a href="#" th:href="@{/profile}" class="nav-item profile-nav">
+                <div class="profile-pic"></div>
+                Me
+            </a>
+
+            <div class="work-divider"></div>
+
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+                    </svg>
+                </div>
+                Work
+            </a>
+
+            <a href="#" class="premium-link">Try Premium for free</a>
+        </div>
     </div>
 </div>
 
-<!--<div class="container">-->
-<!--    <div class="sidebar">-->
-<!--        <img class="profile-pic" th:src="@{/images/profile.jpg}" alt="Profile" style="width:100%; border-radius: 10px;">-->
-<!--        <div class="profile-name" th:text="${user.name}">Sanjeet Kumar</div>-->
-<!--        <p style="text-align:center;" th:text="${user.headline}">Student at ..</p>-->
-<!--        <hr>-->
-<!--        <p>Profile viewers: <span th:text="${user.profileViews}">0</span></p>-->
-<!--        <p>Connections: <span th:text="${user.connectionCount}">0</span></p>-->
-<!--    </div>-->
+<!-- Main Content -->
+<div class="container">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="profile-pic-large"></div>
+        </div>
+        <div class="sidebar-content">
+            <div class="profile-name">Sanjeet Kumar</div>
+            <div class="profile-headline">Student at ..</div>
+        </div>
+        <div class="profile-stats">
+            <div class="stat-item">
+                <span>Profile viewers</span>
+                <span>0</span>
+            </div>
+            <div class="stat-item">
+                <span>Connections</span>
+                <span>0</span>
+            </div>
+        </div>
+    </div>
 
-<!--    <div class="main">-->
-<!--        <div class="post-box">-->
-<!--            <h3>Start a post</h3>-->
-<!--            <input type="text" placeholder="What do you want to talk about?">-->
-<!--        </div>-->
-<!--        <div class="post-card" th:each="post : ${posts}">-->
-<!--            <h4 th:text="${post.author}">John Doe</h4>-->
-<!--            <p th:text="${post.content}">Sample post content goes here...</p>-->
-<!--            <div class="actions">-->
-<!--                <span>Like</span>-->
-<!--                <span>Comment</span>-->
-<!--                <span>Repost</span>-->
-<!--                <span>Send</span>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
+    <!-- Main Feed -->
+    <div class="main">
+        <!-- Create Post Box -->
+        <div class="post-box">
+            <h3>Start a post</h3>
+            <a href="/post/create" style="text-decoration: none; display: block;">
+                <input type="text" class="post-input" placeholder="What do you want to talk about?" readonly style="cursor: pointer;">
+            </a>
+        </div>
+
+        <!-- Posts Container -->
+        <div class="posts-container">
+            <!-- No Posts Message -->
+            <div th:if="${posts == null || posts.size() == 0}" class="no-posts">
+                <p>No posts available yet. Be the first to share something!</p>
+            </div>
+
+            <!-- Dynamic Posts -->
+            <div th:each="post : ${posts}" class="post-card">
+                <div class="post-header">
+                    <div class="post-author-section">
+                        <div class="post-author-pic" th:text="${authorName != null ? #strings.substring(authorName, 0, 1) : 'U'}"></div>
+                        <div class="post-author-info">
+                            <h4 th:text="${authorName != null ? authorName : 'Anonymous User'}">Author Name</h4>
+                            <p>Professional • 1st</p>
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <a th:href="@{/post/edit/{id}(id=${post.postId})}" class="post-action-link">Edit</a>
+                        <a th:href="@{/post/delete/{id}(id=${post.postId})}" class="post-action-link delete">Delete</a>
+                    </div>
+                </div>
+
+                <div class="post-timestamp" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">
+                    21 Jan 2025 • 10:30
+                </div>
+
+                <div class="post-content" th:text="${post.postDescription}">
+                    Post content will appear here...
+                </div>
+
+                <div class="actions">
+                    <div class="action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.46 11l-3.91-3.91a7 7 0 01-1.69-2.74l-.49-1.47A2.76 2.76 0 0010.76 1 2.75 2.75 0 008 3.74v1.12a9 9 0 01-.46 2.85L7.05 9H4.76A2.76 2.76 0 002 11.76a2.75 2.75 0 002.74 2.74H7.5"/>
+                        </svg>
+                        Like
+                    </div>
+                    <div class="action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 9h10v1H7zM7 12h7v1H7zM7 15h8v1H7z"/>
+                            <path d="M19 3H5a2 2 0 00-2 2v10a2 2 0 002 2h11l3 3V5a2 2 0 00-2-2z"/>
+                        </svg>
+                        Comment
+                    </div>
+                    <div class="action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 7a1 1 0 00-1-1h-8l-.94-2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7z"/>
+                        </svg>
+                        Repost
+                    </div>
+                    <div class="action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 3L0 10l7.66 4.26L16 8l-6.26 8.34L14 24l7-21z"/>
+                        </svg>
+                        Send
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+        <h3>LinkedIn News</h3>
+        <p>Trending topics and updates</p>
+    </div>
+</div>
 
 </body>
 </html>

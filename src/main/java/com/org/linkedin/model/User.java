@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,14 +21,45 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    private String profilePictureUrl;
+
+    private String fullName;
+
+    private String additionalName;
+
+    private String pronouns;
+
+    private String headline;
+
+    private String industry;
+
+    private String location;
+
+    private String city;
+
+    private Long phoneNumber;
+
+    private String birthday;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Education> educations = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Experience> experiences;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Project> projects;
+
+    @ManyToMany
+    private List<Skill> skills;
+
+    private String about;
+
     @OneToMany(mappedBy = "user")
     private List<ApplyJob> appliedJobs;
 
     @OneToMany(mappedBy = "user")
     private List<Job> jobs;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    private UserProfile userProfile;
 
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
@@ -83,14 +115,6 @@ public class User {
         this.jobs = jobs;
     }
 
-    public UserProfile getUserProfile() {
-        return userProfile;
-    }
-
-    public void setUserProfile(UserProfile userProfile) {
-        this.userProfile = userProfile;
-    }
-
     public List<Comment> getComments() {
         return comments;
     }
@@ -113,5 +137,125 @@ public class User {
 
     public void setFollowers(List<User> followers) {
         this.followers = followers;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
+    }
+
+    public List<Experience> getExperiences() {
+        return experiences;
+    }
+
+    public void setExperiences(List<Experience> experiences) {
+        this.experiences = experiences;
+    }
+
+    public List<Education> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<Education> educations) {
+        this.educations = educations;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public Long getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(Long phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+
+    public String getHeadline() {
+        return headline;
+    }
+
+    public void setHeadline(String headline) {
+        this.headline = headline;
+    }
+
+    public String getAdditionalName() {
+        return additionalName;
+    }
+
+    public void setAdditionalName(String additionalName) {
+        this.additionalName = additionalName;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPronouns() {
+        return pronouns;
+    }
+
+    public void setPronouns(String pronouns) {
+        this.pronouns = pronouns;
     }
 }

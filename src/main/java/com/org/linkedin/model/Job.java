@@ -56,8 +56,20 @@ public class Job {
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<AdditionalQuestion> additionalQuestions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ApplyJob> applyJobList = new ArrayList<>();
+
+
     public Long getId() {
         return id;
+    }
+
+    public List<ApplyJob> getApplyJobList() {
+        return applyJobList;
+    }
+
+    public void setApplyJobList(List<ApplyJob> applyJobList) {
+        this.applyJobList = applyJobList;
     }
 
     public void setId(Long id) {
