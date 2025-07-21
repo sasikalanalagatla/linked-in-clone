@@ -69,6 +69,6 @@ public class PostController {
     @GetMapping("/delete/{id}")
     public String deletePost(@PathVariable Long id) {
         postRepository.deleteById(id);
-        return "redirect:/post/list";
+        return "redirect:/";
     }
 }
