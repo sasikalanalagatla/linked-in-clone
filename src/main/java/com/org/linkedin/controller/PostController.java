@@ -67,7 +67,7 @@ public class PostController {
     @GetMapping("/")
     public String getPostFeed(Model model) {
         List<Post> posts = postRepository.findAll();
-        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
+        User dummyUser = userRepository.findByFullName("sasikala");
         List<User> connections = connectionRequestService.getConnections(dummyUser);
         Integer totalConnection = connections.size();
         Map<Long, Boolean> postUserLikes = new HashMap<>();
@@ -114,7 +114,7 @@ public class PostController {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
+        User dummyUser = userRepository.findByFullName("sasikala");
         if (dummyUser == null) {
             throw new RuntimeException("Dummy user 'sasikala' not found");
         }
