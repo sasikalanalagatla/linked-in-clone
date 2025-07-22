@@ -764,7 +764,7 @@
             color: #000;
             border-color: #000;
         }
-        /* Reaction Picker Styles */
+
 .action-btn-container {
     position: relative;
     flex: 1;
@@ -843,7 +843,6 @@
     }
 }
 
-/* Updated styles for post actions */
 .post-engagement {
     display: flex;
     justify-content: space-between;
@@ -943,7 +942,8 @@
             </div>
             <div class="search-container">
                 <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0
+                    1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                 </svg>
                 <input type="text" class="search-input" placeholder="Search">
             </div>
@@ -961,7 +961,8 @@
             <a href="#" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5
+                        3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
                     </svg>
                 </div>
                 My Network
@@ -969,7 +970,8 @@
             <a href="#" th:href="@{/job/feed}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0
+                         011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
                     </svg>
                 </div>
                 Jobs
@@ -1014,11 +1016,14 @@
 <div class="container">
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="profile-pic-large"></div>
+            <div class="profile-pic-large">
+                <img th:src="${user.profilePictureUrl}" alt="Profile Picture"
+                     style="width:70px; height:70px; border-radius: 50%;">
+            </div>
         </div>
         <div class="sidebar-content">
-            <div class="profile-name">John Doe</div>
-            <div class="profile-headline">Software Engineer at Tech Corp</div>
+            <div class="profile-name" th:text="${user.fullName}">John Doe</div>
+            <div class="profile-headline" th:text="${user.headline}">Software Engineer at Tech Corp</div>
         </div>
         <div class="profile-stats">
             <div class="stat-item">
@@ -1027,7 +1032,7 @@
             </div>
             <div class="stat-item">
                 <span>Connections</span>
-                <span>500</span>
+                <span th:text="${totalConnection}">500</span>
             </div>
         </div>
     </div>
@@ -1042,7 +1047,8 @@
             </div>
         </div>
 
-        <div th:if="${not #lists.isEmpty(posts)}" class="posts-container">
+        <div class="posts-container" id="postsContainer">
+            <!-- Initial posts will be loaded here by Thymeleaf -->
             <div th:each="post : ${posts}" class="post-card">
                 <div class="post-header">
                     <div class="post-author-section">
@@ -1058,6 +1064,11 @@
                 </div>
                 <div class="post-content">
                     <p th:text="${post.postDescription}">Post content</p>
+
+                    <div th:if="${post.imageUrl != null}">
+                        <img th:src="${post.imageUrl}" alt="Post Image"
+                             style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
+                    </div>
                 </div>
                 <div class="post-engagement">
                     <span th:text="${post.totalReactions + ' reactions'}">0 reactions</span>
@@ -1084,10 +1095,19 @@
             </div>
         </div>
 
+        <div class="loading-indicator" id="loadingIndicator" style="display: none; text-align: center; padding: 20px;">
+            <p>Loading more posts...</p>
+        </div>
+
+        <div class="no-more-posts" id="noMorePosts" style="display: none; text-align: center; padding: 20px;">
+            <p>You've reached the end of posts!</p>
+        </div>
+
         <div th:if="${#lists.isEmpty(posts)}" class="no-posts">
             <p>No posts to display. Be the first to post something!</p>
         </div>
     </div>
+
     <div class="right-sidebar">
         <h3>LinkedIn News</h3>
         <p>Latest updates from your network</p>
@@ -1102,7 +1122,12 @@
         </div>
     </div>
 </div>
+
 <script>
+    let currentPage = 1;
+    let loading = false;
+    let hasMorePosts = true;
+
     function reactToPost(postId, reactionType) {
         fetch('/post/react/' + postId + '?type=' + reactionType, {
             method: 'POST',
@@ -1112,7 +1137,7 @@
         })
         .then(response => {
             if (response.ok) {
-                location.reload(); // Refresh to show updated reactions
+                location.reload();
             }
         })
         .catch(error => console.error('Error:', error));
@@ -1121,6 +1146,150 @@
     function openPostModal() {
         window.location.href = '/post/create';
     }
+
+    function loadMorePosts() {
+        if (loading || !hasMorePosts) return;
+
+        loading = true;
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        fetch(`/posts/load-more?page=${currentPage}&size=10`)
+            .then(response => response.json())
+            .then(data => {
+                loading = false;
+                document.getElementById('loadingIndicator').style.display = 'none';
+
+                if (data.posts && data.posts.length > 0) {
+                    appendPosts(data.posts);
+                    currentPage++;
+
+                    if (data.posts.length < 10 || data.isLastPage) {
+                        hasMorePosts = false;
+                        document.getElementById('noMorePosts').style.display = 'block';
+                    }
+                } else {
+                    hasMorePosts = false;
+                    document.getElementById('noMorePosts').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading more posts:', error);
+                loading = false;
+                document.getElementById('loadingIndicator').style.display = 'none';
+            });
+    }
+
+    function appendPosts(posts) {
+        const postsContainer = document.getElementById('postsContainer');
+
+        posts.forEach(post => {
+            const postCard = createPostCard(post);
+            postsContainer.appendChild(postCard);
+        });
+        observePosts();
+    }
+
+    function createPostCard(post) {
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+
+        const createdAtFormatted = new Date(post.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).replace(',', ' •');
+
+        postCard.innerHTML = `
+            <div class="post-header">
+                <div class="post-author-section">
+                    <div class="post-author-pic">${post.authorName.charAt(0)}</div>
+                    <div class="post-author-info">
+                        <h4>${post.authorName}</h4>
+                        <p>Posted on ${createdAtFormatted}</p>
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn">⋯</button>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>${post.postDescription}</p>
+                ${post.imageUrl ? `
+                    <div>
+                        <img src="${post.imageUrl}" alt="Post Image"
+                             style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
+                    </div>
+                ` : ''}
+            </div>
+            <div class="post-engagement">
+                <span>${post.totalReactions} reactions</span>
+                <span>0 comments</span>
+            </div>
+            <div class="post-actions-bar">
+                <button class="action-btn" onclick="reactToPost(${post.postId}, 'LIKE')">
+                    <span class="action-icon">👍</span>
+                    <span>Like</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">💬</span>
+                    <span>Comment</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">↻</span>
+                    <span>Repost</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">✉️</span>
+                    <span>Send</span>
+                </button>
+            </div>
+        `;
+
+        return postCard;
+    }
+    let postsInCurrentBatch = 0;
+    let totalPostsViewed = 0;
+    const POSTS_PER_BATCH = 10;
+    const TRIGGER_AT_POST = 6; // Load more when 6th post in current batch is viewed
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('viewed')) {
+                entry.target.classList.add('viewed');
+                totalPostsViewed++;
+
+                const currentBatchPosition = ((totalPostsViewed - 1) % POSTS_PER_BATCH) + 1;
+
+                console.log(`Post viewed: ${totalPostsViewed} (Position in batch: ${currentBatchPosition})`);
+
+                if (currentBatchPosition === TRIGGER_AT_POST) {
+                    console.log(`Reached ${TRIGGER_AT_POST}th post in batch, loading more...`);
+                    loadMorePosts();
+                }
+            }
+        });
+    }, {
+        threshold: 0.5,
+        rootMargin: '0px 0px -20px 0px'
+    });
+    function observePosts() {
+        const posts = document.querySelectorAll('#postsContainer .post-card:not(.observed)');
+        posts.forEach(post => {
+            post.classList.add('observed');
+            observer.observe(post);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialPosts = document.querySelectorAll('#postsContainer .post-card').length;
+        if (initialPosts > 0) {
+            currentPage = Math.ceil(initialPosts / 10) + 1;
+            postsInCurrentBatch = initialPosts % POSTS_PER_BATCH || POSTS_PER_BATCH;
+        }
+
+        setTimeout(observePosts, 500);
+    });
 </script>
 </body>
 </html>

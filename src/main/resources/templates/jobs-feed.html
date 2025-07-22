@@ -465,7 +465,8 @@
         <div class="search-container">
             <form th:action="@{/job/feed}" method="get" style="position: relative;">
                 <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0
+                    1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                 </svg>
                 <input type="text" name="keyword" class="search-input"
                        placeholder="Search jobs or skills..."
@@ -517,13 +518,21 @@
 <div class="container">
     <div class="left-panel">
         <div class="job-filters">
-            <div class="filter-pill active">Jobs</div>
-            <div class="filter-pill">Date posted</div>
-            <div class="filter-pill">Company</div>
-            <div class="filter-pill">Easy Apply</div>
-            <div class="filter-pill">Under 10 applicants</div>
-            <div class="filter-pill">In my network</div>
+            <a th:href="@{/job/feed(range='past 24 hours', keyword=${keyword},page =0)}"
+               th:classappend="${range == 'past 24 hours'} ? 'active' : ''"
+               class="filter-pill">Past 24 Hours</a>
+
+            <a th:href="@{/job/feed(range='past 7 days', keyword=${keyword}, page = 0)}"
+               th:classappend="${range == 'past 7 days'} ? 'active' : ''"
+               class="filter-pill">Past 7 Days</a>
+
+            <a th:href="@{/job/feed(range='past 30 days', keyword=${keyword}, page = 0)}"
+               th:classappend="${range == 'past 30 days'} ? 'active' : ''"
+               class="filter-pill">Past 30 Days</a>
+
         </div>
+
+
 
         <div class="job-list" th:if="${jobs != null and !jobs.isEmpty()}">
             <a th:each="job : ${jobs}"
@@ -547,21 +556,20 @@
 
         <div class="pagination-container" th:if="${jobs != null and !jobs.isEmpty() and totalPages > 1}">
             <div class="pagination">
-                <!-- Previous Button -->
-                <a th:href="@{/job/feed(page=${currentPage - 1}, keyword=${param.keyword})}"
+                <a th:href="@{/job/feed(page=${currentPage - 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
                    class="page-btn"
                    th:classappend="${currentPage == 0} ? 'disabled'"
                    th:if="${currentPage > 0}">Previous</a>
 
                 <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                           th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
-                    <a th:href="@{/job/feed(page=${i}, keyword=${param.keyword})}"
+                    <a th:href="@{/job/feed(page=${i}, keyword=${param.keyword}, range=${range})}"
                        class="page-btn"
                        th:classappend="${i == currentPage} ? 'active'"
                        th:text="${i + 1}">1</a>
                 </th:block>
 
-                <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword})}"
+                <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
                    class="page-btn"
                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
                    th:if="${currentPage < totalPages - 1}">Next</a>
@@ -570,7 +578,7 @@
             <div class="pagination-info">
                 Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">10</span>
             </div>
-        </div>
+    </div>
     </div>
 
     <div class="right-panel" th:if="${selectedJob != null}">

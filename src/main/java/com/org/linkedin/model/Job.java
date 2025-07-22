@@ -24,6 +24,7 @@ public class Job {
     @Column(nullable = false)
     private String company;
 
+    @Column(columnDefinition = "TEXT")
     private String jobDescription;
 
     private String jobLocation;

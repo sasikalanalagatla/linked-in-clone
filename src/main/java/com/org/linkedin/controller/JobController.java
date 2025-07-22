@@ -8,16 +8,18 @@ import com.org.linkedin.repository.ApplyJobRepository;
 import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
-import com.org.linkedin.service.CloudinaryService;
+import com.org.linkedin.service.impl.CloudinaryService;
 import com.org.linkedin.service.impl.JobServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -42,16 +44,30 @@ public class JobController {
 
     @GetMapping("/job/feed")
     public String jobFeed(@RequestParam(value = "keyword", required = false) String keyword,
+                          @RequestParam(value = "range", required = false) String range,
                           @RequestParam(value = "jobId", required = false) Long jobId,
                           @RequestParam(value = "page", defaultValue = "0") int page,
                           @RequestParam(value = "size", defaultValue = "5") int size,
                           Model model) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("jobCreatedAt").descending());
         Page<Job> jobPage;
 
-        if (keyword != null && !keyword.isEmpty()) {
+        LocalDateTime createdAfter = null;
+        if ("past 24 hours".equalsIgnoreCase(range)) {
+            createdAfter = LocalDateTime.now().minusHours(24);
+        } else if ("past 7 days".equalsIgnoreCase(range)) {
+            createdAfter = LocalDateTime.now().minusDays(7);
+        } else if ("past 30 days".equalsIgnoreCase(range)) {
+            createdAfter = LocalDateTime.now().minusDays(30);
+        }
+
+        if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
+            jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
             jobPage = jobServiceImpl.searchJobs(keyword, pageable);
+        } else if (createdAfter != null) {
+            jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
         } else {
             jobPage = jobServiceImpl.getAllJobs(pageable);
         }
@@ -59,6 +75,7 @@ public class JobController {
         List<Job> jobs = jobPage.getContent();
         model.addAttribute("jobs", jobs);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("range", range);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", jobPage.getTotalPages());
         model.addAttribute("size", size);
@@ -71,9 +88,10 @@ public class JobController {
         }
 
         model.addAttribute("selectedJob", selectedJob);
-
         return "jobs-feed";
     }
+
+
 
     @PostMapping("/job/create")
     public String createPost(@ModelAttribute("job") Job job,
