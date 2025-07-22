@@ -44,14 +44,19 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Education> educations = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Experience> experiences;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Experience> experiences = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Project> projects;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Project> projects = new ArrayList<>();
 
     @ManyToMany
-    private List<Skill> skills;
+    @JoinTable(
+            name = "user_skills",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private List<Skill> skills = new ArrayList<>();
 
     private String about;
 

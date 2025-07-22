@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Followers</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f2ef;
+            padding: 30px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.15);
+        }
+        h2 {
+            color: #0a66c2;
+            margin-bottom: 20px;
+        }
+        .follower {
+            padding: 12px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .follower:last-child {
+            border-bottom: none;
+        }
+        .follower-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .follower-headline {
+            color: #666;
+            font-size: 14px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 14px;
+            background: #0a66c2;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 th:text="'Followers of '">Followers</h2>
+
+    <div th:if="${followers.isEmpty()}">
+        <p>No followers yet.</p>
+    </div>
+
+    <div th:each="follower : ${followers}" class="follower">
+        <div class="follower-name" th:text="${follower.fullName}">Follower Name</div>
+        <div class="follower-headline" th:text="${follower.headline}">Headline</div>
+    </div>
+
+    <a class="back-link" th:href="@{'/profile/' + 2}">← Back to Profile</a>
+</div>
+</body>
+</html>

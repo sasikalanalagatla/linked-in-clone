@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Controller
 public class ProfileController {
 
@@ -25,7 +27,7 @@ public class ProfileController {
     @GetMapping("/profile/{userId}")
     public String showProfile(@PathVariable("userId") Long userId,
                               Model model) {
-        User user = userService.getUserById(2l);
+        User user = userService.getUserById(userId);
         model.addAttribute("user", user);
         String email = user.getEmail();
         model.addAttribute("email",email);

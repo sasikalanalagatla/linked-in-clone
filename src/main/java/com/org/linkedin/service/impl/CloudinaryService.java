@@ -1,4 +1,4 @@
-package com.org.linkedin.service;
+package com.org.linkedin.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

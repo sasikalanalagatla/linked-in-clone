@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
@@ -16,7 +16,7 @@
             color: #000000e6;
         }
 
-        /* Updated Navbar Styles */
+        /* Navbar Styles */
         .navbar {
             display: flex;
             align-items: center;
@@ -370,6 +370,91 @@
             margin-bottom: 12px;
         }
 
+        /* Reaction Counts Display */
+        .reaction-counts {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 12px;
+            color: #666;
+            min-height: 20px;
+        }
+
+        .reaction-summary {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reaction-icons {
+            display: flex;
+            align-items: center;
+            gap: -2px;
+        }
+
+        .reaction-emoji {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 1px solid white;
+            margin-left: -2px;
+        }
+
+        .reaction-emoji:first-child {
+            margin-left: 0;
+        }
+
+        .reaction-emoji.like {
+            background: #0073b1;
+            color: white;
+        }
+
+        .reaction-emoji.love {
+            background: #df704d;
+            color: white;
+        }
+
+        .reaction-emoji.celebrate {
+            background: #6dae4f;
+            color: white;
+        }
+
+        .reaction-emoji.insightful {
+            background: #f5c75d;
+            color: white;
+        }
+
+        .reaction-emoji.curious {
+            background: #f09199;
+            color: white;
+        }
+
+        .reaction-emoji.support {
+            background: #8b5a9f;
+            color: white;
+        }
+
+        .reaction-count {
+            margin-left: 4px;
+            cursor: pointer;
+        }
+
+        .reaction-count:hover {
+            text-decoration: underline;
+        }
+
+        .post-stats {
+            margin-left: auto;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Actions Bar */
         .actions {
             display: flex;
             justify-content: space-around;
@@ -387,13 +472,147 @@
             font-weight: 600;
             cursor: pointer;
             border-radius: 4px;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             flex: 1;
             justify-content: center;
+            position: relative;
+            border: none;
+            background: none;
         }
 
         .action-btn:hover {
             background-color: #f3f2ef;
+        }
+
+        .action-btn.reacted {
+            color: #0073b1;
+            font-weight: 700;
+        }
+
+        .action-btn.reacted.like {
+            color: #0073b1;
+        }
+
+        .action-btn.reacted.love {
+            color: #df704d;
+        }
+
+        .action-btn.reacted.celebrate {
+            color: #6dae4f;
+        }
+
+        .action-btn.reacted.insightful {
+            color: #f5c75d;
+        }
+
+        .action-btn.reacted.curious {
+            color: #f09199;
+        }
+
+        .action-btn.reacted.support {
+            color: #8b5a9f;
+        }
+
+        /* Reaction Picker */
+        .reaction-picker {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 8px 12px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            z-index: 100;
+            border: 1px solid #00000017;
+        }
+
+        .reaction-picker.show {
+            display: flex;
+            animation: fadeInUp 0.2s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .reaction-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .reaction-option:hover {
+            transform: scale(1.2);
+        }
+
+        .reaction-option::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: white;
+            white-space: nowrap;
+            background: rgba(0,0,0,0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .reaction-option:hover::after {
+            opacity: 1;
+        }
+
+        .reaction-option.like {
+            background: #0073b1;
+            color: white;
+        }
+
+        .reaction-option.love {
+            background: #df704d;
+            color: white;
+        }
+
+        .reaction-option.celebrate {
+            background: #6dae4f;
+            color: white;
+        }
+
+        .reaction-option.insightful {
+            background: #f5c75d;
+            color: #333;
+        }
+
+        .reaction-option.curious {
+            background: #f09199;
+            color: white;
+        }
+
+        .reaction-option.support {
+            background: #8b5a9f;
+            color: white;
         }
 
         .right-sidebar {
@@ -426,11 +645,295 @@
         .posts-container {
             margin-top: 8px;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .reaction-picker {
+                transform: translateX(-20px);
+                left: 20px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 24px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 552px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #00000017;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close {
+            color: #666;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-post-input {
+            width: 100%;
+            min-height: 200px;
+            border: none;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            padding: 12px;
+            line-height: 1.5;
+        }
+
+        .modal-post-input:focus {
+            outline: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #00000017;
+        }
+
+        .post-btn {
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .post-btn:hover:not(:disabled) {
+            background-color: #004182;
+        }
+
+        .post-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .cancel-btn {
+            background: none;
+            color: #666;
+            border: 1px solid #666;
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cancel-btn:hover {
+            background-color: #f3f2ef;
+            color: #000;
+            border-color: #000;
+        }
+
+.action-btn-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.reaction-picker {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 8px 12px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    z-index: 100;
+    border: 1px solid #00000017;
+}
+
+.reaction-picker.show {
+    display: flex;
+    animation: fadeInUp 0.2s ease-out;
+}
+
+.reaction-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.reaction-option:hover {
+    transform: scale(1.2);
+}
+
+.reaction-option::after {
+    content: attr(data-type);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: white;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.8);
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.reaction-option:hover::after {
+    opacity: 1;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.post-engagement {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 12px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.post-actions-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.post-actions-bar .action-btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    color: #666;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.post-actions-bar .action-btn:hover {
+    background-color: #f3f2ef;
+}
+
+.post-actions-bar .action-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Updated post input container */
+.post-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.profile-pic-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin-right: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.post-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.post-option-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.post-option-btn:hover {
+    background-color: #f3f2ef;
+}
+
+.option-icon {
+    margin-right: 8px;
+    font-size: 16px;
+}
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
     <div class="navbar-container">
         <div class="left-section">
@@ -438,17 +941,16 @@
                 <span class="logo-text">in</span>
             </div>
             <div class="search-container">
-                <form th:action="@{/job/feed}" method="get" style="position: relative;">
-                    <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                    </svg>
-                    <input type="text" name="keyword" class="search-input" placeholder="Search" th:value="${param.keyword}">
-                </form>
+                <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0
+                    1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search">
             </div>
         </div>
 
         <div class="nav-items">
-            <a href="#" th:href="@{/home}" class="nav-item active">
+            <a href="#" class="nav-item active">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
@@ -456,10 +958,11 @@
                 </div>
                 Home
             </a>
-            <a href="#" th:href="@{/network}" class="nav-item">
+            <a href="#" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5
+                        3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
                     </svg>
                 </div>
                 My Network
@@ -467,12 +970,13 @@
             <a href="#" th:href="@{/job/feed}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0
+                         011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
                     </svg>
                 </div>
                 Jobs
             </a>
-            <a href="#" th:href="@{/messaging}" class="nav-item">
+            <a href="#" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -480,7 +984,7 @@
                 </div>
                 Messaging
             </a>
-            <a href="#" th:href="@{/notifications}" class="nav-item">
+            <a href="#" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 22a2.02 2.02 0 002-2H10a2.02 2.02 0 002 2zm7-7.5V9c0-3.07-1.64-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 3.36 7 5.92 7 9v5.5l-2 2V18h14v-1.5l-2-2z"></path>
@@ -488,7 +992,7 @@
                 </div>
                 Notifications
             </a>
-            <a href="#" th:href="@{/profile}" class="nav-item profile-nav">
+            <a href="#" th:href="@{'/profile/'+1}"  class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
             </a>
@@ -509,107 +1013,283 @@
     </div>
 </div>
 
-<!-- Main Content -->
 <div class="container">
-    <!-- Left Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="profile-pic-large"></div>
+            <div class="profile-pic-large">
+                <img th:src="${user.profilePictureUrl}" alt="Profile Picture"
+                     style="width:70px; height:70px; border-radius: 50%;">
+            </div>
         </div>
         <div class="sidebar-content">
-            <div class="profile-name">Sanjeet Kumar</div>
-            <div class="profile-headline">Student at ..</div>
+            <div class="profile-name" th:text="${user.fullName}">John Doe</div>
+            <div class="profile-headline" th:text="${user.headline}">Software Engineer at Tech Corp</div>
         </div>
         <div class="profile-stats">
             <div class="stat-item">
                 <span>Profile viewers</span>
-                <span>0</span>
+                <span>150</span>
             </div>
             <div class="stat-item">
                 <span>Connections</span>
-                <span>0</span>
+                <span th:text="${totalConnection}">500</span>
             </div>
         </div>
     </div>
 
-    <!-- Main Feed -->
     <div class="main">
-        <!-- Create Post Box -->
         <div class="post-box">
             <h3>Start a post</h3>
-            <a href="/post/create" style="text-decoration: none; display: block;">
-                <input type="text" class="post-input" placeholder="What do you want to talk about?" readonly style="cursor: pointer;">
-            </a>
+            <div class="post-input-container">
+                <div class="profile-pic-small">J</div>
+                <input type="text" class="post-input" placeholder="What do you want to talk about?"
+                       onclick="openPostModal()" readonly>
+            </div>
         </div>
 
-        <!-- Posts Container -->
-        <div class="posts-container">
-            <!-- No Posts Message -->
-            <div th:if="${posts == null || posts.size() == 0}" class="no-posts">
-                <p>No posts available yet. Be the first to share something!</p>
-            </div>
-
-            <!-- Dynamic Posts -->
+        <div class="posts-container" id="postsContainer">
+            <!-- Initial posts will be loaded here by Thymeleaf -->
             <div th:each="post : ${posts}" class="post-card">
                 <div class="post-header">
                     <div class="post-author-section">
-                        <div class="post-author-pic" th:text="${authorName != null ? #strings.substring(authorName, 0, 1) : 'U'}"></div>
+                        <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
                         <div class="post-author-info">
-                            <h4 th:text="${authorName != null ? authorName : 'Anonymous User'}">Author Name</h4>
-                            <p>Professional • 1st</p>
+                            <h4 th:text="${post.authorName}">Author Name</h4>
+                            <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
                         </div>
                     </div>
                     <div class="post-actions">
-                        <a th:href="@{/post/edit/{id}(id=${post.postId})}" class="post-action-link">Edit</a>
-                        <a th:href="@{/post/delete/{id}(id=${post.postId})}" class="post-action-link delete">Delete</a>
+                        <button class="post-action-btn">⋯</button>
                     </div>
                 </div>
+                <div class="post-content">
+                    <p th:text="${post.postDescription}">Post content</p>
 
-                <div class="post-timestamp" th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">
-                    21 Jan 2025 • 10:30
+                    <div th:if="${post.imageUrl != null}">
+                        <img th:src="${post.imageUrl}" alt="Post Image"
+                             style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
+                    </div>
                 </div>
-
-                <div class="post-content" th:text="${post.postDescription}">
-                    Post content will appear here...
+                <div class="post-engagement">
+                    <span th:text="${post.totalReactions + ' reactions'}">0 reactions</span>
+                    <span>0 comments</span>
                 </div>
-
-                <div class="actions">
-                    <div class="action-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19.46 11l-3.91-3.91a7 7 0 01-1.69-2.74l-.49-1.47A2.76 2.76 0 0010.76 1 2.75 2.75 0 008 3.74v1.12a9 9 0 01-.46 2.85L7.05 9H4.76A2.76 2.76 0 002 11.76a2.75 2.75 0 002.74 2.74H7.5"/>
-                        </svg>
-                        Like
-                    </div>
-                    <div class="action-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 9h10v1H7zM7 12h7v1H7zM7 15h8v1H7z"/>
-                            <path d="M19 3H5a2 2 0 00-2 2v10a2 2 0 002 2h11l3 3V5a2 2 0 00-2-2z"/>
-                        </svg>
-                        Comment
-                    </div>
-                    <div class="action-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 7a1 1 0 00-1-1h-8l-.94-2H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V7z"/>
-                        </svg>
-                        Repost
-                    </div>
-                    <div class="action-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M21 3L0 10l7.66 4.26L16 8l-6.26 8.34L14 24l7-21z"/>
-                        </svg>
-                        Send
-                    </div>
+                <div class="post-actions-bar">
+                    <button class="action-btn" th:onclick="'reactToPost(' + ${post.postId} + ', \'LIKE\')'">
+                        <span class="action-icon">👍</span>
+                        <span>Like</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="action-icon">💬</span>
+                        <span>Comment</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="action-icon">↻</span>
+                        <span>Repost</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="action-icon">✉️</span>
+                        <span>Send</span>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div class="loading-indicator" id="loadingIndicator" style="display: none; text-align: center; padding: 20px;">
+            <p>Loading more posts...</p>
+        </div>
+
+        <div class="no-more-posts" id="noMorePosts" style="display: none; text-align: center; padding: 20px;">
+            <p>You've reached the end of posts!</p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(posts)}" class="no-posts">
+            <p>No posts to display. Be the first to post something!</p>
+        </div>
     </div>
 
-    <!-- Right Sidebar -->
     <div class="right-sidebar">
         <h3>LinkedIn News</h3>
-        <p>Trending topics and updates</p>
+        <p>Latest updates from your network</p>
+
+        <div class="news-item">
+            <h4>Tech industry growing rapidly</h4>
+            <p>2h ago • 5,234 readers</p>
+        </div>
+        <div class="news-item">
+            <h4>New remote work trends emerging</h4>
+            <p>4h ago • 3,891 readers</p>
+        </div>
     </div>
 </div>
 
+<script>
+    let currentPage = 1;
+    let loading = false;
+    let hasMorePosts = true;
+
+    function reactToPost(postId, reactionType) {
+        fetch('/post/react/' + postId + '?type=' + reactionType, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function openPostModal() {
+        window.location.href = '/post/create';
+    }
+
+    function loadMorePosts() {
+        if (loading || !hasMorePosts) return;
+
+        loading = true;
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        fetch(`/posts/load-more?page=${currentPage}&size=10`)
+            .then(response => response.json())
+            .then(data => {
+                loading = false;
+                document.getElementById('loadingIndicator').style.display = 'none';
+
+                if (data.posts && data.posts.length > 0) {
+                    appendPosts(data.posts);
+                    currentPage++;
+
+                    if (data.posts.length < 10 || data.isLastPage) {
+                        hasMorePosts = false;
+                        document.getElementById('noMorePosts').style.display = 'block';
+                    }
+                } else {
+                    hasMorePosts = false;
+                    document.getElementById('noMorePosts').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading more posts:', error);
+                loading = false;
+                document.getElementById('loadingIndicator').style.display = 'none';
+            });
+    }
+
+    function appendPosts(posts) {
+        const postsContainer = document.getElementById('postsContainer');
+
+        posts.forEach(post => {
+            const postCard = createPostCard(post);
+            postsContainer.appendChild(postCard);
+        });
+        observePosts();
+    }
+
+    function createPostCard(post) {
+        const postCard = document.createElement('div');
+        postCard.className = 'post-card';
+
+        const createdAtFormatted = new Date(post.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).replace(',', ' •');
+
+        postCard.innerHTML = `
+            <div class="post-header">
+                <div class="post-author-section">
+                    <div class="post-author-pic">${post.authorName.charAt(0)}</div>
+                    <div class="post-author-info">
+                        <h4>${post.authorName}</h4>
+                        <p>Posted on ${createdAtFormatted}</p>
+                    </div>
+                </div>
+                <div class="post-actions">
+                    <button class="post-action-btn">⋯</button>
+                </div>
+            </div>
+            <div class="post-content">
+                <p>${post.postDescription}</p>
+                ${post.imageUrl ? `
+                    <div>
+                        <img src="${post.imageUrl}" alt="Post Image"
+                             style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
+                    </div>
+                ` : ''}
+            </div>
+            <div class="post-engagement">
+                <span>${post.totalReactions} reactions</span>
+                <span>0 comments</span>
+            </div>
+            <div class="post-actions-bar">
+                <button class="action-btn" onclick="reactToPost(${post.postId}, 'LIKE')">
+                    <span class="action-icon">👍</span>
+                    <span>Like</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">💬</span>
+                    <span>Comment</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">↻</span>
+                    <span>Repost</span>
+                </button>
+                <button class="action-btn">
+                    <span class="action-icon">✉️</span>
+                    <span>Send</span>
+                </button>
+            </div>
+        `;
+
+        return postCard;
+    }
+    let postsInCurrentBatch = 0;
+    let totalPostsViewed = 0;
+    const POSTS_PER_BATCH = 10;
+    const TRIGGER_AT_POST = 6; // Load more when 6th post in current batch is viewed
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('viewed')) {
+                entry.target.classList.add('viewed');
+                totalPostsViewed++;
+
+                const currentBatchPosition = ((totalPostsViewed - 1) % POSTS_PER_BATCH) + 1;
+
+                console.log(`Post viewed: ${totalPostsViewed} (Position in batch: ${currentBatchPosition})`);
+
+                if (currentBatchPosition === TRIGGER_AT_POST) {
+                    console.log(`Reached ${TRIGGER_AT_POST}th post in batch, loading more...`);
+                    loadMorePosts();
+                }
+            }
+        });
+    }, {
+        threshold: 0.5,
+        rootMargin: '0px 0px -20px 0px'
+    });
+    function observePosts() {
+        const posts = document.querySelectorAll('#postsContainer .post-card:not(.observed)');
+        posts.forEach(post => {
+            post.classList.add('observed');
+            observer.observe(post);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const initialPosts = document.querySelectorAll('#postsContainer .post-card').length;
+        if (initialPosts > 0) {
+            currentPage = Math.ceil(initialPosts / 10) + 1;
+            postsInCurrentBatch = initialPosts % POSTS_PER_BATCH || POSTS_PER_BATCH;
+        }
+
+        setTimeout(observePosts, 500);
+    });
+</script>
 </body>
 </html>

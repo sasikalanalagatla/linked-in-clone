@@ -2,6 +2,9 @@ package com.org.linkedin.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Skill {
 
@@ -10,6 +13,17 @@ public class Skill {
     private Long skillId;
 
     private String skillName;
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    @ManyToMany(mappedBy = "skills")
+    private List<User> users = new ArrayList<>();
 
     public Skill() {
     }

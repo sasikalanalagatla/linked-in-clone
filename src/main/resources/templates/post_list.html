@@ -13,10 +13,9 @@
 
 <div th:each="post : ${posts}" style="background-color: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; margin: 20px auto; width: 60%;">
 
-    <!-- Post Header -->
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h3 th:text="${authorName}" style="margin: 0; color: #333;"></h3>
+            <h3 th:text="${post.authorName}" style="margin: 0; color: #333;"></h3>
             <small th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}"></small>
         </div>
         <div>
@@ -25,8 +24,16 @@
         </div>
     </div>
 
-    <!-- Post Description -->
     <p th:text="${post.postDescription}" style="margin-top: 15px; font-size: 16px; color: #444;"></p>
+
+    <div style="margin-top: 10px;">
+        <strong>Total Reactions:</strong>
+        <span th:text="${post.totalReactions}">0</span>
+    </div>
+
+    <form th:action="@{'/post/react/' + ${post.postId}}" method="post" style="margin-top: 10px;">
+        <button type="submit" name="type" value="LIKE">👍 Like</button>
+    </form>
 
 </div>
 

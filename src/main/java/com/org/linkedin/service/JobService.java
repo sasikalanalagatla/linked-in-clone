@@ -16,6 +16,7 @@ public interface JobService {
 
     List<Job> getAllJobs();
 
+
     String deleteJobById(Long jobId);
 
     Page<Job> getAllJobs(Pageable pageable);
@@ -23,4 +24,6 @@ public interface JobService {
     void updateJob(Job job);
 
     Page<Job> searchJobs(String keyword, Pageable pageable);
+
+
 }

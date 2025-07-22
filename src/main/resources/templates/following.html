@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="Following">Following</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .following-user {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+<h2>Following</h2>
+
+<div th:if="${following.isEmpty()}">
+    <p>You are not following anyone yet.</p>
+</div>
+
+<div th:each="followee : ${following}" class="following-user">
+    <p th:text="${followee.fullName}">Full Name</p>
+</div>
+</body>
+</html>

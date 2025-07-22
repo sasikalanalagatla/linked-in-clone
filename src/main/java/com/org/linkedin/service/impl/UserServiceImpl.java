@@ -37,4 +37,21 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(existingUser);
     }
 
+    @Override
+    public void followUser(Long followerId, Long followeeId) {
+        if (followerId.equals(followeeId)) return;
+
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new IllegalArgumentException("Follower not found"));
+
+        User followee = userRepository.findById(followeeId)
+                .orElseThrow(() -> new IllegalArgumentException("User to follow not found"));
+
+        if (!followee.getFollowers().contains(follower)) {
+            followee.getFollowers().add(follower);
+            userRepository.save(followee);
+        }
+    }
+
+
 }
