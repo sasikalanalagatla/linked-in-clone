@@ -60,140 +60,54 @@ public class Job {
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ApplyJob> applyJobList = new ArrayList<>();
 
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getJobTitle() { return jobTitle; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
 
-    public List<ApplyJob> getApplyJobList() {
-        return applyJobList;
-    }
+    public String getJobDescription() { return jobDescription; }
+    public void setJobDescription(String jobDescription) { this.jobDescription = jobDescription; }
 
-    public void setApplyJobList(List<ApplyJob> applyJobList) {
-        this.applyJobList = applyJobList;
-    }
+    public String getCompany() { return company; }
+    public void setCompany(String company) { this.company = company; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getJobLocation() { return jobLocation; }
+    public void setJobLocation(String jobLocation) { this.jobLocation = jobLocation; }
 
-    public String getJobTitle() {
-        return jobTitle;
-    }
+    public WorkPlaceType getJobWorkPlaceTypes() { return jobWorkPlaceTypes; }
+    public void setJobWorkPlaceTypes(WorkPlaceType jobWorkPlaceTypes) { this.jobWorkPlaceTypes = jobWorkPlaceTypes; }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
+    public JobType getJobTypes() { return jobTypes; }
+    public void setJobTypes(JobType jobTypes) { this.jobTypes = jobTypes; }
 
-    public String getJobDescription() {
-        return jobDescription;
-    }
+    public LocalDateTime getJobCreatedAt() { return jobCreatedAt; }
+    public void setJobCreatedAt(LocalDateTime jobCreatedAt) { this.jobCreatedAt = jobCreatedAt; }
 
-    public void setJobDescription(String jobDescription) {
-        this.jobDescription = jobDescription;
-    }
+    public String getRecruiterEmail() { return recruiterEmail; }
+    public void setRecruiterEmail(String recruiterEmail) { this.recruiterEmail = recruiterEmail; }
 
-    public String getCompany() {
-        return company;
-    }
+    public boolean isJobPostEdited() { return isJobPostEdited; }
+    public void setJobPostEdited(boolean jobPostEdited) { isJobPostEdited = jobPostEdited; }
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
+    public Long getApplicationsCount() { return applicationsCount; }
+    public void setApplicationsCount(Long applicationsCount) { this.applicationsCount = applicationsCount; }
 
-    public String getJobLocation() {
-        return jobLocation;
-    }
+    public String getExperienceLevel() { return experienceLevel; }
+    public void setExperienceLevel(String experienceLevel) { this.experienceLevel = experienceLevel; }
 
-    public void setJobLocation(String jobLocation) {
-        this.jobLocation = jobLocation;
-    }
+    public Long getCompanyId() { return companyId; }
+    public void setCompanyId(Long companyId) { this.companyId = companyId; }
 
-    public WorkPlaceType getJobWorkPlaceTypes() {
-        return jobWorkPlaceTypes;
-    }
+    public List<Skill> getRequiredSkills() { return requiredSkills; }
+    public void setRequiredSkills(List<Skill> requiredSkills) { this.requiredSkills = requiredSkills; }
 
-    public void setJobWorkPlaceTypes(WorkPlaceType jobWorkPlaceTypes) {
-        this.jobWorkPlaceTypes = jobWorkPlaceTypes;
-    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
-    public JobType getJobTypes() {
-        return jobTypes;
-    }
+    public List<AdditionalQuestion> getAdditionalQuestions() { return additionalQuestions; }
+    public void setAdditionalQuestions(List<AdditionalQuestion> additionalQuestions) { this.additionalQuestions = additionalQuestions; }
 
-    public void setJobTypes(JobType jobTypes) {
-        this.jobTypes = jobTypes;
-    }
-
-    public LocalDateTime getJobCreatedAt() {
-        return jobCreatedAt;
-    }
-
-    public void setJobCreatedAt(LocalDateTime jobCreatedAt) {
-        this.jobCreatedAt = jobCreatedAt;
-    }
-
-    public String getRecruiterEmail() {
-        return recruiterEmail;
-    }
-
-    public void setRecruiterEmail(String recruiterEmail) {
-        this.recruiterEmail = recruiterEmail;
-    }
-
-    public boolean isJobPostEdited() {
-        return isJobPostEdited;
-    }
-
-    public void setJobPostEdited(boolean jobPostEdited) {
-        isJobPostEdited = jobPostEdited;
-    }
-
-    public Long getApplicationsCount() {
-        return applicationsCount;
-    }
-
-    public void setApplicationsCount(Long applicationsCount) {
-        this.applicationsCount = applicationsCount;
-    }
-
-    public String getExperienceLevel() {
-        return experienceLevel;
-    }
-
-    public void setExperienceLevel(String experienceLevel) {
-        this.experienceLevel = experienceLevel;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public List<Skill> getRequiredSkills() {
-        return requiredSkills;
-    }
-
-    public void setRequiredSkills(List<Skill> requiredSkills) {
-        this.requiredSkills = requiredSkills;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public List<AdditionalQuestion> getAdditionalQuestions() {
-        return additionalQuestions;
-    }
-
-    public void setAdditionalQuestions(List<AdditionalQuestion> additionalQuestions) {
-        this.additionalQuestions = additionalQuestions;
-    }
+    public List<ApplyJob> getApplyJobList() { return applyJobList; }
+    public void setApplyJobList(List<ApplyJob> applyJobList) { this.applyJobList = applyJobList; }
 }

@@ -1,18 +1,118 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Project</title>
+    <meta charset="UTF-8">
+    <title th:text="${project.projectId} ? 'Edit Project' : 'Add New Project'">Add Project</title>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #1f2937;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background-color: #4f46e5;
+            color: #ffffff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        .delete-button {
+            background-color: #dc2626;
+            margin-left: 8px;
+        }
+        .delete-button:hover {
+            background-color: #b91c1c;
+        }
+        .error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 <body>
-<h2>Add Project</h2>
-<form th:action="@{'/add/project/' + ${userId}}" method="post" th:object="${project}">
-    <label>Name:</label>
-    <input type="text" th:field="*{name}" required><br>
-
-    <label>Description:</label>
-    <textarea th:field="*{description}"></textarea><br>
-
-    <button type="submit">Save</button>
-</form>
+<div class="container">
+    <h1 th:text="${project.projectId} ? 'Edit Project' : 'Add New Project'">Add Project</h1>
+    <form th:action="${project.projectId} ? @{/edit/project/{userId}/{projectId}(userId=${userId},projectId=${project.projectId})} : @{/add/project/{userId}(userId=${userId})}"
+          th:object="${project}" method="post" class="form-container">
+        <div th:if="${#fields.hasErrors('global')}" th:errors="*{global}" class="error"></div>
+        <div class="form-group">
+            <label for="name">Project Title</label>
+            <input type="text" id="name" th:field="*{name}" required>
+            <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></div>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}" required></textarea>
+            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
+        </div>
+        <div class="form-group">
+            <label for="skillsString">Skills (comma-separated)</label>
+            <input type="text" id="skillsString" name="skillsString" th:value="${skillsString != null} ? ${skillsString} : ''" placeholder="e.g., Java,Python,SQL" required>
+            <div th:if="${#fields.hasErrors('skills')}" th:errors="*{skills}" class="error"></div>
+        </div>
+        <input type="hidden" name="userId" th:value="${userId}">
+        <button type="submit" th:text="${project.projectId} ? 'Update Project' : 'Save Project'">Submit</button>
+        <form th:if="${project.projectId}"
+              th:action="@{/delete/project/{userId}/{projectId}(userId=${userId},projectId=${project.projectId})}"
+              method="post" style="display:inline;">
+            <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this project?')">Delete Project</button>
+        </form>
+    </form>
+</div>
 </body>
 </html>

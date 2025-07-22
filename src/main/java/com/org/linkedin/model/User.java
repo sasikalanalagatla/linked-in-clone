@@ -15,7 +15,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(unique = true , nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -58,6 +58,9 @@ public class User {
     )
     private List<Skill> skills = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Certification> certifications = new ArrayList<>();
+
     private String about;
 
     @OneToMany(mappedBy = "user")
@@ -80,187 +83,75 @@ public class User {
     @ManyToMany(mappedBy = "following")
     private List<User> followers;
 
-    public Long getUserId() {
-        return userId;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public List<ApplyJob> getAppliedJobs() { return appliedJobs; }
+    public void setAppliedJobs(List<ApplyJob> appliedJobs) { this.appliedJobs = appliedJobs; }
 
-    public String getPassword() {
-        return password;
-    }
+    public List<Job> getJobs() { return jobs; }
+    public void setJobs(List<Job> jobs) { this.jobs = jobs; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public List<Comment> getComments() { return comments; }
+    public void setComments(List<Comment> comments) { this.comments = comments; }
 
-    public List<ApplyJob> getAppliedJobs() {
-        return appliedJobs;
-    }
+    public List<User> getFollowing() { return following; }
+    public void setFollowing(List<User> following) { this.following = following; }
 
-    public void setAppliedJobs(List<ApplyJob> appliedJobs) {
-        this.appliedJobs = appliedJobs;
-    }
+    public List<User> getFollowers() { return followers; }
+    public void setFollowers(List<User> followers) { this.followers = followers; }
 
-    public List<Job> getJobs() {
-        return jobs;
-    }
+    public String getProfilePictureUrl() { return profilePictureUrl; }
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
-    }
+    public String getAbout() { return about; }
+    public void setAbout(String about) { this.about = about; }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
+    public List<Skill> getSkills() { return skills; }
+    public void setSkills(List<Skill> skills) { this.skills = skills; }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
+    public List<Project> getProjects() { return projects; }
+    public void setProjects(List<Project> projects) { this.projects = projects; }
 
-    public List<User> getFollowing() {
-        return following;
-    }
+    public List<Experience> getExperiences() { return experiences; }
+    public void setExperiences(List<Experience> experiences) { this.experiences = experiences; }
 
-    public void setFollowing(List<User> following) {
-        this.following = following;
-    }
+    public List<Education> getEducations() { return educations; }
+    public void setEducations(List<Education> educations) { this.educations = educations; }
 
-    public List<User> getFollowers() {
-        return followers;
-    }
+    public List<Certification> getCertifications() { return certifications; }
+    public void setCertifications(List<Certification> certifications) { this.certifications = certifications; }
 
-    public void setFollowers(List<User> followers) {
-        this.followers = followers;
-    }
+    public String getBirthday() { return birthday; }
+    public void setBirthday(String birthday) { this.birthday = birthday; }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
+    public Long getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(Long phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
 
-    public String getAbout() {
-        return about;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setAbout(String about) {
-        this.about = about;
-    }
+    public String getIndustry() { return industry; }
+    public void setIndustry(String industry) { this.industry = industry; }
 
-    public List<Skill> getSkills() {
-        return skills;
-    }
+    public String getHeadline() { return headline; }
+    public void setHeadline(String headline) { this.headline = headline; }
 
-    public void setSkills(List<Skill> skills) {
-        this.skills = skills;
-    }
+    public String getAdditionalName() { return additionalName; }
+    public void setAdditionalName(String additionalName) { this.additionalName = additionalName; }
 
-    public List<Project> getProjects() {
-        return projects;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public void setProjects(List<Project> projects) {
-        this.projects = projects;
-    }
-
-    public List<Experience> getExperiences() {
-        return experiences;
-    }
-
-    public void setExperiences(List<Experience> experiences) {
-        this.experiences = experiences;
-    }
-
-    public List<Education> getEducations() {
-        return educations;
-    }
-
-    public void setEducations(List<Education> educations) {
-        this.educations = educations;
-    }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
-
-    public Long getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(Long phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getIndustry() {
-        return industry;
-    }
-
-    public void setIndustry(String industry) {
-        this.industry = industry;
-    }
-
-    public String getHeadline() {
-        return headline;
-    }
-
-    public void setHeadline(String headline) {
-        this.headline = headline;
-    }
-
-    public String getAdditionalName() {
-        return additionalName;
-    }
-
-    public void setAdditionalName(String additionalName) {
-        this.additionalName = additionalName;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPronouns() {
-        return pronouns;
-    }
-
-    public void setPronouns(String pronouns) {
-        this.pronouns = pronouns;
-    }
+    public String getPronouns() { return pronouns; }
+    public void setPronouns(String pronouns) { this.pronouns = pronouns; }
 }

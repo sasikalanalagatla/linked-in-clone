@@ -36,7 +36,7 @@ public class ProfileController {
 
     @GetMapping("/profile/edit/{id}")
     public String showEditProfileForm(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(2l);
+        User user = userService.getUserById(1l);
         model.addAttribute("user", user);
         return "edit-profile";
     }
@@ -44,7 +44,7 @@ public class ProfileController {
     @PostMapping("/profile/update")
     public String updateProfile(@ModelAttribute("user") User updatedUser) {
         userService.updateUser(updatedUser);
-        return "redirect:/profile/" + 2;
+        return "redirect:/profile/" + 1;
     }
 
 

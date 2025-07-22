@@ -37,9 +37,6 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions = new ArrayList<>();
 
-    private Integer totalReactions = 0;
-
-
     public Long getPostId() { return postId; }
     public void setPostId(Long postId) { this.postId = postId; }
 
@@ -81,4 +78,6 @@ public class Post {
 
     public Integer getTotalReactions() { return totalReactions; }
     public void setTotalReactions(Integer totalReactions) { this.totalReactions = totalReactions; }
+
+    private Integer totalReactions = 0;
 }
