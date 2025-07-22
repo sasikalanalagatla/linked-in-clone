@@ -8,6 +8,7 @@ import com.org.linkedin.service.ExperienceService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExperienceServiceImpl implements ExperienceService {
@@ -27,8 +28,8 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     @Override
     public Experience addExperience(Long userId, Experience experience) {
-        User user = userRepository.findById(userId).orElseThrow();
-        experience.setUser(user);
+        Optional<User> user = userRepository.findById(userId);
+        experience.setUser(user.get());
         return experienceRepository.save(experience);
     }
 

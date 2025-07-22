@@ -7,6 +7,8 @@ import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.SkillService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class SkillServiceImpl implements SkillService {
 
@@ -20,7 +22,7 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public Skill saveSkillForUser(Long userId, Skill skill) {
-        User user = userRepository.findById(userId).orElse(null);
+        Optional<User> user = userRepository.findById(userId);
         if (user == null) return null;
 
         Skill savedSkill;
@@ -40,9 +42,9 @@ public class SkillServiceImpl implements SkillService {
 
         savedSkill = skillRepository.save(savedSkill);
 
-        if (!user.getSkills().contains(savedSkill)) {
-            user.getSkills().add(savedSkill);
-            userRepository.save(user);
+        if (!user.get().getSkills().contains(savedSkill)) {
+            user.get().getSkills().add(savedSkill);
+            userRepository.save(user.get());
         }
 
         return savedSkill;
@@ -51,12 +53,12 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public void deleteUserSkill(Long userId, Long skillId) {
-        User user = userRepository.findById(userId).orElse(null);
+        Optional<User> user = userRepository.findById(userId);
         Skill skill = skillRepository.findById(skillId).orElse(null);
 
         if (user != null && skill != null) {
-            user.getSkills().remove(skill);
-            userRepository.save(user);
+            user.get().getSkills().remove(skill);
+            userRepository.save(user.get());
         }
     }
 

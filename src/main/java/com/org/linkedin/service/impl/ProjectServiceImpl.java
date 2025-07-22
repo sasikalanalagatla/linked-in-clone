@@ -8,6 +8,7 @@ import com.org.linkedin.service.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -22,8 +23,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project addProject(Long userId, Project project) {
-        User user = userRepository.findById(userId).orElseThrow();
-        project.setUser(user);
+        Optional<User> user = userRepository.findById(userId);
+        project.setUser(user.get());
         return projectRepository.save(project);
     }
 

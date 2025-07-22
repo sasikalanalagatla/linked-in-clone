@@ -8,6 +8,7 @@ import com.org.linkedin.service.EducationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EducationServiceImpl implements EducationService {
@@ -27,8 +28,8 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public Education addEducation(Long userId, Education education) {
-        User user = userRepository.findById(userId).orElseThrow();
-        education.setUser(user);
+        Optional<User> user = userRepository.findById(userId);
+        education.setUser(user.get());
         return educationRepository.save(education);
     }
 
@@ -45,22 +46,22 @@ public class EducationServiceImpl implements EducationService {
         return educationRepository.save(education);
     }
 
+    @Override
     public void deleteEducation(Long educationId) {
         educationRepository.deleteById(educationId);
     }
 
+    @Override
     public void saveOrUpdate(Long userId, Education education) {
-        User user = userRepository.findById(userId).orElseThrow();
-        education.setUser(user);
+        Optional<User> user = userRepository.findById(userId);
+        education.setUser(user.get());
         educationRepository.save(education);
     }
 
+    @Override
     public Education getEducationById(Long id) {
         return educationRepository.findById(id).orElse(null);
     }
 
-    public void deleteById(Long id) {
-        educationRepository.deleteById(id);
-    }
 
 }

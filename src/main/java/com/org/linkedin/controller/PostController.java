@@ -123,4 +123,15 @@ public class PostController {
         return "Reaction updated";
     }
 
+    @GetMapping("/post/all")
+    public String viewAllPosts(Model model) {
+        List<Post> posts = postRepository.findAll();
+
+        for (Post post : posts) {
+            post.setTotalReactions(post.getReactions().size());
+        }
+
+        model.addAttribute("posts", posts);
+        return "post_list";
+    }
 }
