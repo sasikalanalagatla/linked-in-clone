@@ -55,5 +55,4 @@ public class MyNetworkController {
         return "connections";
     }
 
-
 }

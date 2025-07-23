@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="postList">
+    <div th:each="post, iterStat : ${posts}"
+         th:class="'post-card'"
+         th:id="'post-' + ${post.postId}">
+
+        <div>
+            <strong th:text="${post.authorName}">Username</strong>
+            <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</span>
+        </div>
+
+        <div th:text="${post.postDescription}">Post content</div>
+
+        <div th:if="${iterStat.index == 5}" id="trigger-point"></div>
+
+        <hr/>
+    </div>
+</div>
+</body>
+</html>

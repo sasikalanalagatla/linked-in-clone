@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sasikala Nalagatla - LinkedIn</title>
+    <title th:text="${user.fullName} + ' | LinkedIn Profile'">Profile</title>
     <style>
         * {
             margin: 0;
@@ -12,552 +10,204 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f3f2ef;
-            color: #000000e6;
-            line-height: 1.5;
         }
 
-        /* Header */
-        .header {
-            background: #283e4a;
-            padding: 0 16px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid #283e4a;
-        }
-
-        .header-content {
-            max-width: 1128px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            height: 52px;
-        }
-
-        .linkedin-logo {
-            color: #0a66c2;
-            font-size: 34px;
-            font-weight: bold;
-            margin-right: 24px;
-        }
-
-        .search-box {
-            background: #edf3f8;
-            border: none;
-            border-radius: 2px;
-            padding: 8px 12px;
-            width: 280px;
-            font-size: 14px;
-        }
-
-        /* Main Container */
         .container {
-            max-width: 1128px;
-            margin: 0 auto;
-            padding: 24px;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 24px;
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Profile Card */
-        .profile-card {
-            background: white;
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: white;
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.2);
         }
 
         .cover-photo {
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 180px;
+            background-color: #b4d0e7;
             position: relative;
         }
 
-        .profile-photo {
-            width: 152px;
-            height: 152px;
+        .profile-header {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            padding: 0 30px 20px 30px;
+            position: relative;
+            top: -60px;
+        }
+
+        .profile-header img {
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             border: 4px solid white;
-            position: absolute;
-            bottom: -76px;
-            left: 24px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="152" height="152" viewBox="0 0 152 152"><circle cx="76" cy="76" r="76" fill="%23ddd"/><circle cx="76" cy="60" r="25" fill="%23999"/><ellipse cx="76" cy="120" rx="35" ry="25" fill="%23999"/></svg>') center/cover;
+            object-fit: cover;
+            background-color: white;
         }
 
         .profile-info {
-            padding: 100px 24px 24px 24px;
+            flex-grow: 1;
         }
 
-        .profile-name {
-            font-size: 32px;
-            font-weight: 600;
+        .profile-info h1 {
+            font-size: 24px;
             margin-bottom: 4px;
         }
 
-        .profile-headline {
-            font-size: 20px;
-            color: #666666;
-            margin-bottom: 8px;
+        .profile-info p {
+            margin: 2px 0;
+            color: #666;
         }
 
-        .profile-location {
-            color: #666666;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .profile-stats {
-            color: #0a66c2;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .profile-buttons {
+        .action-buttons {
             display: flex;
-            gap: 8px;
             flex-wrap: wrap;
+            justify-content: flex-end;
+            padding: 10px 30px;
+            gap: 10px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
         }
 
-        .btn {
-            padding: 6px 16px;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid;
+        .action-buttons a,
+        .action-buttons button {
+            background-color: #0a66c2;
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
             text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            cursor: pointer;
         }
 
-        .btn-primary {
-            background: #0a66c2;
-            color: white;
-            border-color: #0a66c2;
+        .section {
+            padding: 30px;
+            border-top: 1px solid #e0e0e0;
         }
 
-        .btn-secondary {
-            background: white;
+        .section h2 {
             color: #0a66c2;
-            border-color: #0a66c2;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #666666;
-            border-color: #666666;
-        }
-
-        /* Section Cards */
-        .section-card {
-            background: white;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.2);
-        }
-
-        .section-title {
             font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
 
-        /* About Section */
-        .about-text {
+        .section-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .section-item strong {
+            display: block;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .skills span {
+            display: inline-block;
+            background-color: #eef3f8;
+            color: #0a66c2;
+            padding: 6px 12px;
+            margin: 4px 6px 0 0;
+            border-radius: 30px;
             font-size: 14px;
+        }
+
+        .about p {
+            font-size: 15px;
             line-height: 1.6;
-            color: #000000e6;
-        }
-
-        /* Experience Section */
-        .experience-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #e9e5df;
-        }
-
-        .experience-item:last-child {
-            border-bottom: none;
-        }
-
-        .company-logo {
-            width: 48px;
-            height: 48px;
-            background: #ddd;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
-        .experience-content h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .experience-content .company {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 2px;
-        }
-
-        .experience-content .duration {
-            font-size: 12px;
-            color: #666666;
-            margin-bottom: 8px;
-        }
-
-        .experience-content .description {
-            font-size: 14px;
-            color: #000000e6;
-        }
-
-        /* Education Section */
-        .education-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid #e9e5df;
-        }
-
-        .education-item:last-child {
-            border-bottom: none;
-        }
-
-        .school-logo {
-            width: 48px;
-            height: 48px;
-            background: #0a66c2;
-            border-radius: 4px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Skills Section */
-        .skills-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .skill-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e9e5df;
-        }
-
-        .skill-item:last-child {
-            border-bottom: none;
-        }
-
-        .skill-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .skill-endorsements {
-            font-size: 12px;
-            color: #666666;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .sidebar-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.2);
-        }
-
-        .sidebar-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .profile-viewer {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            padding: 8px 0;
-        }
-
-        .viewer-photo {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #ddd;
-        }
-
-        .viewer-info h4 {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .viewer-info p {
-            font-size: 12px;
-            color: #666666;
-        }
-
-        .analytics-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9e5df;
-        }
-
-        .analytics-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                padding: 12px;
-                gap: 16px;
-            }
-
-            .profile-info {
-                padding: 80px 16px 16px 16px;
-            }
-
-            .profile-name {
-                font-size: 24px;
-            }
-
-            .profile-headline {
-                font-size: 16px;
-            }
-
-            .section-card {
-                padding: 16px;
-            }
+            color: #444;
         }
     </style>
 </head>
 <body>
-<!-- Header -->
-<header class="header">
-    <div class="header-content">
-        <div class="linkedin-logo">in</div>
-        <input type="text" class="search-box" placeholder="Search">
-    </div>
-</header>
 
-<!-- Main Container -->
 <div class="container">
-    <main class="main-content">
-        <!-- Profile Card -->
-        <div class="profile-card">
-            <div class="cover-photo"></div>
-            <div class="profile-photo"></div>
-            <div class="profile-info">
-                <!-- EDIT: Change your name here -->
-                <h1 class="profile-name">Your Full Name</h1>
+    <div class="cover-photo"></div>
 
-                <!-- EDIT: Change your professional headline here -->
-                <p class="profile-headline">Your Professional Title | Key Skills | Industry Focus</p>
+    <div class="profile-header">
+        <img th:src="${user.profilePictureUrl}" alt="Profile Picture">
+        <div class="profile-info">
+            <h1 th:text="${user.fullName}">Full Name</h1>
+            <p th:text="${user.headline}">Headline</p>
+            <p th:text="${user.location} + ', ' + ${user.city}">Location</p>
+            <p th:text="${user.industry}">Industry</p>
+            <p th:text="'Pronouns: ' + ${user.pronouns}">Pronouns</p>
+        </div>
+    </div>
 
-                <!-- EDIT: Change your location here -->
-                <p class="profile-location">Your City, State, Country</p>
+    <div class="action-buttons">
+        <a th:href="@{/profile/edit/{id}(id=${user.userId})}">✏ Edit Profile</a>
 
-                <!-- EDIT: Update your connection count -->
-                <p class="profile-stats">500+ connections</p>
-
-                <div class="profile-buttons">
-                    <a href="#" class="btn btn-primary">Open to</a>
-                    <a href="#" class="btn btn-secondary">Add profile section</a>
-                    <a href="#" class="btn btn-secondary">Enhance profile</a>
-                    <a href="#" class="btn btn-outline">Resources</a>
-                </div>
-            </div>
+        <div th:if="${user.userId != 2}">
+            <form th:action="@{'/profile/' + ${user.userId} + '/follow'}" method="post">
+                <button type="submit">Follow</button>
+            </form>
         </div>
 
-        <!-- About Section -->
-        <div class="section-card">
-            <h2 class="section-title">About</h2>
-            <div class="about-text">
-                <!-- EDIT: Replace this entire about section with your own content -->
-                <p>Write your professional summary here. This should be 2-4 paragraphs describing:</p>
-                <br>
-                <p>• Your current role and key expertise<br>
-                    • Your career objectives and what you're looking for<br>
-                    • Your main technical skills and areas of interest<br>
-                    • Any notable achievements or projects</p>
-                <br>
-                <p>Example structure:<br>
-                    🔹 Your primary technical skills<br>
-                    🔹 Your experience level and specializations<br>
-                    🔹 What makes you unique as a professional<br>
-                    🔹 Your career goals or what you're seeking</p>
+        <a th:if="${user.userId == 2}" th:href="@{'/profile/' + ${user.userId} + '/followers'}">
+            👥 Followers (<span th:text="${user.followers.size()}">0</span>)
+        </a>
 
-                <!-- INSTRUCTIONS:
-                To customize this section:
-                1. Replace the placeholder text above with your actual professional summary
-                2. Keep it conversational but professional
-                3. Use bullet points (🔹 or •) for easy reading
-                4. Include keywords relevant to your field
-                5. Aim for 150-300 words total
-                -->
-            </div>
+        <a th:if="${user.userId == 2}" th:href="@{'/profile/' + ${user.userId} + '/following'}">
+            ➕ Following (<span th:text="${user.following.size()}">0</span>)
+        </a>
+
+        <div th:if="${user.userId != 2}">
+            <form th:action="@{'/connect/' + ${user.userId}}" method="post">
+                <button type="submit">Connect</button>
+            </form>
         </div>
 
-        <!-- Experience Section -->
-        <div class="section-card">
-            <h2 class="section-title">Experience</h2>
-            <div class="experience-item">
-                <div class="company-logo"></div>
-                <div class="experience-content">
-                    <h3>Java Developer Intern</h3>
-                    <p class="company">Tech Solutions Pvt Ltd</p>
-                    <p class="duration">Jun 2024 - Present · 2 mos</p>
-                    <p class="description">Working on backend development projects using Java, Spring Boot, and MySQL. Developed RESTful APIs and implemented data structures for optimizing application performance.</p>
-                </div>
-            </div>
-            <div class="experience-item">
-                <div class="company-logo"></div>
-                <div class="experience-content">
-                    <h3>Programming Tutor</h3>
-                    <p class="company">Self-employed</p>
-                    <p class="duration">Jan 2024 - May 2024 · 5 mos</p>
-                    <p class="description">Taught Java programming concepts and data structures to undergraduate students. Created learning materials and coding exercises to help students understand complex algorithms.</p>
-                </div>
-            </div>
-        </div>
+        <a th:href="@{/connections}">
+            <button>All Connections</button>
+        </a>
+    </div>
 
-        <!-- Education Section -->
-        <div class="section-card">
-            <h2 class="section-title">Education</h2>
-            <div class="education-item">
-                <div class="school-logo">AIT</div>
-                <div class="experience-content">
-                    <h3>Audisankara Institute of Technology, Gudur</h3>
-                    <p class="company">Bachelor of Technology - BTech, Computer Science Engineering</p>
-                    <p class="duration">2021 - 2025</p>
-                    <p class="description">Relevant coursework: Data Structures and Algorithms, Object-Oriented Programming, Database Management Systems, Software Engineering, Computer Networks</p>
-                </div>
-            </div>
-            <div class="education-item">
-                <div class="school-logo">HS</div>
-                <div class="experience-content">
-                    <h3>Narayana Junior College</h3>
-                    <p class="company">Intermediate, Mathematics, Physics, Chemistry (MPC)</p>
-                    <p class="duration">2019 - 2021</p>
-                    <p class="description">Strong foundation in Mathematics and logical reasoning which supports programming and algorithmic thinking.</p>
-                </div>
-            </div>
-        </div>
+    <div class="section about">
+        <h2>About</h2>
+        <p th:text="${user.about}">User description...</p>
+    </div>
 
-        <!-- Skills Section -->
-        <div class="section-card">
-            <h2 class="section-title">Skills</h2>
-            <div class="skills-grid">
-                <div class="skill-item">
-                    <span class="skill-name">Java</span>
-                    <span class="skill-endorsements">15 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">Data Structures</span>
-                    <span class="skill-endorsements">12 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">Algorithms</span>
-                    <span class="skill-endorsements">10 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">Spring Boot</span>
-                    <span class="skill-endorsements">8 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">MySQL</span>
-                    <span class="skill-endorsements">7 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">Backend Development</span>
-                    <span class="skill-endorsements">9 endorsements</span>
-                </div>
-                <div class="skill-item">
-                    <span class="skill-name">Object-Oriented Programming</span>
-                    <span class="skill-endorsements">11 endorsements</span>
-                </div>
-            </div>
+    <div class="section">
+        <h2>Education</h2>
+        <div th:each="edu : ${user.educations}" class="section-item">
+            <strong th:text="${edu.schoolName}">School</strong>
+            <p th:text="${edu.degree} + ' - ' + ${edu.fieldOfStudy}">Degree - Field</p>
+            <p th:text="${edu.startDate} + ' - ' + ${edu.endDate}">Dates</p>
+            <p th:text="'Grade: ' + ${edu.grade}">Grade</p>
+            <p th:text="'Activities: ' + ${edu.extraCurricularActivity}">Activities</p>
         </div>
-    </main>
+    </div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <!-- Analytics Card -->
-        <div class="sidebar-card">
-            <h3 class="sidebar-title">Analytics</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom: 12px;">🔒 Private to you</p>
-            <div class="analytics-item">
-                <span>👁️ 46 profile views</span>
-            </div>
-            <div class="analytics-item">
-                <span>📊 142 post impressions</span>
-            </div>
-            <div class="analytics-item">
-                <span>🔍 10 search appearances</span>
-            </div>
+    <div class="section">
+        <h2>Experience</h2>
+        <div th:each="exp : ${user.experiences}" class="section-item">
+            <strong th:text="${exp.title}">Title</strong>
+            <p th:text="${exp.companyName}">Company</p>
+            <p th:text="${exp.startDate} + ' - ' + ${exp.endDate}">Dates</p>
         </div>
+    </div>
 
-        <!-- People Also Viewed -->
-        <div class="sidebar-card">
-            <h3 class="sidebar-title">People also viewed</h3>
-            <div class="profile-viewer">
-                <div class="viewer-photo"></div>
-                <div class="viewer-info">
-                    <h4>Sushma Reddy</h4>
-                    <p>Automotive | Embedded Engineer</p>
-                </div>
-            </div>
-            <div class="profile-viewer">
-                <div class="viewer-photo"></div>
-                <div class="viewer-info">
-                    <h4>Sudha Yanamal</h4>
-                    <p>Software Engineer at TCS</p>
-                </div>
-            </div>
-            <div class="profile-viewer">
-                <div class="viewer-photo"></div>
-                <div class="viewer-info">
-                    <h4>Rakesh Kumar</h4>
-                    <p>Java Developer at Infosys</p>
-                </div>
-            </div>
+    <div class="section">
+        <h2>Projects</h2>
+        <div th:each="project : ${user.projects}" class="section-item">
+            <strong th:text="${project.name}">Title</strong>
+            <p th:text="${project.description}">Description</p>
         </div>
+    </div>
 
-        <!-- Promoted Section -->
-        <div class="sidebar-card">
-            <h3 class="sidebar-title">Maruti Suzuki Innovation</h3>
-            <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Promoted</p>
-            <p style="font-size: 14px;">Sasikala, partner with Maruti Suzuki Innovation</p>
-            <p style="font-size: 12px; color: #666; margin-top: 8px;">Get the latest startup programs and cohorts updates</p>
-            <a href="#" class="btn btn-secondary" style="margin-top: 12px; width: 100%;">Follow</a>
+    <div class="section">
+        <h2>Skills</h2>
+        <div class="skills">
+            <span th:each="skill : ${user.skills}" th:text="${skill.skillName}">Skill</span>
         </div>
-    </aside>
+    </div>
 </div>
+
 </body>
 </html>

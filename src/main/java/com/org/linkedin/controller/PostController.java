@@ -5,8 +5,13 @@ import com.org.linkedin.model.User;
 import com.org.linkedin.repository.PostRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ConnectionRequestService;
+import com.org.linkedin.service.PostService;
 import com.org.linkedin.service.ReactionService;
 import com.org.linkedin.service.impl.CloudinaryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +30,16 @@ public class PostController {
     private final ReactionService reactionService;
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
+    private final PostService postService;
 
     public PostController(PostRepository postRepository, UserRepository userRepository,
-                          ReactionService reactionService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService) {
+                          ReactionService reactionService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService, PostService postService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.reactionService = reactionService;
         this.cloudinaryService = cloudinaryService;
         this.connectionRequestService = connectionRequestService;
+        this.postService = postService;
     }
 
     @GetMapping("/post/create")
@@ -66,10 +73,14 @@ public class PostController {
 
     @GetMapping("/")
     public String getPostFeed(Model model) {
-        List<Post> posts = postRepository.findAll();
-        User dummyUser = userRepository.findByFullName("sasikala");
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
+        Page<Post> postPage = postService.findAll(pageable);
+        List<Post> posts = postPage.getContent();
+
+        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
         List<User> connections = connectionRequestService.getConnections(dummyUser);
         Integer totalConnection = connections.size();
+
         Map<Long, Boolean> postUserLikes = new HashMap<>();
         for (Post post : posts) {
             post.setTotalReactions(post.getReactions().size());
@@ -78,12 +89,15 @@ public class PostController {
                 postUserLikes.put(post.getPostId(), liked);
             }
         }
-        model.addAttribute("user",dummyUser);
+
+        model.addAttribute("user", dummyUser);
         model.addAttribute("totalConnection", totalConnection);
         model.addAttribute("posts", posts);
         model.addAttribute("postUserLikes", postUserLikes);
+
         return "home-page";
     }
+
 
     @GetMapping("/post/edit/{id}")
     public String editPostForm(@PathVariable Long id, Model model) {
@@ -114,7 +128,7 @@ public class PostController {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        User dummyUser = userRepository.findByFullName("sasikala");
+        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
         if (dummyUser == null) {
             throw new RuntimeException("Dummy user 'sasikala' not found");
         }
@@ -134,4 +148,15 @@ public class PostController {
         model.addAttribute("posts", posts);
         return "post_list";
     }
+
+    @GetMapping("/loadMorePosts")
+    public String loadMorePosts(@RequestParam int page, Model model) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("postId").descending());
+        Page<Post> postPage = postService.findAll(pageable);
+
+        model.addAttribute("posts", postPage.getContent());
+
+        return "partials/postCards :: postList";
+    }
+
 }

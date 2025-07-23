@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
@@ -15,8 +15,6 @@
             line-height: 1.33;
             color: #000000e6;
         }
-
-        /* Navbar Styles */
         .navbar {
             display: flex;
             align-items: center;
@@ -176,7 +174,6 @@
             padding: 0 8px;
         }
 
-        /* Container and Layout */
         .container {
             display: flex;
             max-width: 1128px;
@@ -370,7 +367,6 @@
             margin-bottom: 12px;
         }
 
-        /* Reaction Counts Display */
         .reaction-counts {
             display: flex;
             align-items: center;
@@ -454,7 +450,6 @@
             color: #666;
         }
 
-        /* Actions Bar */
         .actions {
             display: flex;
             justify-content: space-around;
@@ -513,7 +508,6 @@
             color: #8b5a9f;
         }
 
-        /* Reaction Picker */
         .reaction-picker {
             position: absolute;
             bottom: 100%;
@@ -646,7 +640,6 @@
             margin-top: 8px;
         }
 
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .reaction-picker {
                 transform: translateX(-20px);
@@ -654,7 +647,6 @@
             }
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -770,28 +762,6 @@
     flex: 1;
     display: flex;
     justify-content: center;
-}
-
-.reaction-picker {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border-radius: 50px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    padding: 8px 12px;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    z-index: 100;
-    border: 1px solid #00000017;
-}
-
-.reaction-picker.show {
-    display: flex;
-    animation: fadeInUp 0.2s ease-out;
 }
 
 .reaction-option {
@@ -958,7 +928,7 @@
                 </div>
                 Home
             </a>
-            <a href="#" class="nav-item">
+            <a th:href="@{/mynetwork}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5
@@ -1048,9 +1018,10 @@
         </div>
 
         <div class="posts-container" id="postsContainer">
-            <!-- Initial posts will be loaded here by Thymeleaf -->
-            <div th:each="post : ${posts}" class="post-card">
-                <div class="post-header">
+            <div th:each="post, iterStat : ${posts}" class="post-card"
+                 th:id="${iterStat.index == 5 ? 'trigger-point' : null}">
+
+            <div class="post-header">
                     <div class="post-author-section">
                         <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
                         <div class="post-author-info">
@@ -1124,172 +1095,42 @@
 </div>
 
 <script>
-    let currentPage = 1;
+    let page = 1;
     let loading = false;
-    let hasMorePosts = true;
 
-    function reactToPost(postId, reactionType) {
-        fetch('/post/react/' + postId + '?type=' + reactionType, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+    const observer = new IntersectionObserver(async (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !loading) {
+            loading = true;
+            page += 1;
 
-    function openPostModal() {
-        window.location.href = '/post/create';
-    }
+            const response = await fetch(`/loadMorePosts?page=${page}`);
+            const html = await response.text();
 
-    function loadMorePosts() {
-        if (loading || !hasMorePosts) return;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
 
-        loading = true;
-        document.getElementById('loadingIndicator').style.display = 'block';
+            const newPosts = tempDiv.querySelectorAll('.post-card');
+            const container = document.getElementById('postsContainer');
 
-        fetch(`/posts/load-more?page=${currentPage}&size=10`)
-            .then(response => response.json())
-            .then(data => {
+            newPosts.forEach(post => container.appendChild(post));
+
+            setTimeout(() => {
+                const posts = container.querySelectorAll('.post-card');
+                const newTrigger = posts[page * 10 - 5];
+                if (newTrigger) observer.observe(newTrigger);
                 loading = false;
-                document.getElementById('loadingIndicator').style.display = 'none';
-
-                if (data.posts && data.posts.length > 0) {
-                    appendPosts(data.posts);
-                    currentPage++;
-
-                    if (data.posts.length < 10 || data.isLastPage) {
-                        hasMorePosts = false;
-                        document.getElementById('noMorePosts').style.display = 'block';
-                    }
-                } else {
-                    hasMorePosts = false;
-                    document.getElementById('noMorePosts').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading more posts:', error);
-                loading = false;
-                document.getElementById('loadingIndicator').style.display = 'none';
-            });
-    }
-
-    function appendPosts(posts) {
-        const postsContainer = document.getElementById('postsContainer');
-
-        posts.forEach(post => {
-            const postCard = createPostCard(post);
-            postsContainer.appendChild(postCard);
-        });
-        observePosts();
-    }
-
-    function createPostCard(post) {
-        const postCard = document.createElement('div');
-        postCard.className = 'post-card';
-
-        const createdAtFormatted = new Date(post.createdAt).toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        }).replace(',', ' •');
-
-        postCard.innerHTML = `
-            <div class="post-header">
-                <div class="post-author-section">
-                    <div class="post-author-pic">${post.authorName.charAt(0)}</div>
-                    <div class="post-author-info">
-                        <h4>${post.authorName}</h4>
-                        <p>Posted on ${createdAtFormatted}</p>
-                    </div>
-                </div>
-                <div class="post-actions">
-                    <button class="post-action-btn">⋯</button>
-                </div>
-            </div>
-            <div class="post-content">
-                <p>${post.postDescription}</p>
-                ${post.imageUrl ? `
-                    <div>
-                        <img src="${post.imageUrl}" alt="Post Image"
-                             style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
-                    </div>
-                ` : ''}
-            </div>
-            <div class="post-engagement">
-                <span>${post.totalReactions} reactions</span>
-                <span>0 comments</span>
-            </div>
-            <div class="post-actions-bar">
-                <button class="action-btn" onclick="reactToPost(${post.postId}, 'LIKE')">
-                    <span class="action-icon">👍</span>
-                    <span>Like</span>
-                </button>
-                <button class="action-btn">
-                    <span class="action-icon">💬</span>
-                    <span>Comment</span>
-                </button>
-                <button class="action-btn">
-                    <span class="action-icon">↻</span>
-                    <span>Repost</span>
-                </button>
-                <button class="action-btn">
-                    <span class="action-icon">✉️</span>
-                    <span>Send</span>
-                </button>
-            </div>
-        `;
-
-        return postCard;
-    }
-    let postsInCurrentBatch = 0;
-    let totalPostsViewed = 0;
-    const POSTS_PER_BATCH = 10;
-    const TRIGGER_AT_POST = 6; // Load more when 6th post in current batch is viewed
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting && !entry.target.classList.contains('viewed')) {
-                entry.target.classList.add('viewed');
-                totalPostsViewed++;
-
-                const currentBatchPosition = ((totalPostsViewed - 1) % POSTS_PER_BATCH) + 1;
-
-                console.log(`Post viewed: ${totalPostsViewed} (Position in batch: ${currentBatchPosition})`);
-
-                if (currentBatchPosition === TRIGGER_AT_POST) {
-                    console.log(`Reached ${TRIGGER_AT_POST}th post in batch, loading more...`);
-                    loadMorePosts();
-                }
-            }
-        });
-    }, {
-        threshold: 0.5,
-        rootMargin: '0px 0px -20px 0px'
-    });
-    function observePosts() {
-        const posts = document.querySelectorAll('#postsContainer .post-card:not(.observed)');
-        posts.forEach(post => {
-            post.classList.add('observed');
-            observer.observe(post);
-        });
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        const initialPosts = document.querySelectorAll('#postsContainer .post-card').length;
-        if (initialPosts > 0) {
-            currentPage = Math.ceil(initialPosts / 10) + 1;
-            postsInCurrentBatch = initialPosts % POSTS_PER_BATCH || POSTS_PER_BATCH;
+            }, 500);
         }
+    }, {
+        threshold: 1.0
+    });
 
-        setTimeout(observePosts, 500);
+    window.addEventListener('DOMContentLoaded', () => {
+        const trigger = document.getElementById('trigger-point');
+        if (trigger) observer.observe(trigger);
     });
 </script>
+
 </body>
 </html>

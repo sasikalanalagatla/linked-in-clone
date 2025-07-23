@@ -1,5 +1,6 @@
 package com.org.linkedin.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,12 +43,15 @@ public class User {
     private String birthday;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Education> educations = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Experience> experiences = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Project> projects = new ArrayList<>();
 
     @ManyToMany
@@ -56,17 +60,21 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
+    @JsonIgnore
     private List<Skill> skills = new ArrayList<>();
 
     private String about;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<ApplyJob> appliedJobs;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Job> jobs;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Comment> comments;
 
     @ManyToMany
@@ -75,9 +83,11 @@ public class User {
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
+    @JsonIgnore
     private List<User> following;
 
     @ManyToMany(mappedBy = "following")
+    @JsonIgnore
     private List<User> followers;
 
     public Long getUserId() {
