@@ -7,6 +7,7 @@ import com.org.linkedin.service.CertificationService;
 import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,18 +46,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void followUser(Long followerId, Long followeeId) {
-        if (followerId.equals(followeeId)) return;
+        if (followerId.equals(followeeId)) {
+            return; // Prevent self-following
+        }
 
         User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> new IllegalArgumentException("Follower not found"));
-
         User followee = userRepository.findById(followeeId)
                 .orElseThrow(() -> new IllegalArgumentException("User to follow not found"));
 
-        if (!followee.getFollowers().contains(follower)) {
-            followee.getFollowers().add(follower);
-            userRepository.save(followee);
+        if (!follower.getFollowing().contains(followee)) {
+            follower.getFollowing().add(followee);
+            userRepository.save(follower);
         }
+    }
+
+    @Override
+    public List<User> getFollowers(User user) {
+        List<User> followers = user.getFollowers();
+        return followers != null ? followers : new ArrayList<>();
+    }
+
+    @Override
+    public List<User> getFollowing(User user) {
+        List<User> following = user.getFollowing();
+        return following != null ? following : new ArrayList<>();
     }
 
     @Override

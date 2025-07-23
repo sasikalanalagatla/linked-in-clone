@@ -72,16 +72,21 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<User> followers = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_following",
-            joinColumns = @JoinColumn(name = "follower_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
-    private List<User> following;
-
-    @ManyToMany(mappedBy = "following")
-    private List<User> followers;
+    private List<User> following = new ArrayList<>();
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }

@@ -1,82 +1,683 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>My Network</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Network - LinkedIn</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #f3f2ef;
-            padding: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        .card {
-            background-color: white;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f3f2ef;
+            color: #000000;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 0;
+            height: 52px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #00000017;
+        }
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            max-width: 1128px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            justify-content: space-between;
+        }
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar .logo {
+            height: 34px;
+            width: 34px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0a66c2;
+            border-radius: 2px;
+        }
+        .navbar .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 6px 8px 6px 40px;
+            border-radius: 4px;
+            border: none;
+            background-color: #edf3f8;
+            font-size: 14px;
+            height: 34px;
+        }
+        .search-input::placeholder {
+            color: #666;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #666;
+        }
+        .navbar .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: color 0.2s;
+            min-width: 80px;
+            position: relative;
+        }
+        .nav-item:hover {
+            color: #000;
+        }
+        .nav-item.active {
+            color: #000;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
+            background-color: #000;
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .nav-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -8px;
+            background-color: #c37d16;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-nav {
+            position: relative;
+        }
+        .profile-pic {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 2px;
+        }
+        .work-divider {
+            height: 24px;
+            width: 1px;
+            background-color: #00000017;
+            margin: 0 12px;
+        }
+        .premium-link {
+            color: #915907;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 8px;
+        }
+        .main-container {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            display: grid;
+            grid-template-columns: 225px 1fr;
+            gap: 24px;
+        }
+        .sidebar {
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border: 1px solid #e6e6e6;
+            overflow: hidden;
+        }
+        .sidebar-header {
             padding: 16px;
-            margin-bottom: 12px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+        .sidebar-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f2ef;
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            transition: background-color 0.2s;
         }
-
-        .user-info {
+        .sidebar-item:hover {
+            background-color: #f3f2ef;
+        }
+        .sidebar-item.active {
+            background-color: #e7f3ff;
+            color: #0a66c2;
+            font-weight: 600;
+        }
+        .sidebar-item .icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        .sidebar-count {
+            color: #666;
+            font-size: 14px;
+        }
+        .content {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e6e6e6;
+        }
+        .content-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        .tabs {
+            display: flex;
+            gap: 32px;
+        }
+        .tab {
+            padding: 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .tab.active {
+            color: #01754f;
+            border-bottom-color: #01754f;
+        }
+        .invitations-section, .connections-section {
+            padding: 24px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+        .show-all {
+            color: #0a66c2;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .invitation-card, .connection-card {
             display: flex;
             align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f2ef;
         }
-
-        .user-info img {
+        .invitation-card:last-child, .connection-card:last-child {
+            border-bottom: none;
+        }
+        .profile-image {
             width: 48px;
             height: 48px;
             border-radius: 50%;
             margin-right: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
         }
-
-        .actions button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            margin-left: 8px;
+        .invitation-info, .connection-info {
+            flex: 1;
+        }
+        .invitation-name, .connection-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 2px;
+        }
+        .invitation-title, .connection-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .mutual-connections {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+        .mutual-icon {
+            margin-right: 4px;
+        }
+        .invitation-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid;
+            transition: all 0.2s;
             cursor: pointer;
         }
-
-        .accept-btn {
+        .btn-primary {
             background-color: #0a66c2;
             color: white;
+            border-color: #0a66c2;
         }
-
-        .ignore-btn {
-            background-color: #e0e0e0;
+        .btn-primary:hover {
+            background-color: #004182;
+            border-color: #004182;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #666;
+            border-color: #666;
+        }
+        .btn-secondary:hover {
+            background-color: #f3f2ef;
+        }
+        .games-section {
+            padding: 24px;
+            border-top: 1px solid #e6e6e6;
+        }
+        .games-grid {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .game-card {
+            flex: 1;
+            padding: 16px;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            text-align: center;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-card:nth-child(2) {
+            background: linear-gradient(135deg, #a55eea, #8e44ad);
+        }
+        .game-card:nth-child(3) {
+            background: linear-gradient(135deg, #26de81, #20bf6b);
+        }
+        .game-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .game-date {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+        .game-solve-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .game-solve-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .people-section {
+            padding: 24px;
+            border-top: 1px solid #e6e6e6;
+        }
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .sidebar {
+                display: none;
+            }
+            .navbar .nav-items {
+                gap: 0;
+            }
         }
     </style>
 </head>
 <body>
+<!-- Navbar -->
+<div class="navbar">
+    <div class="navbar-container">
+        <div class="left-section">
+            <div class="logo">
+                <span class="logo-text">in</span>
+            </div>
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search">
+            </div>
+        </div>
 
-<h2>Connection Requests</h2>
+        <div class="nav-items">
+            <a href="#" th:href="@{/}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
+                    </svg>
+                </div>
+                Home
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                    </svg>
+                </div>
+                My Network
+            </a>
+            <a href="#" th:href="@{/job/feed}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                    </svg>
+                </div>
+                Jobs
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
+                    </svg>
+                </div>
+                Messaging
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22a2.02 2.02 0 002-2H10a2.02 2.02 0 002 2zm7-7.5V9c0-3.07-1.64-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 3.36 7 5.92 7 9v5.5l-2 2V18h14v-1.5l-2-2z"></path>
+                    </svg>
+                </div>
+                Notifications
+            </a>
+            <a href="#" th:href="@{'/profile/'+1}" class="nav-item profile-nav active">
+                <div class="profile-pic"></div>
+                Me
+            </a>
 
-<div th:if="${#lists.isEmpty(requests)}">
-    <p>No pending requests</p>
-</div>
+            <div class="work-divider"></div>
 
-<div th:each="req : ${requests}" class="card">
-    <div class="user-info">
-        <img th:src="${req.sender.profilePictureUrl}" alt="Profile" />
-        <div>
-            <div th:text="${req.sender.fullName}"></div>
-            <small th:text="${req.sender.headline}"></small>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+                    </svg>
+                </div>
+                Work
+            </a>
+
+            <a href="#" class="premium-link">Try Premium for free</a>
         </div>
     </div>
-    <div class="actions">
-        <form th:action="@{'/accept/' + ${req.id}}" method="post" style="display:inline;">
-            <button type="submit" class="accept-btn">Accept</button>
-        </form>
-
-        <form th:action="@{'/connection/reject'}" method="post" style="display:inline;">
-            <input type="hidden" name="requestId" th:value="${req.id}" />
-            <button type="submit" class="ignore-btn">Ignore</button>
-        </form>
-    </div>
 </div>
 
+
+<div class="main-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title">Manage my network</h2>
+        </div>
+        <a href="#" class="sidebar-item" onclick="showConnections()">
+            <span>
+                <span class="icon">👥</span>
+                Connections
+            </span>
+            <span class="sidebar-count" th:text="${connections != null} ? ${#lists.size(connections)} : 0"></span>
+        </a>
+        <a href="#" class="sidebar-item" onclick="showInvitations()">
+            <span>
+                <span class="icon">📩</span>
+                Invitations
+            </span>
+            <span class="sidebar-count" th:text="${requests != null} ? ${#lists.size(requests)} : 0"></span>
+        </a>
+        <a th:href="@{/profile/{id}/followers(id=${currentUserId})}" class="sidebar-item" onclick="showFollowers()">
+            <span>
+                <span class="icon">👤</span>
+                Followers
+            </span>
+            <span class="sidebar-count" th:text="${followers != null} ? ${#lists.size(followers)} : 0"></span>
+        </a>
+        <a th:href="@{/profile/{id}/following(id=${currentUserId})}" class="sidebar-item" onclick="showFollowing()">
+            <span>
+                <span class="icon">👤</span>
+                Following
+            </span>
+            <span class="sidebar-count" th:text="${following != null} ? ${#lists.size(following)} : 0"></span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <span>
+                <span class="icon">👥</span>
+                Groups
+            </span>
+            <span class="sidebar-count">4</span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <span>
+                <span class="icon">📅</span>
+                Events
+            </span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <span>
+                <span class="icon">📄</span>
+                Pages
+            </span>
+            <span class="sidebar-count">185</span>
+        </a>
+        <a href="#" class="sidebar-item">
+            <span>
+                <span class="icon">📧</span>
+                Newsletters
+            </span>
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+        <div class="content-header">
+            <div class="tabs">
+                <a href="#" class="tab active" onclick="showInvitations()">Grow</a>
+                <a href="#" class="tab" onclick="showConnections()">Connections</a>
+            </div>
+        </div>
+
+        <!-- Invitations Section -->
+        <section id="invitations-section" class="invitations-section">
+            <div class="section-header">
+                <h3 class="section-title">Invitations (<span th:text="${requests != null} ? ${#lists.size(requests)} : 0"></span>)</h3>
+            </div>
+            <div th:if="${requests == null or #lists.isEmpty(requests)}">
+                <p>No pending requests</p>
+            </div>
+            <div th:each="request : ${requests}" class="invitation-card">
+                <div class="profile-image" th:text="${request.sender.fullName != null} ? ${request.sender.fullName.substring(0,1)} : 'U'"></div>
+                <div class="invitation-info">
+                    <div class="invitation-name" th:text="${request.sender.fullName} + ' ✓'"></div>
+                    <div class="invitation-title" th:text="${request.sender.headline != null} ? ${request.sender.headline} : 'No title provided'"></div>
+                    <div class="mutual-connections">
+                        <span class="mutual-icon">👥</span>
+                        <span>No mutual connections</span>
+                    </div>
+                </div>
+                <div class="invitation-actions">
+                    <form th:action="@{/ignore/{requestId}(requestId=${request.id})}" method="post">
+                        <button type="submit" class="btn btn-secondary">Ignore</button>
+                    </form>
+                    <form th:action="@{/accept/{requestId}(requestId=${request.id})}" method="post">
+                        <button type="submit" class="btn btn-primary">Accept</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connections Section -->
+        <section id="connections-section" class="connections-section" style="display: none;">
+            <div class="section-header">
+                <h3 class="section-title">Connections (<span th:text="${connections != null} ? ${#lists.size(connections)} : 0"></span>)</h3>
+            </div>
+            <div th:if="${connections == null or #lists.isEmpty(connections)}">
+                <p>No connections yet</p>
+            </div>
+            <div th:each="connection : ${connections}" class="connection-card">
+                <div class="profile-image" th:text="${connection.fullName != null} ? ${connection.fullName.substring(0,1)} : 'U'"></div>
+                <div class="connection-info">
+                    <div class="connection-name" th:text="${connection.fullName} + ' ✓'"></div>
+                    <div class="connection-title" th:text="${connection.headline != null} ? ${connection.headline} : 'No title provided'"></div>
+                    <div class="mutual-connections">
+                        <span class="mutual-icon">👥</span>
+                        <span>No mutual connections</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Games Section -->
+        <section class="games-section">
+            <div class="section-header">
+                <h3 class="section-title">Stay in touch through daily games</h3>
+            </div>
+            <div class="games-grid">
+                <div class="game-card">
+                    <div class="game-title">Zip #127</div>
+                    <div class="game-date">Tuesday, Jul 22</div>
+                    <button class="game-solve-btn">Solve</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-title">Queens #448</div>
+                    <div class="game-date">Tuesday, Jul 22</div>
+                    <button class="game-solve-btn">Solve</button>
+                </div>
+                <div class="game-card">
+                    <div class="game-title">Tango #288</div>
+                    <div class="game-date">Tuesday, Jul 22</div>
+                    <button class="game-solve-btn">Solve</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- People Section -->
+        <section class="people-section">
+            <div class="section-header">
+                <h3 class="section-title">People you may know based on your recent activity</h3>
+                <a href="#" class="show-all">Show all</a>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    function showInvitations() {
+        document.getElementById('invitations-section').style.display = 'block';
+        document.getElementById('connections-section').style.display = 'none';
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.querySelectorAll('.tab')[1].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[0].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[1].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+    }
+
+    function showConnections() {
+        document.getElementById('invitations-section').style.display = 'none';
+        document.getElementById('connections-section').style.display = 'block';
+        document.querySelectorAll('.tab')[0].classList.remove('active');
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[0].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+    }
+
+    function showFollowers() {
+        document.querySelectorAll('.sidebar-item')[0].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[2].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+    }
+
+    function showFollowing() {
+        document.querySelectorAll('.sidebar-item')[0].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[3].classList.add('active');
+    }
+</script>
 </body>
 </html>

@@ -12,51 +12,56 @@ import java.util.List;
 @Service
 public class ConnectionRequestImpl implements ConnectionRequestService {
 
-    private final ConnectionRequestRepository repository;
+    private final ConnectionRequestRepository connectionRequestRepository;
 
-    public ConnectionRequestImpl(ConnectionRequestRepository repository) {
-        this.repository = repository;
-    }
-
-    @Override
-    public List<ConnectionRequest> getPendingRequests(User user) {
-        return repository.findByReceiverAndAcceptedFalse(user);
+    public ConnectionRequestImpl(ConnectionRequestRepository connectionRequestRepository) {
+        this.connectionRequestRepository = connectionRequestRepository;
     }
 
     @Override
     public void sendRequest(User sender, User receiver) {
-        if (repository.existsBySenderAndReceiver(sender, receiver)) return;
-
+        if (sender.equals(receiver)) {
+            return; // Prevent self-connection
+        }
         ConnectionRequest request = new ConnectionRequest();
         request.setSender(sender);
         request.setReceiver(receiver);
-        request.setAccepted(false);
-        repository.save(request);
+        request.setStatus("PENDING");
+        connectionRequestRepository.save(request);
     }
 
     @Override
     public void acceptRequest(Long requestId) {
-        ConnectionRequest request = repository.findById(requestId).orElse(null);
-        if (request != null) {
-            request.setAccepted(true);
-            repository.save(request);
-        }
+        ConnectionRequest request = connectionRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+        request.setStatus("ACCEPTED");
+        connectionRequestRepository.save(request);
+    }
+
+    @Override
+    public void ignoreRequest(Long requestId) {
+        ConnectionRequest request = connectionRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+        request.setStatus("IGNORED");
+        connectionRequestRepository.save(request);
+    }
+
+    @Override
+    public List<ConnectionRequest> getPendingRequests(User user) {
+        return connectionRequestRepository.findByReceiverAndStatus(user, "PENDING");
     }
 
     @Override
     public List<User> getConnections(User user) {
-        List<ConnectionRequest> accepted = repository.findBySenderAndAcceptedTrueOrReceiverAndAcceptedTrue(user, user);
+        List<ConnectionRequest> acceptedRequests = connectionRequestRepository.findBySenderOrReceiverAndStatus(user, user, "ACCEPTED");
         List<User> connections = new ArrayList<>();
-
-        for (ConnectionRequest req : accepted) {
-            if (req.getSender().getUserId().equals(user.getUserId())) {
-                connections.add(req.getReceiver());
+        for (ConnectionRequest request : acceptedRequests) {
+            if (request.getSender().equals(user)) {
+                connections.add(request.getReceiver());
             } else {
-                connections.add(req.getSender());
+                connections.add(request.getSender());
             }
         }
         return connections;
     }
-
-
 }

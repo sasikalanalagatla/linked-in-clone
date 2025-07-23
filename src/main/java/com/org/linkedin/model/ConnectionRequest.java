@@ -15,17 +15,37 @@ public class ConnectionRequest {
     @ManyToOne
     private User receiver;
 
-    private boolean accepted;
+    private String status; // PENDING, ACCEPTED, IGNORED
 
-    public boolean isAccepted() { return accepted; }
-    public void setAccepted(boolean accepted) { this.accepted = accepted; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public User getSender() { return sender; }
-    public void setSender(User sender) { this.sender = sender; }
+    public User getSender() {
+        return sender;
+    }
 
-    public User getReceiver() { return receiver; }
-    public void setReceiver(User receiver) { this.receiver = receiver; }
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

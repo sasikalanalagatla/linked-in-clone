@@ -9,6 +9,8 @@ public interface UserService {
     User getUserById(Long userId);
     User updateUser(User updatedUser);
     void followUser(Long followerId, Long followeeId);
+    List<User> getFollowers(User user);
+    List<User> getFollowing(User user);
     List<Certification> getUserCertifications(Long userId);
     Certification addCertification(Long userId, Certification certification);
     Certification updateCertification(Certification certification);

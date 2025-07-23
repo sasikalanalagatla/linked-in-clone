@@ -7,9 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ConnectionRequestRepository extends JpaRepository<ConnectionRequest, Long> {
-    List<ConnectionRequest> findByReceiverAndAcceptedFalse(User receiver);
-    boolean existsBySenderAndReceiver(User sender, User receiver);
-    List<ConnectionRequest> findBySenderAndAcceptedTrueOrReceiverAndAcceptedTrue(User sender, User receiver);
-
-
+    List<ConnectionRequest> findByReceiverAndStatus(User receiver, String status);
+    List<ConnectionRequest> findBySenderOrReceiverAndStatus(User sender, User receiver, String status);
 }
