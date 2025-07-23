@@ -46,7 +46,7 @@ public class PostController {
 
     @GetMapping("/post/create")
     public String showCreatePostForm(Model model) {
-        User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
+        User user = userRepository.findByFullName("sasikala");
         if (user == null) {
             throw new CustomException("USER_NOT_FOUND", "User not found");
         }
@@ -61,8 +61,12 @@ public class PostController {
             throw new CustomException("INVALID_POST", "Post data cannot be null");
         }
         try {
-            User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
+            User user = userRepository.findByFullName("sasikala");
+            if (user == null) {
+                throw new CustomException("USER_NOT_FOUND", "User 'sasikala' not found in the database");
+            }
             post.setAuthorName(user.getFullName());
+            post.setAuthorId(user.getUserId());
             if (imageFile != null && !imageFile.isEmpty()) {
                 String imageUrl = cloudinaryService.uploadFile(imageFile);
                 post.setImageUrl(imageUrl);
@@ -75,13 +79,13 @@ public class PostController {
             model.addAttribute("error", "Error creating post: " + e.getMessage());
             return "create_post";
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error uploading image: " + e.getMessage(), e);
         }
     }
 
     @GetMapping("/")
     public String getPostFeed(Model model) {
-        User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
+        User user = userRepository.findByFullName("sasikala");
         Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
         List<Post> posts = postPage.getContent();
@@ -100,6 +104,38 @@ public class PostController {
         model.addAttribute("totalConnection", totalConnection);
         model.addAttribute("posts", posts);
         model.addAttribute("postUserLikes", postUserLikes);
+
+        return "home-page";
+    }
+
+    @GetMapping("/post/options/{id}")
+    public String showPostOptions(@PathVariable Long id, Model model) {
+        if (id == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+        }
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+
+        User user = userRepository.findByFullName("sasikala");
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
+        Page<Post> postPage = postService.findAll(pageable);
+        List<Post> posts = postPage.getContent();
+
+        List<User> connections = connectionRequestService.getConnections(user);
+        Integer totalConnection = connections.size();
+
+        Map<Long, Boolean> postUserLikes = new HashMap<>();
+        for (Post p : posts) {
+            p.setTotalReactions(p.getReactions().size());
+            boolean liked = reactionService.hasUserLikedPost(p, user);
+            postUserLikes.put(p.getPostId(), liked);
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("totalConnection", totalConnection);
+        model.addAttribute("posts", posts);
+        model.addAttribute("postUserLikes", postUserLikes);
+        model.addAttribute("selectedPost", id); // Set the selected post ID to show the options menu
 
         return "home-page";
     }
@@ -157,15 +193,23 @@ public class PostController {
 
     @PostMapping("/post/react/{postId}")
     @ResponseBody
-    public String reactToPost(@PathVariable Long postId) {
+    public Map<String, Object> reactToPost(@PathVariable Long postId) {
         if (postId == null) {
             throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
-        User user = userRepository.findByFullName("Sanjeet Kumar Yadav"); // Hardcoded as per original
+        User user = userRepository.findByFullName("sasikala");
+        if (user == null) {
+            throw new CustomException("USER_NOT_FOUND", "User 'sasikala' not found");
+        }
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
         reactionService.toggleReaction(user, post);
-        return "Reaction updated";
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Reaction updated");
+        response.put("totalReactions", post.getReactions().size());
+        response.put("hasLiked", reactionService.hasUserLikedPost(post, user));
+        return response;
     }
 
     @GetMapping("/post/all")

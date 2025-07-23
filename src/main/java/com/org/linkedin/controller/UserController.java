@@ -18,7 +18,7 @@ public class UserController {
 
     @GetMapping("/user/profile")
     public String viewProfile(Model model) {
-        User user = userService.getUserById(2L); // Hardcoded as per original
+        User user = userService.getUserById(1L); // Hardcoded as per original
         model.addAttribute("user", user);
         return "user-profile";
     }

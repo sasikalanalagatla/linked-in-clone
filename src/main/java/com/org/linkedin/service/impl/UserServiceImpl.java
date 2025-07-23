@@ -32,6 +32,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findByEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new CustomException("INVALID_EMAIL", "Email cannot be null or empty");
+        }
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with email " + email + " not found"));
+    }
+
+    @Override
     public User updateUser(User updatedUser) {
         if (updatedUser == null || updatedUser.getUserId() == null) {
             throw new CustomException("INVALID_USER", "User data or ID cannot be null");

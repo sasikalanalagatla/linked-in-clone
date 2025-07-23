@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class JobController {
@@ -173,12 +174,12 @@ public class JobController {
         Job job = jobServiceImpl.getJobById(jobId);
         String resumeUrl = cloudinaryService.uploadFile(resumeFile);
         applyJob.setResumeUrl(resumeUrl);
-        User user = userRepository.findByEmail(applyJob.getEmail());
-        if (user == null) {
+        Optional<User> user = userRepository.findByEmail(applyJob.getEmail());
+        if (user.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "User with email " + applyJob.getEmail() + " not found");
         }
 
-        applyJob.setUser(user);
+        applyJob.setUser(user.get());
         applyJob.setJob(job);
         applyJobRepository.save(applyJob);
 

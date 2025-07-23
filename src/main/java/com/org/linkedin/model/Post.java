@@ -32,7 +32,6 @@ public class Post {
     private Boolean edited = false;
     private Long authorId;
     private String authorName;
-    private String authorTitle;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions = new ArrayList<>();
@@ -69,9 +68,6 @@ public class Post {
 
     public String getAuthorName() { return authorName; }
     public void setAuthorName(String authorName) { this.authorName = authorName; }
-
-    public String getAuthorTitle() { return authorTitle; }
-    public void setAuthorTitle(String authorTitle) { this.authorTitle = authorTitle; }
 
     public List<Reaction> getReactions() { return reactions; }
     public void setReactions(List<Reaction> reactions) { this.reactions = reactions; }

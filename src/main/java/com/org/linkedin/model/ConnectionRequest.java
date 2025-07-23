@@ -17,10 +17,8 @@ public class ConnectionRequest {
 
     private String status;
 
-    @Column(name = "accepted", nullable = false)
     private Boolean accepted = false;
 
-    // Constructors
     public ConnectionRequest() {}
 
     public ConnectionRequest(User sender, User receiver, String status) {
@@ -30,7 +28,6 @@ public class ConnectionRequest {
         this.accepted = "ACCEPTED".equals(status);
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -61,7 +58,6 @@ public class ConnectionRequest {
 
     public void setStatus(String status) {
         this.status = status;
-        // Update accepted field based on status
         this.accepted = "ACCEPTED".equals(status);
     }
 

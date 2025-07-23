@@ -31,16 +31,14 @@ public class ReactionServiceImpl implements ReactionService {
         Reaction existing = reactionRepository.findByUserAndPost(user, post);
         if (existing != null) {
             reactionRepository.delete(existing);
-            post.setTotalReactions(post.getTotalReactions() - 1);
         } else {
             Reaction reaction = new Reaction();
             reaction.setUser(user);
             reaction.setPost(post);
             reaction.setReactionType("LIKE");
             reactionRepository.save(reaction);
-            post.setTotalReactions(post.getTotalReactions() + 1);
         }
-        postRepository.save(post);
+        postRepository.save(post); // Save post to persist any other changes
     }
 
     @Override

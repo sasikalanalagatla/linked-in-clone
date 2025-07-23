@@ -16,7 +16,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (postRepository.count() == 0) {
+        if (postRepository.count() <10) {
             for (int i = 1; i <= 1000; i++) {
                 Post post = new Post();
                 post.setPostDescription("Sample post " + i);
@@ -27,7 +27,6 @@ public class DataLoader implements CommandLineRunner {
                 post.setEdited(false);
                 post.setAuthorId((long) i);
                 post.setAuthorName("User " + i);
-                post.setAuthorTitle("Engineer");
                 post.setTotalReactions(i % 20);
 
                 postRepository.save(post);
