@@ -32,6 +32,30 @@ public interface JobRepository extends JpaRepository<Job, Long> {
                               Pageable pageable);
 
 
+    @Query("SELECT j FROM Job j WHERE j.applicationsCount < 10")
+    Page<Job> findJobsWithUnder10Applicants(Pageable pageable);
+
+    @Query("SELECT DISTINCT j FROM Job j LEFT JOIN j.requiredSkills s " +
+            "WHERE (LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(j.company) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(s.skillName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND j.applicationsCount < 10")
+    Page<Job> searchJobsWithUnder10Applicants(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT j FROM Job j WHERE j.jobCreatedAt >= :createdAfter AND j.applicationsCount < 10")
+    Page<Job> filterByCreatedAtWithUnder10Applicants(@Param("createdAfter") LocalDateTime createdAfter, Pageable pageable);
+
+    @Query("SELECT DISTINCT j FROM Job j LEFT JOIN j.requiredSkills s " +
+            "WHERE (LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(j.company) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(s.skillName) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND j.jobCreatedAt >= :createdAfter AND j.applicationsCount < 10")
+    Page<Job> filterAndSearchWithUnder10Applicants(@Param("keyword") String keyword,
+                                                   @Param("createdAfter") LocalDateTime createdAfter,
+                                                   Pageable pageable);
+
+
+
 
 
 }

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ApplyJobRepository extends JpaRepository<ApplyJob, Long> {
+
+    boolean existsByJobIdAndUserEmail(Long jobId, String email);
 }

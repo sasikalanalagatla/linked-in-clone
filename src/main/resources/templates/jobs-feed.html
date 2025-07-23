@@ -610,6 +610,7 @@
                 </div>
                 Work
             </a>
+            <a href="#" class="premium-link">Try Premium for free</a>
         </div>
     </div>
 </div>
@@ -617,17 +618,21 @@
 <div class="container">
     <div class="left-panel">
         <div class="job-filters">
-            <a th:href="@{/job/feed(range='past 24 hours', keyword=${keyword},page =0)}"
+            <a th:href="@{/job/feed(range='past 24 hours', keyword=${keyword}, page=0, under10=${under10})}"
                th:classappend="${range == 'past 24 hours'} ? 'active' : ''"
                class="filter-pill">Past 24 Hours</a>
 
-            <a th:href="@{/job/feed(range='past 7 days', keyword=${keyword}, page = 0)}"
+            <a th:href="@{/job/feed(range='past 7 days', keyword=${keyword}, page=0, under10=${under10})}"
                th:classappend="${range == 'past 7 days'} ? 'active' : ''"
                class="filter-pill">Past 7 Days</a>
 
-            <a th:href="@{/job/feed(range='past 30 days', keyword=${keyword}, page = 0)}"
+            <a th:href="@{/job/feed(range='past 30 days', keyword=${keyword}, page=0, under10=${under10})}"
                th:classappend="${range == 'past 30 days'} ? 'active' : ''"
                class="filter-pill">Past 30 Days</a>
+
+            <a th:href="@{/job/feed(range=${range}, keyword=${keyword}, page=0, under10=${under10 != null ? !under10 : true})}"
+               th:classappend="${under10 != null and under10} ? 'active' : ''"
+               class="filter-pill">Under 10 Applicants</a>
         </div>
 
         <div class="job-list" th:if="${jobs != null and !jobs.isEmpty()}">
@@ -652,23 +657,7 @@
 
         <div class="pagination-container" th:if="${jobs != null and !jobs.isEmpty() and totalPages > 1}">
             <div class="pagination">
-                <a th:href="@{/job/feed(page=${currentPage - 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
-                   class="page-btn"
-                   th:classappend="${currentPage == 0} ? 'disabled'"
-                   th:if="${currentPage > 0}">Previous</a>
-
-                <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                          th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
-                    <a th:href="@{/job/feed(page=${i}, keyword=${param.keyword}, range=${range})}"
-                       class="page-btn"
-                       th:classappend="${i == currentPage} ? 'active'"
-                       th:text="${i + 1}">1</a>
-                </th:block>
-
-                <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
-                   class="page-btn"
-                   th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
-                   th:if="${currentPage < totalPages - 1}">Next</a>
+                currentPage
             </div>
 
             <div class="pagination-info">

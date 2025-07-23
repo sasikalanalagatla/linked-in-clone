@@ -49,6 +49,7 @@ public class JobController {
     public String jobFeed(@RequestParam(value = "keyword", required = false) String keyword,
                           @RequestParam(value = "range", required = false) String range,
                           @RequestParam(value = "jobId", required = false) Long jobId,
+                          @RequestParam(value = "under10", required = false) Boolean under10,
                           @RequestParam(value = "page", defaultValue = "0") int page,
                           @RequestParam(value = "size", defaultValue = "5") int size,
                           Model model) {
@@ -64,20 +65,33 @@ public class JobController {
             createdAfter = LocalDateTime.now().minusDays(30);
         }
 
-        if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
-            jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
-        } else if (keyword != null && !keyword.isEmpty()) {
-            jobPage = jobServiceImpl.searchJobs(keyword, pageable);
-        } else if (createdAfter != null) {
-            jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
+        if (Boolean.TRUE.equals(under10)) {
+            if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
+                jobPage = jobRepository.filterAndSearchWithUnder10Applicants(keyword, createdAfter, pageable);
+            } else if (keyword != null && !keyword.isEmpty()) {
+                jobPage = jobRepository.searchJobsWithUnder10Applicants(keyword, pageable);
+            } else if (createdAfter != null) {
+                jobPage = jobRepository.filterByCreatedAtWithUnder10Applicants(createdAfter, pageable);
+            } else {
+                jobPage = jobRepository.findJobsWithUnder10Applicants(pageable);
+            }
         } else {
-            jobPage = jobServiceImpl.getAllJobs(pageable);
+            if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
+                jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
+            } else if (keyword != null && !keyword.isEmpty()) {
+                jobPage = jobServiceImpl.searchJobs(keyword, pageable);
+            } else if (createdAfter != null) {
+                jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
+            } else {
+                jobPage = jobServiceImpl.getAllJobs(pageable);
+            }
         }
 
         List<Job> jobs = jobPage.getContent();
         model.addAttribute("jobs", jobs);
         model.addAttribute("keyword", keyword);
         model.addAttribute("range", range);
+        model.addAttribute("under10", under10);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", jobPage.getTotalPages());
         model.addAttribute("size", size);

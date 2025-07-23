@@ -1,4 +1,3 @@
-/*
 package com.org.linkedin;
 
 import com.org.linkedin.enums.JobType;
@@ -52,4 +51,4 @@ public class DummyJobDataLoader {
            }
         };
     }
-}*/
+}
