@@ -193,23 +193,17 @@ public class PostController {
 
     @PostMapping("/post/react/{postId}")
     @ResponseBody
-    public Map<String, Object> reactToPost(@PathVariable Long postId) {
-        if (postId == null) {
-            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
-        }
-        User user = userRepository.findByFullName("sasikala");
-        if (user == null) {
-            throw new CustomException("USER_NOT_FOUND", "User 'sasikala' not found");
-        }
+    public String reactToPost(@PathVariable Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-        reactionService.toggleReaction(user, post);
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Reaction updated");
-        response.put("totalReactions", post.getReactions().size());
-        response.put("hasLiked", reactionService.hasUserLikedPost(post, user));
-        return response;
+        User dummyUser = userRepository.findByFullName("sasikala");
+        if (dummyUser == null) {
+            throw new RuntimeException("Dummy user 'sasikala' not found");
+        }
+
+        reactionService.toggleReaction(dummyUser, post);
+        return "Reaction updated";
     }
 
     @GetMapping("/post/all")
