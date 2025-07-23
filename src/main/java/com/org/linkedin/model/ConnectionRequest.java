@@ -15,8 +15,22 @@ public class ConnectionRequest {
     @ManyToOne
     private User receiver;
 
-    private String status; // PENDING, ACCEPTED, IGNORED
+    private String status;
 
+    @Column(name = "accepted", nullable = false)
+    private Boolean accepted = false;
+
+    // Constructors
+    public ConnectionRequest() {}
+
+    public ConnectionRequest(User sender, User receiver, String status) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.status = status;
+        this.accepted = "ACCEPTED".equals(status);
+    }
+
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -47,5 +61,15 @@ public class ConnectionRequest {
 
     public void setStatus(String status) {
         this.status = status;
+        // Update accepted field based on status
+        this.accepted = "ACCEPTED".equals(status);
+    }
+
+    public Boolean getAccepted() {
+        return accepted;
+    }
+
+    public void setAccepted(Boolean accepted) {
+        this.accepted = accepted;
     }
 }

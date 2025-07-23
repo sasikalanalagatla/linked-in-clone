@@ -1,5 +1,6 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.AdditionalQuestion;
 import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Job;
@@ -19,9 +20,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class JobController {
@@ -50,7 +51,6 @@ public class JobController {
                           @RequestParam(value = "page", defaultValue = "0") int page,
                           @RequestParam(value = "size", defaultValue = "5") int size,
                           Model model) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by("jobCreatedAt").descending());
         Page<Job> jobPage;
 
@@ -92,13 +92,13 @@ public class JobController {
         return "jobs-feed";
     }
 
-
-
     @PostMapping("/job/create")
     public String createPost(@ModelAttribute("job") Job job,
                              @RequestParam(required = false) String addQuestion,
                              Model model) {
-
+        if (job == null) {
+            throw new CustomException("INVALID_JOB", "Job data cannot be null");
+        }
         if (addQuestion != null) {
             job.getAdditionalQuestions().add(new AdditionalQuestion());
             model.addAttribute("job", job);
@@ -107,6 +107,11 @@ public class JobController {
         }
 
         for (AdditionalQuestion question : job.getAdditionalQuestions()) {
+            if (question.getQuestionText() == null || question.getQuestionText().trim().isEmpty()) {
+                model.addAttribute("job", job);
+                model.addAttribute("skills", skillRepository.findAll());
+                throw new CustomException("INVALID_QUESTION", "Question text cannot be empty");
+            }
             question.setJob(job);
         }
 
@@ -124,14 +129,20 @@ public class JobController {
     }
 
     @GetMapping("/job/get/{jobId}")
-    public String getJobById(@PathVariable("jobId") Long jobId, Model model){
+    public String getJobById(@PathVariable("jobId") Long jobId, Model model) {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
         Job job = jobServiceImpl.getJobById(jobId);
-        model.addAttribute("job",job);
+        model.addAttribute("job", job);
         return "single-job";
     }
 
-     @GetMapping("/job/apply/{jobId}")
+    @GetMapping("/job/apply/{jobId}")
     public String showApplyForm(@PathVariable Long jobId, Model model) {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
         Job job = jobServiceImpl.getJobById(jobId);
         ApplyJob applyJob = new ApplyJob();
 
@@ -149,34 +160,45 @@ public class JobController {
     @PostMapping("/job/apply/{jobId}")
     public String submitApplyForm(@PathVariable Long jobId,
                                   @ModelAttribute ApplyJob applyJob,
-                                  @RequestParam("resumeFile") MultipartFile resumeFile) {
-        try {
-            Job job = jobServiceImpl.getJobById(jobId);
-            String resumeUrl = cloudinaryService.uploadFile(resumeFile);
-            applyJob.setResumeUrl(resumeUrl);
-            User user = userRepository.findByEmail(applyJob.getEmail());
-            applyJob.setUser(user);
-
-            applyJob.setJob(job);
-            applyJobRepository.save(applyJob);
-
-            return "redirect:/job/feed?jobId=" + jobId;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "redirect:/job/apply/" + jobId + "?error=true";
+                                  @RequestParam("resumeFile") MultipartFile resumeFile) throws IOException {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
         }
+        if (applyJob == null || applyJob.getEmail() == null) {
+            throw new CustomException("INVALID_APPLICATION", "Application data or email cannot be null");
+        }
+        if (resumeFile == null || resumeFile.isEmpty()) {
+            throw new CustomException("INVALID_FILE", "Resume file cannot be null or empty");
+        }
+        Job job = jobServiceImpl.getJobById(jobId);
+        String resumeUrl = cloudinaryService.uploadFile(resumeFile);
+        applyJob.setResumeUrl(resumeUrl);
+        User user = userRepository.findByEmail(applyJob.getEmail());
+        if (user == null) {
+            throw new CustomException("USER_NOT_FOUND", "User with email " + applyJob.getEmail() + " not found");
+        }
+
+        applyJob.setUser(user);
+        applyJob.setJob(job);
+        applyJobRepository.save(applyJob);
+
+        return "redirect:/job/feed?jobId=" + jobId;
     }
 
-
     @PostMapping("/job/delete/{jobId}")
-    public String deleteJobById(@PathVariable("jobId") Long jobId){
+    public String deleteJobById(@PathVariable("jobId") Long jobId) {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
         jobServiceImpl.deleteJobById(jobId);
         return "redirect:/job/feed";
     }
 
     @GetMapping("/job/edit/{id}")
     public String editJobForm(@PathVariable Long id, Model model) {
+        if (id == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
         Job job = jobServiceImpl.getJobById(id);
         model.addAttribute("job", job);
         return "edit-job";
@@ -184,6 +206,9 @@ public class JobController {
 
     @PostMapping("/job/update")
     public String updateJob(@ModelAttribute("job") Job updatedJob) {
+        if (updatedJob == null || updatedJob.getId() == null) {
+            throw new CustomException("INVALID_JOB", "Job data or ID cannot be null");
+        }
         jobServiceImpl.updateJob(updatedJob);
         return "redirect:/job/feed";
     }

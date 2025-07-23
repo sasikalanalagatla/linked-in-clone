@@ -1,5 +1,6 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
@@ -20,14 +21,10 @@ public class ProfileController {
 
     @GetMapping("/profile/{userId}")
     public String showProfile(@PathVariable("userId") Long userId, Model model, HttpSession session) {
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            // Return a default user or redirect if no user is found
-            user = new User(); // Placeholder, adjust as per your User class
-            user.setUserId(userId);
-            user.setFullName("Unknown User");
-            user.setEmail("unknown@example.com");
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+        User user = userService.getUserById(userId);
         model.addAttribute("user", user);
         model.addAttribute("email", user.getEmail());
         model.addAttribute("currentUserId", 1L); // Hardcoded for development
@@ -37,19 +34,19 @@ public class ProfileController {
 
     @GetMapping("/profile/edit/{id}")
     public String showEditProfileForm(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            user = new User(); // Placeholder
-            user.setUserId(id);
-            user.setFullName("Unknown User");
-            user.setEmail("unknown@example.com");
+        if (id == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+        User user = userService.getUserById(id);
         model.addAttribute("user", user);
         return "edit-profile";
     }
 
     @PostMapping("/profile/update")
     public String updateProfile(@ModelAttribute("user") User updatedUser) {
+        if (updatedUser == null || updatedUser.getUserId() == null) {
+            throw new CustomException("INVALID_USER", "User data or ID cannot be null");
+        }
         userService.updateUser(updatedUser);
         return "redirect:/profile/" + updatedUser.getUserId();
     }

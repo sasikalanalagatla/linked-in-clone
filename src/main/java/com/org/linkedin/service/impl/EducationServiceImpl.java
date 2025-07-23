@@ -1,5 +1,6 @@
 package com.org.linkedin.service.impl;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Education;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.EducationRepository;
@@ -23,19 +24,38 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public List<Education> getAllEducationsByUserId(Long userId) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
         return educationRepository.findByUserUserId(userId);
     }
 
     @Override
     public Education addEducation(Long userId, Education education) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (education == null) {
+            throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
+        }
         Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
+        }
         education.setUser(user.get());
         return educationRepository.save(education);
     }
 
     @Override
     public Education updateEducation(Long educationId, Education updatedEducation) {
-        Education education = educationRepository.findById(educationId).orElseThrow();
+        if (educationId == null) {
+            throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
+        }
+        if (updatedEducation == null) {
+            throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
+        }
+        Education education = educationRepository.findById(educationId)
+                .orElseThrow(() -> new CustomException("EDUCATION_NOT_FOUND", "Education with ID " + educationId + " not found"));
         education.setSchoolName(updatedEducation.getSchoolName());
         education.setDegree(updatedEducation.getDegree());
         education.setFieldOfStudy(updatedEducation.getFieldOfStudy());
@@ -48,20 +68,37 @@ public class EducationServiceImpl implements EducationService {
 
     @Override
     public void deleteEducation(Long educationId) {
+        if (educationId == null) {
+            throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
+        }
+        if (!educationRepository.existsById(educationId)) {
+            throw new CustomException("EDUCATION_NOT_FOUND", "Education with ID " + educationId + " not found");
+        }
         educationRepository.deleteById(educationId);
     }
 
     @Override
     public void saveOrUpdate(Long userId, Education education) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (education == null) {
+            throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
+        }
         Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
+        }
         education.setUser(user.get());
         educationRepository.save(education);
     }
 
     @Override
     public Education getEducationById(Long id) {
-        return educationRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
+        }
+        return educationRepository.findById(id)
+                .orElseThrow(() -> new CustomException("EDUCATION_NOT_FOUND", "Education with ID " + id + " not found"));
     }
-
-
 }

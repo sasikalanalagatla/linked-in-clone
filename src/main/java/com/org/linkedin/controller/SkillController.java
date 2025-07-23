@@ -1,8 +1,8 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Skill;
 import com.org.linkedin.service.SkillService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,15 +26,21 @@ public class SkillController {
 
     @PostMapping("/save")
     public String saveSkill(@ModelAttribute Skill skill) {
-        Long userId = 1l;
+        if (skill == null) {
+            throw new CustomException("INVALID_SKILL", "Skill data cannot be null");
+        }
+        Long userId = 1L; // Hardcoded for development
         skillService.saveSkillForUser(userId, skill);
-        return "redirect:/profile/"+1;
+        return "redirect:/profile/" + userId;
     }
 
     @GetMapping("/delete/{id}")
     public String deleteSkill(@PathVariable Long id) {
-        Long userId = 1l;
+        if (id == null) {
+            throw new CustomException("INVALID_SKILL_ID", "Skill ID cannot be null");
+        }
+        Long userId = 1L; // Hardcoded for development
         skillService.deleteUserSkill(userId, id);
-        return "redirect:/profile/"+1;
+        return "redirect:/profile/" + userId;
     }
 }

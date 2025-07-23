@@ -1,5 +1,6 @@
 package com.org.linkedin.service.impl;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Skill;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.SkillRepository;
@@ -22,19 +23,23 @@ public class SkillServiceImpl implements SkillService {
 
     @Override
     public Skill saveSkillForUser(Long userId, Skill skill) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (skill == null) {
+            throw new CustomException("INVALID_SKILL", "Skill data cannot be null");
+        }
         Optional<User> user = userRepository.findById(userId);
-        if (user == null) return null;
+        if (user.isEmpty()) {
+            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
+        }
 
         Skill savedSkill;
 
         if (skill.getSkillId() != null) {
-            savedSkill = skillRepository.findById(skill.getSkillId()).orElse(null);
-            if (savedSkill != null) {
-                savedSkill.setSkillName(skill.getSkillName());
-            } else {
-                savedSkill = new Skill();
-                savedSkill.setSkillName(skill.getSkillName());
-            }
+            savedSkill = skillRepository.findById(skill.getSkillId())
+                    .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + skill.getSkillId() + " not found"));
+            savedSkill.setSkillName(skill.getSkillName());
         } else {
             savedSkill = new Skill();
             savedSkill.setSkillName(skill.getSkillName());
@@ -50,20 +55,31 @@ public class SkillServiceImpl implements SkillService {
         return savedSkill;
     }
 
-
     @Override
     public void deleteUserSkill(Long userId, Long skillId) {
-        Optional<User> user = userRepository.findById(userId);
-        Skill skill = skillRepository.findById(skillId).orElse(null);
-
-        if (user != null && skill != null) {
-            user.get().getSkills().remove(skill);
-            userRepository.save(user.get());
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+        if (skillId == null) {
+            throw new CustomException("INVALID_SKILL_ID", "Skill ID cannot be null");
+        }
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
+        }
+        Skill skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + skillId + " not found"));
+
+        user.get().getSkills().remove(skill);
+        userRepository.save(user.get());
     }
 
     @Override
     public Skill getSkillById(Long id) {
-        return skillRepository.findById(id).orElse(null);
+        if (id == null) {
+            throw new CustomException("INVALID_SKILL_ID", "Skill ID cannot be null");
+        }
+        return skillRepository.findById(id)
+                .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + id + " not found"));
     }
 }

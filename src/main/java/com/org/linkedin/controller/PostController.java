@@ -1,5 +1,6 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Post;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.PostRepository;
@@ -33,7 +34,8 @@ public class PostController {
     private final PostService postService;
 
     public PostController(PostRepository postRepository, UserRepository userRepository,
-                          ReactionService reactionService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService, PostService postService) {
+                          ReactionService reactionService, CloudinaryService cloudinaryService,
+                          ConnectionRequestService connectionRequestService, PostService postService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.reactionService = reactionService;
@@ -44,53 +46,57 @@ public class PostController {
 
     @GetMapping("/post/create")
     public String showCreatePostForm(Model model) {
+        User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
+        if (user == null) {
+            throw new CustomException("USER_NOT_FOUND", "User not found");
+        }
         model.addAttribute("post", new Post());
-        model.addAttribute("authorName", "Sanjeet Kumar Yadav");
+        model.addAttribute("authorName", user.getFullName());
         return "create_post";
     }
 
     @PostMapping("/post/create")
-    public String createPost(@ModelAttribute("post") Post post,
-                             @RequestParam("imageFile") MultipartFile imageFile) {
-        User user = userRepository.findByFullName("Sanjeet Kumar Yadav");
-        if (user != null) {
-            post.setAuthorName(user.getFullName());
-        } else {
-            post.setAuthorName("Guest");
+    public String createPost(@ModelAttribute("post") Post post, @RequestParam("imageFile") MultipartFile imageFile, Model model) {
+        if (post == null) {
+            throw new CustomException("INVALID_POST", "Post data cannot be null");
         }
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
+        try {
+            User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
+            post.setAuthorName(user.getFullName());
+            if (imageFile != null && !imageFile.isEmpty()) {
                 String imageUrl = cloudinaryService.uploadFile(imageFile);
                 post.setImageUrl(imageUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            postRepository.save(post);
+            return "redirect:/";
+        } catch (CustomException e) {
+            model.addAttribute("post", post);
+            model.addAttribute("authorName", "sasikala");
+            model.addAttribute("error", "Error creating post: " + e.getMessage());
+            return "create_post";
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        postRepository.save(post);
-        return "redirect:/";
     }
 
     @GetMapping("/")
     public String getPostFeed(Model model) {
+        User user = userRepository.findByFullName("sasikala"); // Hardcoded as per original
         Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
         List<Post> posts = postPage.getContent();
 
-        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
-        List<User> connections = connectionRequestService.getConnections(dummyUser);
+        List<User> connections = connectionRequestService.getConnections(user);
         Integer totalConnection = connections.size();
 
         Map<Long, Boolean> postUserLikes = new HashMap<>();
         for (Post post : posts) {
             post.setTotalReactions(post.getReactions().size());
-            if (dummyUser != null) {
-                boolean liked = reactionService.hasUserLikedPost(post, dummyUser);
-                postUserLikes.put(post.getPostId(), liked);
-            }
+            boolean liked = reactionService.hasUserLikedPost(post, user);
+            postUserLikes.put(post.getPostId(), liked);
         }
 
-        model.addAttribute("user", dummyUser);
+        model.addAttribute("user", user);
         model.addAttribute("totalConnection", totalConnection);
         model.addAttribute("posts", posts);
         model.addAttribute("postUserLikes", postUserLikes);
@@ -98,53 +104,76 @@ public class PostController {
         return "home-page";
     }
 
-
     @GetMapping("/post/edit/{id}")
     public String editPostForm(@PathVariable Long id, Model model) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+        if (id == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+        }
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
         model.addAttribute("post", post);
         model.addAttribute("authorName", post.getAuthorName());
         return "edit_post";
     }
 
     @PostMapping("/post/edit/{id}")
-    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
-        post.setPostDescription(updatedPost.getPostDescription());
-        post.setEdited(true);
-        postRepository.save(post);
-        return "redirect:/";
+    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost, Model model) {
+        if (id == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+        }
+        if (updatedPost == null || updatedPost.getPostDescription() == null) {
+            throw new CustomException("INVALID_POST", "Post data or description cannot be null");
+        }
+        try {
+            Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+            post.setPostDescription(updatedPost.getPostDescription());
+            post.setEdited(true);
+            postRepository.save(post);
+            return "redirect:/";
+        } catch (CustomException e) {
+            model.addAttribute("post", updatedPost);
+            model.addAttribute("authorName", "sasikala");
+            model.addAttribute("error", "Error updating post: " + e.getMessage());
+            return "edit_post";
+        }
     }
 
-    @GetMapping("/post/delete/{id}")
-    public String deletePost(@PathVariable Long id) {
-        postRepository.deleteById(id);
-        return "redirect:/";
+    @PostMapping("/post/delete/{id}")
+    public String deletePost(@PathVariable Long id, Model model) {
+        if (id == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+        }
+        try {
+            postRepository.findById(id)
+                    .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+            postRepository.deleteById(id);
+            return "redirect:/";
+        } catch (CustomException e) {
+            model.addAttribute("error", "Error deleting post: " + e.getMessage());
+            return "error";
+        }
     }
 
     @PostMapping("/post/react/{postId}")
     @ResponseBody
     public String reactToPost(@PathVariable Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-
-        User dummyUser = userRepository.findByFullName("Sanjeet Kumar Yadav");
-        if (dummyUser == null) {
-            throw new RuntimeException("Dummy user 'sasikala' not found");
+        if (postId == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
-
-        reactionService.toggleReaction(dummyUser, post);
+        User user = userRepository.findByFullName("Sanjeet Kumar Yadav"); // Hardcoded as per original
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+        reactionService.toggleReaction(user, post);
         return "Reaction updated";
     }
 
     @GetMapping("/post/all")
     public String viewAllPosts(Model model) {
         List<Post> posts = postRepository.findAll();
-
         for (Post post : posts) {
             post.setTotalReactions(post.getReactions().size());
         }
-
         model.addAttribute("posts", posts);
         return "post_list";
     }
@@ -153,10 +182,7 @@ public class PostController {
     public String loadMorePosts(@RequestParam int page, Model model) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
-
         model.addAttribute("posts", postPage.getContent());
-
         return "partials/postCards :: postList";
     }
-
 }

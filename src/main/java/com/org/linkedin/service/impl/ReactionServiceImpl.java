@@ -1,5 +1,6 @@
 package com.org.linkedin.service.impl;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Post;
 import com.org.linkedin.model.Reaction;
 import com.org.linkedin.model.User;
@@ -21,6 +22,12 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public void toggleReaction(User user, Post post) {
+        if (user == null) {
+            throw new CustomException("INVALID_USER", "User cannot be null");
+        }
+        if (post == null) {
+            throw new CustomException("INVALID_POST", "Post cannot be null");
+        }
         Reaction existing = reactionRepository.findByUserAndPost(user, post);
         if (existing != null) {
             reactionRepository.delete(existing);
@@ -38,6 +45,12 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Override
     public boolean hasUserLikedPost(Post post, User user) {
+        if (user == null) {
+            throw new CustomException("INVALID_USER", "User cannot be null");
+        }
+        if (post == null) {
+            throw new CustomException("INVALID_POST", "Post cannot be null");
+        }
         return reactionRepository.existsByUserAndPost(user, post);
     }
 }

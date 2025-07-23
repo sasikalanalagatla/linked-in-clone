@@ -1,11 +1,11 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.ChatMessage;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.ChatService;
 import com.org.linkedin.service.impl.ConnectionRequestImpl;
 import com.org.linkedin.service.impl.UserServiceImpl;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -34,26 +34,30 @@ public class ChatController {
 
     @MessageMapping("/chat")
     public void processMessage(ChatMessage chatMessage) {
+        if (chatMessage == null || chatMessage.getReceiverEmail() == null) {
+            throw new CustomException("INVALID_MESSAGE", "Message or receiver email cannot be null");
+        }
         chatService.saveMessage(chatMessage);
         String to = "/topic/messages/" + chatMessage.getReceiverEmail();
         messagingTemplate.convertAndSend(to, chatMessage);
     }
 
     @GetMapping
-    public String chatPage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail,
-                           HttpSession session,
-                           Model model) {
-        User loggedInUser = userService.getUserById(1L); // use session if available
+    public String chatPage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail, Model model) {
+        User loggedInUser = userService.getUserById(1L); // Hardcoded as per original
         String senderEmail = loggedInUser.getEmail();
+        if (senderEmail == null) {
+            throw new CustomException("INVALID_EMAIL", "Sender email cannot be null");
+        }
 
         List<User> connections = connectionRequest.getConnections(loggedInUser);
-        model.addAttribute("connections", connections);
+        model.addAttribute("connections", connections != null ? connections : new ArrayList<>());
         model.addAttribute("senderEmail", senderEmail);
 
         if (receiverEmail != null) {
             model.addAttribute("receiverEmail", receiverEmail);
             List<ChatMessage> history = chatService.getChatHistory(senderEmail, receiverEmail);
-            model.addAttribute("chatHistory", history);
+            model.addAttribute("chatHistory", history != null ? history : new ArrayList<>());
         }
 
         return "chat";

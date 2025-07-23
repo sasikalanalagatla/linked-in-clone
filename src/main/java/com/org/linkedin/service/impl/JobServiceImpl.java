@@ -1,5 +1,6 @@
 package com.org.linkedin.service.impl;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.service.JobService;
@@ -19,41 +20,76 @@ public class JobServiceImpl implements JobService {
         this.jobRepository = jobRepository;
     }
 
-    public Job createJob(Job job){
+    @Override
+    public Job createJob(Job job) {
+        if (job == null) {
+            throw new CustomException("INVALID_JOB", "Job data cannot be null");
+        }
         return jobRepository.save(job);
     }
+
     @Override
     public Job getJobById(Long jobId) {
-        return jobRepository.getById(jobId);
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
+        return jobRepository.findById(jobId)
+                .orElseThrow(() -> new CustomException("JOB_NOT_FOUND", "Job with ID " + jobId + " not found"));
     }
+
     @Override
-    public Job editJobById(Long jobId){
-        return null;
+    public Job editJobById(Long jobId) {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
+        return jobRepository.findById(jobId)
+                .orElseThrow(() -> new CustomException("JOB_NOT_FOUND", "Job with ID " + jobId + " not found"));
     }
 
     @Override
     public List<Job> getAllJobs() {
-        return List.of();
+        return jobRepository.findAll();
     }
 
     @Override
     public Page<Job> getAllJobs(Pageable pageable) {
+        if (pageable == null) {
+            throw new CustomException("INVALID_PAGEABLE", "Pageable cannot be null");
+        }
         return jobRepository.findAll(pageable);
     }
 
     @Override
     public Page<Job> searchJobs(String keyword, Pageable pageable) {
+        if (pageable == null) {
+            throw new CustomException("INVALID_PAGEABLE", "Pageable cannot be null");
+        }
+        if (keyword == null) {
+            throw new CustomException("INVALID_KEYWORD", "Search keyword cannot be null");
+        }
         return jobRepository.searchJobsByTitleOrSkill(keyword, pageable);
     }
 
     @Override
     public String deleteJobById(Long jobId) {
+        if (jobId == null) {
+            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
+        }
+        if (!jobRepository.existsById(jobId)) {
+            throw new CustomException("JOB_NOT_FOUND", "Job with ID " + jobId + " not found");
+        }
         jobRepository.deleteById(jobId);
         return "post deleted";
     }
 
     @Override
     public void updateJob(Job job) {
+        if (job == null || job.getId() == null) {
+            throw new CustomException("INVALID_JOB", "Job data or ID cannot be null");
+        }
+        if (!jobRepository.existsById(job.getId())) {
+            throw new CustomException("JOB_NOT_FOUND", "Job with ID " + job.getId() + " not found");
+        }
         jobRepository.save(job);
     }
 }

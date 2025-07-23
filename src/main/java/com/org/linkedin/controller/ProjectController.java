@@ -1,5 +1,6 @@
 package com.org.linkedin.controller;
 
+import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Project;
 import com.org.linkedin.service.ProjectService;
 import jakarta.validation.Valid;
@@ -15,18 +16,22 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    // Original mapping for /add/project/{userId}
     @GetMapping("/add/project/{userId}")
     public String showAddProjectForm(@PathVariable Long userId, Model model) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
         model.addAttribute("project", new Project());
         model.addAttribute("userId", userId);
         model.addAttribute("skillsString", "");
         return "add-project";
     }
 
-    // New mapping for /new/project/{userId} - points to same functionality
     @GetMapping("/new/project/{userId}")
     public String showNewProjectForm(@PathVariable Long userId, Model model) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
         model.addAttribute("project", new Project());
         model.addAttribute("userId", userId);
         model.addAttribute("skillsString", "");
@@ -39,37 +44,51 @@ public class ProjectController {
                              BindingResult result,
                              @RequestParam("skillsString") String skillsString,
                              Model model) {
-        projectService.saveProject(userId, project, skillsString, result);
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (project == null) {
+            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
+        }
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
-            return "add-project";
+            throw new CustomException("INVALID_PROJECT_DATA", "Invalid project data");
         }
-        return "redirect:/"; // Redirect to home instead of projects
+        projectService.saveProject(userId, project, skillsString, result);
+        return "redirect:/profile/" + userId;
     }
 
-    // Also add POST mapping for /new/project/{userId} to handle form submissions
     @PostMapping("/new/project/{userId}")
     public String addNewProject(@PathVariable Long userId,
                                 @Valid @ModelAttribute("project") Project project,
                                 BindingResult result,
                                 @RequestParam("skillsString") String skillsString,
                                 Model model) {
-        projectService.saveProject(userId, project, skillsString, result);
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (project == null) {
+            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
+        }
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
-            return "add-project";
+            throw new CustomException("INVALID_PROJECT_DATA", "Invalid project data");
         }
-        return "redirect:/"; // Redirect to home instead of projects
+        projectService.saveProject(userId, project, skillsString, result);
+        return "redirect:/profile/" + userId;
     }
 
     @GetMapping("/edit/project/{userId}/{projectId}")
     public String showEditProjectForm(@PathVariable Long userId, @PathVariable Long projectId, Model model) {
-        Project project = projectService.getProjectById(projectId);
-        if (project == null) {
-            return "redirect:/"; // Redirect to home if project not found
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+        if (projectId == null) {
+            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
+        }
+        Project project = projectService.getProjectById(projectId);
         String skillsString = projectService.getSkillsStringForProject(projectId);
         model.addAttribute("project", project);
         model.addAttribute("userId", userId);
@@ -84,18 +103,33 @@ public class ProjectController {
                               BindingResult result,
                               @RequestParam("skillsString") String skillsString,
                               Model model) {
-        projectService.updateProject(userId, projectId, project, skillsString, result);
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (projectId == null) {
+            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
+        }
+        if (project == null) {
+            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
+        }
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
-            return "add-project";
+            throw new CustomException("INVALID_PROJECT_DATA", "Invalid project data");
         }
-        return "redirect:/"; // Redirect to home
+        projectService.updateProject(userId, projectId, project, skillsString, result);
+        return "redirect:/profile/" + userId;
     }
 
     @PostMapping("/delete/project/{userId}/{projectId}")
     public String deleteProject(@PathVariable Long userId, @PathVariable Long projectId) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        if (projectId == null) {
+            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
+        }
         projectService.deleteProject(projectId);
-        return "redirect:/"; // Redirect to home
+        return "redirect:/profile/" + userId;
     }
 }
