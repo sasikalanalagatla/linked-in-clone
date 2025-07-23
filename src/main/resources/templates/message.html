@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LinkedIn Messaging</title>
   <style>
     * {
@@ -14,25 +15,26 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
       background: #f3f2ef;
       margin: 0;
+      line-height: 1.5;
     }
 
+    /* Navbar */
     .navbar {
       display: flex;
       align-items: center;
       background-color: #ffffff;
       padding: 0;
-      height: 52px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
+      height: 56px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
       z-index: 1000;
-      border-bottom: 1px solid #00000017;
     }
 
     .navbar-container {
       display: flex;
       align-items: center;
-      max-width: 1128px;
+      max-width: 1200px;
       width: 100%;
       margin: 0 auto;
       padding: 0 16px;
@@ -42,39 +44,46 @@
     .navbar .left-section {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
     .navbar .logo {
-      height: 34px;
-      width: 34px;
-      margin-right: 8px;
+      height: 36px;
+      width: 36px;
+      margin-right: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: #0a66c2;
-      border-radius: 2px;
+      border-radius: 4px;
     }
 
     .navbar .logo-text {
       color: white;
-      font-weight: bold;
-      font-size: 16px;
+      font-weight: 700;
+      font-size: 18px;
     }
 
     .search-container {
       position: relative;
-      width: 280px;
+      width: 300px;
+      max-width: 100%;
     }
 
     .search-input {
       width: 100%;
-      padding: 6px 8px 6px 40px;
-      border-radius: 4px;
-      border: none;
+      padding: 8px 12px 8px 40px;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
       background-color: #edf3f8;
       font-size: 14px;
-      height: 34px;
+      height: 36px;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #0a66c2;
     }
 
     .search-input::placeholder {
@@ -94,52 +103,52 @@
     .navbar .nav-items {
       display: flex;
       align-items: center;
-      gap: 0;
+      gap: 8px;
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 12px;
+      padding: 8px 12px;
       text-decoration: none;
-      color: #666;
-      font-size: 12px;
-      font-weight: 400;
+      color: #333;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      border-radius: 4px;
-      transition: color 0.2s;
-      min-width: 80px;
+      border-radius: 6px;
+      transition: background-color 0.2s, color 0.2s;
+      min-width: 70px;
       position: relative;
     }
 
     .nav-item:hover {
+      background-color: #f3f2ef;
       color: #000;
     }
 
     .nav-item.active {
-      color: #000;
+      color: #0a66c2;
     }
 
     .nav-item.active::after {
       content: '';
       position: absolute;
-      bottom: -6px;
+      bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
-      width: 100%;
+      width: 50%;
       height: 2px;
-      background-color: #000;
+      background-color: #0a66c2;
     }
 
     .nav-icon {
       width: 24px;
       height: 24px;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
     }
 
     .nav-icon svg {
@@ -148,40 +157,46 @@
       fill: currentColor;
     }
 
-    .profile-nav {
-      position: relative;
-    }
-
     .profile-pic {
       width: 24px;
       height: 24px;
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .work-divider {
       height: 24px;
       width: 1px;
-      background-color: #00000017;
-      margin: 0 12px;
+      background-color: rgba(0, 0, 0, 0.1);
+      margin: 0 16px;
     }
 
     .premium-link {
       color: #915907;
       text-decoration: none;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
-      padding: 0 8px;
+      padding: 0 12px;
+      transition: color 0.2s;
     }
 
+    .premium-link:hover {
+      color: #6b4506;
+    }
+
+    /* Container */
     .container {
       display: flex;
-      height: calc(100vh - 52px);
+      height: calc(100vh - 56px);
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
+    /* Sidebar */
     .sidebar {
-      width: 30%;
+      width: 35%;
+      min-width: 280px;
       background: #fff;
       border-right: 1px solid #e0e0e0;
       overflow-y: auto;
@@ -204,7 +219,7 @@
     }
 
     .message-search {
-      padding: 16px 20px;
+      padding: 12px 20px;
       border-bottom: 1px solid #e0e0e0;
     }
 
@@ -212,8 +227,14 @@
       width: 100%;
       padding: 8px 12px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .message-search input:focus {
+      outline: none;
+      border-color: #0a66c2;
     }
 
     .user-list {
@@ -229,6 +250,7 @@
       border-bottom: 1px solid #f0f0f0;
       text-decoration: none;
       color: inherit;
+      transition: background-color 0.2s;
     }
 
     .user-item:hover {
@@ -263,11 +285,12 @@
       font-weight: 600;
       font-size: 14px;
       color: #000;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
+    /* Chat Panel */
     .chat-panel {
-      width: 40%;
+      width: 65%;
       background: #fff;
       display: flex;
       flex-direction: column;
@@ -291,7 +314,7 @@
       font-size: 16px;
       font-weight: 600;
       color: #000;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .chat-messages {
@@ -331,6 +354,7 @@
       border-radius: 18px;
       font-size: 14px;
       line-height: 1.4;
+      word-wrap: break-word;
     }
 
     .message.received .message-bubble {
@@ -357,6 +381,7 @@
       border-radius: 20px;
       padding: 8px 16px;
       background: #fff;
+      transition: border-color 0.2s;
     }
 
     .message-input-container:focus-within {
@@ -388,6 +413,7 @@
       align-items: center;
       justify-content: center;
       font-size: 14px;
+      transition: background-color 0.2s;
     }
 
     .send-button:hover {
@@ -406,6 +432,7 @@
       justify-content: center;
       color: #666;
       font-size: 16px;
+      text-align: center;
     }
 
     .error-message {
@@ -415,38 +442,74 @@
       padding: 0 16px;
     }
 
-    .ad-panel {
-      width: 30%;
-      background: #fff;
-      border-left: 1px solid #e0e0e0;
-      padding: 20px;
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar, .chat-panel {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .navbar-container {
+        padding: 0 8px;
+      }
+
+      .search-container {
+        width: 200px;
+      }
     }
 
-    .ad-title {
-      font-weight: 600;
-      font-size: 16px;
-      color: #000;
-      margin-bottom: 12px;
+    @media (max-width: 768px) {
+      .navbar .nav-items {
+        gap: 4px;
+      }
+
+      .nav-item {
+        min-width: 60px;
+        padding: 8px;
+        font-size: 12px;
+      }
+
+      .search-container {
+        width: 150px;
+      }
+
+      .work-divider, .premium-link {
+        display: none;
+      }
     }
 
-    .ad-content {
-      font-size: 14px;
-      color: #666;
-    }
+    @media (max-width: 480px) {
+      .navbar .left-section {
+        gap: 8px;
+      }
 
-    .ad-content ul {
-      list-style: none;
-      padding: 0;
-      margin: 12px 0;
-    }
+      .navbar .logo {
+        height: 32px;
+        width: 32px;
+      }
 
-    .ad-content ul li {
-      margin-bottom: 8px;
-    }
+      .search-container {
+        width: 120px;
+      }
 
-    .ad-cta {
-      color: #0a66c2;
-      font-weight: 600;
+      .nav-item {
+        min-width: 50px;
+        font-size: 11px;
+      }
+
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .nav-icon svg {
+        width: 16px;
+        height: 16px;
+      }
     }
   </style>
 </head>
@@ -511,9 +574,7 @@
         <div class="profile-pic"></div>
         Me
       </a>
-
       <div class="work-divider"></div>
-
       <a href="#" class="nav-item">
         <div class="nav-icon">
           <svg viewBox="0 0 24 24">
@@ -522,8 +583,7 @@
         </div>
         Work
       </a>
-
-      <a href="#" class="premium-link">Try Premium for free</a>
+      <a href="#" class="premium-link">Try Premium</a>
     </div>
   </div>
 </div>
@@ -535,11 +595,9 @@
       <h2>Chat</h2>
       <div>⋯ ✏️</div>
     </div>
-
     <div class="message-search">
       <input type="text" placeholder="Search messages">
     </div>
-
     <div class="user-list">
       <div th:each="conn : ${connections}">
         <a class="user-item" th:href="@{/message(receiverEmail=${conn.email})}"
@@ -565,7 +623,6 @@
         <h3 th:text="${receiver.fullName ?: 'Unknown User'}">Chat User</h3>
       </div>
     </div>
-
     <div class="chat-messages" id="chatMessages">
       <div th:if="${chatHistory != null}" th:each="msg, iter : ${chatHistory}">
         <div class="message-group" th:if="${iter.first or msg.sender.userId != #lists.get(chatHistory, iter.index - 1)?.sender?.userId}">
@@ -577,41 +634,22 @@
           </div>
         </div>
       </div>
-
       <div th:if="${chatHistory == null or chatHistory.isEmpty()}" class="empty-state">
         <p th:if="${receiver}">Start a conversation with <span th:text="${receiver.fullName ?: 'Unknown User'}"></span></p>
         <p th:unless="${receiver}">Select a conversation to start messaging</p>
       </div>
     </div>
-
     <div th:if="${receiverEmail}" class="message-input-area">
       <form th:action="@{/message/send}" method="post" id="messageForm">
         <input type="hidden" name="receiverEmail" th:value="${receiverEmail}" />
         <input type="hidden" name="senderId" th:value="${sender.userId}" />
-
         <div class="message-input-container">
-          <textarea class="message-input" name="content" id="messageInput"
-                    placeholder="Write a message..." rows="1"></textarea>
+            <textarea class="message-input" name="content" id="messageInput"
+                      placeholder="Write a message..." rows="1"></textarea>
           <button type="submit" class="send-button">➤</button>
         </div>
       </form>
-
       <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
-    </div>
-  </div>
-
-  <!-- Ad Panel -->
-  <div class="ad-panel">
-    <div class="ad-title">See who's hiring on LinkedIn</div>
-    <div class="ad-content">
-      <p>Invest in Your Network</p>
-      <ul>
-        <li>Message anyone with InMail</li>
-        <li>Get up to 11x more profile views</li>
-        <li>Stay ahead with exclusive insights</li>
-        <li>Plus! Get Super Duolingo and more for free. Terms apply.</li>
-      </ul>
-      <p>Try Premium for <span class="ad-cta">$0</span> 1-month free trial. Cancel whenever. We'll remind you 7 days before your trial ends.</p>
     </div>
   </div>
 </div>

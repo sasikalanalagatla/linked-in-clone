@@ -480,8 +480,6 @@
                 </div>
                 Work
             </a>
-
-            <a href="#" class="premium-link">Try Premium for free</a>
         </div>
     </div>
 </div>
@@ -521,32 +519,6 @@
             </span>
             <span class="sidebar-count" th:text="${following != null} ? ${#lists.size(following)} : 0"></span>
         </a>
-        <a href="#" class="sidebar-item">
-            <span>
-                <span class="icon">👥</span>
-                Groups
-            </span>
-            <span class="sidebar-count">4</span>
-        </a>
-        <a href="#" class="sidebar-item">
-            <span>
-                <span class="icon">📅</span>
-                Events
-            </span>
-        </a>
-        <a href="#" class="sidebar-item">
-            <span>
-                <span class="icon">📄</span>
-                Pages
-            </span>
-            <span class="sidebar-count">185</span>
-        </a>
-        <a href="#" class="sidebar-item">
-            <span>
-                <span class="icon">📧</span>
-                Newsletters
-            </span>
-        </a>
     </aside>
 
     <!-- Main Content -->
@@ -571,10 +543,6 @@
                 <div class="invitation-info">
                     <div class="invitation-name" th:text="${request.sender.fullName} + ' ✓'"></div>
                     <div class="invitation-title" th:text="${request.sender.headline != null} ? ${request.sender.headline} : 'No title provided'"></div>
-                    <div class="mutual-connections">
-                        <span class="mutual-icon">👥</span>
-                        <span>No mutual connections</span>
-                    </div>
                 </div>
                 <div class="invitation-actions">
                     <form th:action="@{/ignore/{requestId}(requestId=${request.id})}" method="post">
@@ -600,43 +568,7 @@
                 <div class="connection-info">
                     <div class="connection-name" th:text="${connection.fullName} + ' ✓'"></div>
                     <div class="connection-title" th:text="${connection.headline != null} ? ${connection.headline} : 'No title provided'"></div>
-                    <div class="mutual-connections">
-                        <span class="mutual-icon">👥</span>
-                        <span>No mutual connections</span>
-                    </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Games Section -->
-        <section class="games-section">
-            <div class="section-header">
-                <h3 class="section-title">Stay in touch through daily games</h3>
-            </div>
-            <div class="games-grid">
-                <div class="game-card">
-                    <div class="game-title">Zip #127</div>
-                    <div class="game-date">Tuesday, Jul 22</div>
-                    <button class="game-solve-btn">Solve</button>
-                </div>
-                <div class="game-card">
-                    <div class="game-title">Queens #448</div>
-                    <div class="game-date">Tuesday, Jul 22</div>
-                    <button class="game-solve-btn">Solve</button>
-                </div>
-                <div class="game-card">
-                    <div class="game-title">Tango #288</div>
-                    <div class="game-date">Tuesday, Jul 22</div>
-                    <button class="game-solve-btn">Solve</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- People Section -->
-        <section class="people-section">
-            <div class="section-header">
-                <h3 class="section-title">People you may know based on your recent activity</h3>
-                <a href="#" class="show-all">Show all</a>
             </div>
         </section>
     </main>
