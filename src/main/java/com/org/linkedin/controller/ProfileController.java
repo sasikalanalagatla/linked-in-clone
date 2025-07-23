@@ -1,8 +1,6 @@
 package com.org.linkedin.controller;
 
-import com.org.linkedin.model.Education;
 import com.org.linkedin.model.User;
-import com.org.linkedin.service.impl.EducationServiceImpl;
 import com.org.linkedin.service.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,33 +8,42 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @Controller
 public class ProfileController {
 
     private final UserServiceImpl userService;
 
-    private final EducationServiceImpl educationServiceImpl;
-
-    public ProfileController(UserServiceImpl userService, EducationServiceImpl educationServiceImpl) {
+    @Autowired
+    public ProfileController(UserServiceImpl userService) {
         this.userService = userService;
-        this.educationServiceImpl = educationServiceImpl;
     }
 
     @GetMapping("/profile/{userId}")
-    public String showProfile(@PathVariable("userId") Long userId,
-                              Model model) {
+    public String showProfile(@PathVariable("userId") Long userId, Model model, HttpSession session) {
         User user = userService.getUserById(userId);
+        if (user == null) {
+            // Return a default user or redirect if no user is found
+            user = new User(); // Placeholder, adjust as per your User class
+            user.setUserId(userId);
+            user.setFullName("Unknown User");
+            user.setEmail("unknown@example.com");
+        }
         model.addAttribute("user", user);
-        String email = user.getEmail();
-        model.addAttribute("email",email);
+        model.addAttribute("email", user.getEmail());
+        model.addAttribute("currentUserId", 1L); // Hardcoded for development
+        model.addAttribute("isConnected", userId.equals(1L)); // True if viewing own profile
         return "user-profile";
     }
 
     @GetMapping("/profile/edit/{id}")
     public String showEditProfileForm(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(2l);
+        User user = userService.getUserById(id);
+        if (user == null) {
+            user = new User(); // Placeholder
+            user.setUserId(id);
+            user.setFullName("Unknown User");
+            user.setEmail("unknown@example.com");
+        }
         model.addAttribute("user", user);
         return "edit-profile";
     }
@@ -44,8 +51,6 @@ public class ProfileController {
     @PostMapping("/profile/update")
     public String updateProfile(@ModelAttribute("user") User updatedUser) {
         userService.updateUser(updatedUser);
-        return "redirect:/profile/" + 2;
+        return "redirect:/profile/" + updatedUser.getUserId();
     }
-
-
 }

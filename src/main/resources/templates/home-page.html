@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
@@ -15,6 +15,7 @@
             line-height: 1.33;
             color: #000000e6;
         }
+
         .navbar {
             display: flex;
             align-items: center;
@@ -174,6 +175,7 @@
             padding: 0 8px;
         }
 
+        /* Container and Layout */
         .container {
             display: flex;
             max-width: 1128px;
@@ -367,6 +369,7 @@
             margin-bottom: 12px;
         }
 
+        /* Reaction Counts Display */
         .reaction-counts {
             display: flex;
             align-items: center;
@@ -450,6 +453,7 @@
             color: #666;
         }
 
+        /* Actions Bar */
         .actions {
             display: flex;
             justify-content: space-around;
@@ -508,6 +512,7 @@
             color: #8b5a9f;
         }
 
+        /* Reaction Picker */
         .reaction-picker {
             position: absolute;
             bottom: 100%;
@@ -640,6 +645,7 @@
             margin-top: 8px;
         }
 
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             .reaction-picker {
                 transform: translateX(-20px);
@@ -647,6 +653,7 @@
             }
         }
 
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -928,7 +935,7 @@
                 </div>
                 Home
             </a>
-            <a th:href="@{/mynetwork}" class="nav-item">
+            <a href="#" th:href="@{/mynetwork}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5

@@ -34,59 +34,24 @@ public class Comment {
 
     private boolean commentEdited;
 
-    public Long getCommentId() {
-        return commentId;
-    }
+    public Long getCommentId() { return commentId; }
+    public void setCommentId(Long commentId) { this.commentId = commentId; }
 
-    public void setCommentId(Long commentId) {
-        this.commentId = commentId;
-    }
+    public String getCommentContent() { return commentContent; }
+    public void setCommentContent(String commentContent) { this.commentContent = commentContent; }
 
-    public String getCommentContent() {
-        return commentContent;
-    }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
-    public void setCommentContent(String commentContent) {
-        this.commentContent = commentContent;
-    }
+    public Post getPost() { return post; }
+    public void setPost(Post post) { this.post = post; }
 
-    public User getUser() {
-        return user;
-    }
+    public LocalDateTime getCommentCreatedAt() { return commentCreatedAt; }
+    public void setCommentCreatedAt(LocalDateTime commentCreatedAt) { this.commentCreatedAt = commentCreatedAt; }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public LocalDateTime getCommentUpdatedAt() { return commentUpdatedAt; }
+    public void setCommentUpdatedAt(LocalDateTime commentUpdatedAt) { this.commentUpdatedAt = commentUpdatedAt; }
 
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public LocalDateTime getCommentCreatedAt() {
-        return commentCreatedAt;
-    }
-
-    public void setCommentCreatedAt(LocalDateTime commentCreatedAt) {
-        this.commentCreatedAt = commentCreatedAt;
-    }
-
-    public LocalDateTime getCommentUpdatedAt() {
-        return commentUpdatedAt;
-    }
-
-    public void setCommentUpdatedAt(LocalDateTime commentUpdatedAt) {
-        this.commentUpdatedAt = commentUpdatedAt;
-    }
-
-    public boolean isCommentEdited() {
-        return commentEdited;
-    }
-
-    public void setCommentEdited(boolean commentEdited) {
-        this.commentEdited = commentEdited;
-    }
+    public boolean isCommentEdited() { return commentEdited; }
+    public void setCommentEdited(boolean commentEdited) { this.commentEdited = commentEdited; }
 }

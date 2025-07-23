@@ -1,34 +1,329 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="Following">Following</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Following</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f3f2ef;
+            color: #000000;
         }
-        h2 {
-            margin-bottom: 20px;
+        .navbar {
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 0;
+            height: 52px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #00000017;
         }
-        .following-user {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            max-width: 1128px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            justify-content: space-between;
+        }
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar .logo {
+            height: 34px;
+            width: 34px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0a66c2;
+            border-radius: 2px;
+        }
+        .navbar .logo-text {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 6px 8px 6px 40px;
+            border-radius: 4px;
+            border: none;
+            background-color: #edf3f8;
+            font-size: 14px;
+            height: 34px;
+        }
+        .search-input::placeholder {
+            color: #666;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: #666;
+        }
+        .navbar .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 12px;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            font-weight: 400;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: color 0.2s;
+            min-width: 80px;
+            position: relative;
+        }
+        .nav-item:hover {
+            color: #000;
+        }
+        .nav-item.active {
+            color: #000;
+        }
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
+            background-color: #000;
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .nav-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        .profile-pic {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 2px;
+        }
+        .work-divider {
+            height: 24px;
+            width: 1px;
+            background-color: #00000017;
+            margin: 0 12px;
+        }
+        .premium-link {
+            color: #915907;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 8px;
+        }
+        .main-container {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+        .content {
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e6e6e6;
+            padding: 24px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+        }
+        .following-card {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f2ef;
+        }
+        .following-card:last-child {
+            border-bottom: none;
+        }
+        .profile-image {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .following-info {
+            flex: 1;
+        }
+        .following-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 2px;
+        }
+        .following-title {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 6px 16px;
+            background-color: #0a66c2;
+            color: white;
+            text-decoration: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #0a66c2;
+            transition: all 0.2s;
+        }
+        .back-link:hover {
+            background-color: #004182;
+            border-color: #004182;
+        }
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
-<h2>Following</h2>
-
-<div th:if="${following.isEmpty()}">
-    <p>You are not following anyone yet.</p>
+<!-- Navbar -->
+<div class="navbar">
+    <div class="navbar-container">
+        <div class="left-section">
+            <div class="logo">
+                <span class="logo-text">in</span>
+            </div>
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search">
+            </div>
+        </div>
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
+                    </svg>
+                </div>
+                Home
+            </a>
+            <a href="/mynetwork" class="nav-item active">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                    </svg>
+                </div>
+                My Network
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                    </svg>
+                </div>
+                Jobs
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
+                    </svg>
+                </div>
+                Messaging
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22a2.02 2.02 0 002-2H10a2.02 2.02 0 002 2zm7-7.5V9c0-3.07-1.64-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 3.36 7 5.92 7 9v5.5l-2 2V18h14v-1.5l-2-2z"></path>
+                    </svg>
+                </div>
+                Notifications
+            </a>
+            <a href="#" class="nav-item profile-nav">
+                <div class="profile-pic"></div>
+                Me
+            </a>
+            <div class="work-divider"></div>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+                    </svg>
+                </div>
+                Work
+            </a>
+            <a href="#" class="premium-link">Try Premium for free</a>
+        </div>
+    </div>
 </div>
 
-<div th:each="followee : ${following}" class="following-user">
-    <p th:text="${followee.fullName}">Full Name</p>
+<div class="main-container">
+    <div class="content">
+        <div class="section-header">
+            <h3 class="section-title">Following (<span th:text="${following != null} ? ${#lists.size(following)} : 0"></span>)</h3>
+        </div>
+        <div th:if="${following == null or #lists.isEmpty(following)}">
+            <p>Not following anyone yet</p>
+        </div>
+        <div th:each="followee : ${following}" class="following-card">
+            <div class="profile-image" th:text="${followee.fullName != null} ? ${followee.fullName.substring(0,1)} : 'U'"></div>
+            <div class="following-info">
+                <div class="following-name" th:text="${followee.fullName} + ' ✓'"></div>
+                <div class="following-title" th:text="${followee.headline != null} ? ${followee.headline} : 'No title provided'"></div>
+            </div>
+        </div>
+        <a th:href="@{/mynetwork}" class="back-link">Back to My Network</a>
+    </div>
 </div>
 </body>
 </html>

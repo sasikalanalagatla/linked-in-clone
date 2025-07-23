@@ -26,15 +26,15 @@ public class SkillController {
 
     @PostMapping("/save")
     public String saveSkill(@ModelAttribute Skill skill) {
-        Long userId = 2l;
+        Long userId = 1l;
         skillService.saveSkillForUser(userId, skill);
-        return "redirect:/profile/"+2;
+        return "redirect:/profile/"+1;
     }
 
     @GetMapping("/delete/{id}")
     public String deleteSkill(@PathVariable Long id) {
-        Long userId = 2l;
+        Long userId = 1l;
         skillService.deleteUserSkill(userId, id);
-        return "redirect:/profile/"+2;
+        return "redirect:/profile/"+1;
     }
 }

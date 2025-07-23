@@ -2,15 +2,151 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Add/Edit Skill</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f4f2ee;
+            line-height: 1.33;
+            color: rgba(0,0,0,.9);
+        }
+
+        /* Main container */
+        .main-container {
+            max-width: 1128px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        /* Form card */
+        .form-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.08);
+            padding: 24px;
+            margin-bottom: 8px;
+        }
+
+        .form-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* Form styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,.9);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid rgba(0,0,0,.15);
+            border-radius: 4px;
+            background-color: #fff;
+            outline: none;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        input[type="text"]:focus {
+            border-color: #0077b5;
+            box-shadow: 0 0 0 2px rgba(0,119,181,.2);
+        }
+
+        input[type="text"][required] {
+            background-color: #f9f9f9;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #0077b5;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            align-self: flex-start;
+        }
+
+        .btn-primary:hover {
+            background-color: #005f8f;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid #0077b5;
+            color: #0077b5;
+            border-radius: 24px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            align-self: flex-start;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,119,181,.08);
+            color: #005f8f;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 16px;
+            }
+
+            .form-card {
+                padding: 16px;
+            }
+
+            .form-header {
+                font-size: 18px;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2 th:text="${skill.skillId != null ? 'Edit Skill' : 'Add Skill'}"></h2>
-<form th:action="@{/skills/save}" th:object="${skill}" method="post">
-    <input type="hidden" th:field="*{skillId}" />
-    <label>Skill Name:</label>
-    <input type="text" th:field="*{skillName}" required />
-    <button type="submit" th:text="${skill.skillId != null ? 'Update' : 'Add'}"></button>
-</form>
-<a href="/profile">Back to Profile</a>
+<div class="main-container">
+    <div class="form-card">
+        <h2 class="form-header" th:text="${skill.skillId != null ? 'Edit Skill' : 'Add Skill'}"></h2>
+        <form th:action="@{/skills/save}" th:object="${skill}" method="post">
+            <input type="hidden" th:field="*{skillId}" />
+            <div>
+                <label for="skillName">Skill Name:</label>
+                <input type="text" id="skillName" th:field="*{skillName}" required />
+            </div>
+            <div>
+                <button type="submit" class="btn-primary" th:text="${skill.skillId != null ? 'Update' : 'Add'}"></button>
+                <a th:href="@{/profile/{userId}(userId=${userId})}" class="btn-secondary">Back to Profile</a>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

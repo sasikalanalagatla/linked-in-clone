@@ -63,6 +63,9 @@ public class User {
     @JsonIgnore
     private List<Skill> skills = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Certification> certifications = new ArrayList<>();
+
     private String about;
 
     @OneToMany(mappedBy = "user")
@@ -77,18 +80,21 @@ public class User {
     @JsonIgnore
     private List<Comment> comments;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<User> followers = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_following",
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "following_id")
     )
-    @JsonIgnore
     private List<User> following;
-
-    @ManyToMany(mappedBy = "following")
-    @JsonIgnore
-    private List<User> followers;
 
     public Long getUserId() {
         return userId;
