@@ -996,7 +996,9 @@
         <div class="post-box">
             <h3>Start a post</h3>
             <div class="post-input-container">
-                <div class="profile-pic-small">J</div>
+                <img th:src="${user.profilePictureUrl != null} ? ${user.profilePictureUrl} : @{/images/default-profile.png}"
+                      alt="Profile Picture"
+                      class="profile-pic-small" />
                 <input type="text" class="post-input" placeholder="What do you want to talk about?"
                        onclick="openPostModal()" readonly>
             </div>

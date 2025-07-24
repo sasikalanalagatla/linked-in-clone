@@ -628,5 +628,48 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script th:inline="javascript">
+  const userEmail = /*[[${senderEmail}]]*/ 'guest@example.com'; // Replace fallback with server-side email
+
+  const socket = new SockJS('/ws');
+  const stompClient = Stomp.over(socket);
+
+  stompClient.connect({}, function (frame) {
+      console.log('Connected to WebSocket: ' + frame);
+
+      // Subscribe to your personal message topic
+      stompClient.subscribe('/topic/messages/' + userEmail, function (message) {
+          const msg = JSON.parse(message.body);
+
+          // Dynamically update the chat window
+          const chatMessages = document.querySelector('.chat-messages');
+
+          const messageDiv = document.createElement('div');
+          messageDiv.className = 'message received';
+
+          const avatar = document.createElement('div');
+          avatar.className = 'user-avatar';
+          avatar.textContent = msg.sender && msg.sender.fullName
+              ? msg.sender.fullName.substring(0, 2).toUpperCase()
+              : '--';
+
+          const bubble = document.createElement('div');
+          bubble.className = 'message-bubble';
+          bubble.textContent = msg.content;
+
+          messageDiv.appendChild(avatar);
+          messageDiv.appendChild(bubble);
+          chatMessages.appendChild(messageDiv);
+
+          // Optional: scroll to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+  });
+</script>
+
 </body>
+
 </html>

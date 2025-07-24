@@ -529,21 +529,37 @@
                 <a href="#" class="tab" onclick="showConnections()">Connections</a>
             </div>
         </div>
-
-        <!-- Invitations Section -->
         <section id="invitations-section" class="invitations-section">
             <div class="section-header">
-                <h3 class="section-title">Invitations (<span th:text="${requests != null} ? ${#lists.size(requests)} : 0"></span>)</h3>
+                <h3 class="section-title">
+                    Invitations (<span th:text="${requests != null} ? ${#lists.size(requests)} : 0"></span>)
+                </h3>
             </div>
+
             <div th:if="${requests == null or #lists.isEmpty(requests)}">
                 <p>No pending requests</p>
             </div>
+
             <div th:each="request : ${requests}" class="invitation-card">
-                <div class="profile-image" th:text="${request.sender.fullName != null} ? ${request.sender.fullName.substring(0,1)} : 'U'"></div>
+                <div class="profile-image-container">
+                    <img th:if="${request.sender.profilePictureUrl != null}"
+                         th:src="${request.sender.profilePictureUrl}"
+                         alt="Profile Picture"
+                         class="profile-image" />
+
+                    <div th:if="${request.sender.profilePictureUrl == null}"
+                         class="profile-image fallback"
+                         th:text="${request.sender.fullName != null} ? ${request.sender.fullName.substring(0,1)} : 'U'">
+                    </div>
+                </div>
+
                 <div class="invitation-info">
                     <div class="invitation-name" th:text="${request.sender.fullName} + ' ✓'"></div>
-                    <div class="invitation-title" th:text="${request.sender.headline != null} ? ${request.sender.headline} : 'No title provided'"></div>
+                    <div class="invitation-title"
+                         th:text="${request.sender.headline != null} ? ${request.sender.headline} : 'No title provided'">
+                    </div>
                 </div>
+
                 <div class="invitation-actions">
                     <form th:action="@{/ignore/{requestId}(requestId=${request.id})}" method="post">
                         <button type="submit" class="btn btn-secondary">Ignore</button>
@@ -555,7 +571,6 @@
             </div>
         </section>
 
-        <!-- Connections Section -->
         <section id="connections-section" class="connections-section" style="display: none;">
             <div class="section-header">
                 <h3 class="section-title">Connections (<span th:text="${connections != null} ? ${#lists.size(connections)} : 0"></span>)</h3>
