@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 public class ProfileController {
 
@@ -20,15 +22,18 @@ public class ProfileController {
     }
 
     @GetMapping("/profile/{userId}")
-    public String showProfile(@PathVariable("userId") Long userId, Model model, HttpSession session) {
+    public String showProfile(@PathVariable("userId") Long userId, Model model, Principal principal) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+        String email = principal.getName();
+        User loggedInUser = userService.findByEmail(email);
+
         User user = userService.getUserById(userId);
         model.addAttribute("user", user);
         model.addAttribute("email", user.getEmail());
-        model.addAttribute("currentUserId", 1L); // Hardcoded for development
-        model.addAttribute("isConnected", userId.equals(1L)); // True if viewing own profile
+        model.addAttribute("currentUserId", loggedInUser.getUserId());
+        model.addAttribute("isConnected", userId.equals(loggedInUser.getUserId()));
         return "user-profile";
     }
 

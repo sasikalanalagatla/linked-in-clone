@@ -3,19 +3,53 @@
 <body>
 <div th:fragment="postList">
     <div th:each="post, iterStat : ${posts}"
-         th:class="'post-card'"
-         th:id="'post-' + ${post.postId}">
+         class="post-card"
+         th:id="${iterStat.index == 5 ? 'trigger-point' : null}">
 
-        <div>
-            <strong th:text="${post.authorName}">Username</strong>
-            <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</span>
+        <div class="post-header">
+            <div class="post-author-section">
+                <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
+                <div class="post-author-info">
+                    <h4 th:text="${post.authorName}">Author Name</h4>
+                    <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
+                </div>
+            </div>
+            <div class="post-actions">
+                <button class="post-action-btn">⋯</button>
+            </div>
         </div>
 
-        <div th:text="${post.postDescription}">Post content</div>
+        <div class="post-content">
+            <p th:text="${post.postDescription}">Post content</p>
 
-        <div th:if="${iterStat.index == 5}" id="trigger-point"></div>
+            <div th:if="${post.imageUrl != null}">
+                <img th:src="${post.imageUrl}" alt="Post Image"
+                     style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
+            </div>
+        </div>
+        <div class="post-engagement">
+            <span th:text="${post.totalReactions + ' reactions'}">0 reactions</span>
+            <span>0 comments</span>
+        </div>
 
-        <hr/>
+        <div class="post-actions-bar">
+            <button class="action-btn" th:onclick="'reactToPost(' + ${post.postId} + ', \'LIKE\')'">
+                <span class="action-icon">👍</span>
+                <span>Like</span>
+            </button>
+            <button class="action-btn">
+                <span class="action-icon">💬</span>
+                <span>Comment</span>
+            </button>
+            <button class="action-btn">
+                <span class="action-icon">↻</span>
+                <span>Repost</span>
+            </button>
+            <button class="action-btn">
+                <span class="action-icon">✉️</span>
+                <span>Send</span>
+            </button>
+        </div>
     </div>
 </div>
 </body>

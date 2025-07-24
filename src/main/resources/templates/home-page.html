@@ -986,7 +986,7 @@
         </div>
 
         <div class="nav-items">
-            <a href="#" class="nav-item active">
+            <a th:href="@{/}" class="nav-item active">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
@@ -1012,7 +1012,7 @@
                 </div>
                 Jobs
             </a>
-            <a href="#" class="nav-item">
+            <a href="#"  th:href="@{/message}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -1028,7 +1028,7 @@
                 </div>
                 Notifications
             </a>
-            <a href="#" th:href="@{'/profile/'+1}" class="nav-item profile-nav">
+            <a href="#" th:href="@{'/profile/'+ ${user.userId}}" class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
             </a>
@@ -1056,7 +1056,7 @@
             </div>
         </div>
         <div class="sidebar-content">
-            <a th:href="@{'/profile/' + 1}" class="profile-name" th:text="${user.fullName}">John Doe</a>
+            <a th:href="@{'/profile/' + ${user.userId}}" class="profile-name" th:text="${user.fullName}">John Doe</a>
             <div class="profile-headline" th:text="${user.headline}">Software Engineer at Tech Corp</div>
         </div>
         <div class="profile-stats">
@@ -1089,16 +1089,19 @@
                             <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
                         </div>
                     </div>
-                    <div class="post-actions" th:if="${post.authorName == 'sasikala'}">
+                    <div class="post-actions">
                         <button class="post-action-btn" onclick="togglePostOptionsMenu('post-options-${post.postId}')">⋯</button>
-                        <div class="post-options-menu" id="post-options-${post.postId}">
+                        <div class="post-options-menu" th:id="'post-options-' + ${post.postId}" th:if="${post.authorId == currentUserId}">
                             <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get">
                                 <button type="submit" class="post-option-item edit">Edit</button>
                             </form>
-                            <form th:action="@{/post/delete/{id}(id=${post.postId})}" method="post" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                            <form th:action="@{/post/delete/{id}(id=${post.postId})}" method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this post?');">
                                 <button type="submit" class="post-option-item delete">Delete</button>
                             </form>
                         </div>
+
+
                     </div>
                 </div>
                 <div class="post-content">

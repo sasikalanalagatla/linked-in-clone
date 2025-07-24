@@ -809,8 +809,13 @@
             <div class="profile-content">
                 <a th:href="@{/profile/edit/{userId}(userId=${user.userId})}" class="profile-edit">✏️</a>
                 <h1 class="profile-name" th:text="${user.fullName}">Sasikala Nalagatla</h1>
-                <p class="profile-headline" th:text="${user.headline}">Java Developer | Data Structures and Algorithms | Backend Developer</p>
-                <p class="profile-location">📍 <span th:text="${user.city + ', ' + user.location}">Sri Potti Sriramulu Nellore, Andhra Pradesh, India</span></p>
+                <p class="profile-headline" th:text="${user.headline}">
+                    Java Developer | Data Structures and Algorithms | Backend Developer
+                </p>
+                <p class="profile-location">📍 <span th:text="${user.city + ', ' + user.location}">
+                    Sri Potti Sriramulu Nellore, Andhra Pradesh, India
+                </span>
+                </p>
 
                 <div class="connection-info">
                     <a th:href="@{/mynetwork}" class="connection-count" th:text="${totalConnection} + ' connections'">0 connections</a>
@@ -838,7 +843,6 @@
             <span class="see-more" onclick="toggleAbout()">Show more</span>
         </div>
 
-        <!-- Experience Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Experience</h2>
@@ -889,7 +893,6 @@
             </div>
         </div>
 
-        <!-- Certifications Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Certifications</h2>

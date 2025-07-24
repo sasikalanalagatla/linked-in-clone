@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class PostController {
@@ -45,47 +47,46 @@ public class PostController {
     }
 
     @GetMapping("/post/create")
-    public String showCreatePostForm(Model model) {
-        User user = userRepository.findByFullName("sasikala");
-        if (user == null) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
+    public String showCreatePostForm(Model model, Principal principal) {
         model.addAttribute("post", new Post());
+        String email = principal.getName();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = optionalUser.get();
+
         model.addAttribute("authorName", user.getFullName());
         return "create_post";
     }
 
     @PostMapping("/post/create")
-    public String createPost(@ModelAttribute("post") Post post, @RequestParam("imageFile") MultipartFile imageFile, Model model) {
-        if (post == null) {
-            throw new CustomException("INVALID_POST", "Post data cannot be null");
-        }
-        try {
-            User user = userRepository.findByFullName("sasikala");
-            if (user == null) {
-                throw new CustomException("USER_NOT_FOUND", "User 'sasikala' not found in the database");
-            }
+    public String createPost(@ModelAttribute("post") Post post,
+                             @RequestParam("imageFile") MultipartFile imageFile,
+                             Principal principal) {
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional.get();
+        post.setAuthorId(user.getUserId());
+        if (user != null) {
             post.setAuthorName(user.getFullName());
-            post.setAuthorId(user.getUserId());
-            if (imageFile != null && !imageFile.isEmpty()) {
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
                 String imageUrl = cloudinaryService.uploadFile(imageFile);
                 post.setImageUrl(imageUrl);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            postRepository.save(post);
-            return "redirect:/";
-        } catch (CustomException e) {
-            model.addAttribute("post", post);
-            model.addAttribute("authorName", "sasikala");
-            model.addAttribute("error", "Error creating post: " + e.getMessage());
-            return "create_post";
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading image: " + e.getMessage(), e);
         }
+        postRepository.save(post);
+        return "redirect:/";
     }
 
     @GetMapping("/")
-    public String getPostFeed(Model model) {
-        User user = userRepository.findByFullName("sasikala");
+    public String getPostFeed(Model model, Principal principal) {
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional.get();
+
         Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
         List<Post> posts = postPage.getContent();
@@ -108,37 +109,37 @@ public class PostController {
         return "home-page";
     }
 
-    @GetMapping("/post/options/{id}")
-    public String showPostOptions(@PathVariable Long id, Model model) {
-        if (id == null) {
-            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
-        }
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-
-        User user = userRepository.findByFullName("sasikala");
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
-        Page<Post> postPage = postService.findAll(pageable);
-        List<Post> posts = postPage.getContent();
-
-        List<User> connections = connectionRequestService.getConnections(user);
-        Integer totalConnection = connections.size();
-
-        Map<Long, Boolean> postUserLikes = new HashMap<>();
-        for (Post p : posts) {
-            p.setTotalReactions(p.getReactions().size());
-            boolean liked = reactionService.hasUserLikedPost(p, user);
-            postUserLikes.put(p.getPostId(), liked);
-        }
-
-        model.addAttribute("user", user);
-        model.addAttribute("totalConnection", totalConnection);
-        model.addAttribute("posts", posts);
-        model.addAttribute("postUserLikes", postUserLikes);
-        model.addAttribute("selectedPost", id); // Set the selected post ID to show the options menu
-
-        return "home-page";
-    }
+//    @GetMapping("/post/options/{id}")
+//    public String showPostOptions(@PathVariable Long id, Model model) {
+//        if (id == null) {
+//            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+//        }
+//        Post post = postRepository.findById(id)
+//                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+//
+//        User user = userRepository.findByFullName("sasikala");
+//        Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
+//        Page<Post> postPage = postService.findAll(pageable);
+//        List<Post> posts = postPage.getContent();
+//
+//        List<User> connections = connectionRequestService.getConnections(user);
+//        Integer totalConnection = connections.size();
+//
+//        Map<Long, Boolean> postUserLikes = new HashMap<>();
+//        for (Post p : posts) {
+//            p.setTotalReactions(p.getReactions().size());
+//            boolean liked = reactionService.hasUserLikedPost(p, user);
+//            postUserLikes.put(p.getPostId(), liked);
+//        }
+//
+//        model.addAttribute("user", user);
+//        model.addAttribute("totalConnection", totalConnection);
+//        model.addAttribute("posts", posts);
+//        model.addAttribute("postUserLikes", postUserLikes);
+//        model.addAttribute("selectedPost", id);
+//
+//        return "home-page";
+//    }
 
     @GetMapping("/post/edit/{id}")
     public String editPostForm(@PathVariable Long id, Model model) {
@@ -169,7 +170,6 @@ public class PostController {
             return "redirect:/";
         } catch (CustomException e) {
             model.addAttribute("post", updatedPost);
-            model.addAttribute("authorName", "sasikala");
             model.addAttribute("error", "Error updating post: " + e.getMessage());
             return "edit_post";
         }

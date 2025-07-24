@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +26,9 @@ public class MyNetworkController {
     }
 
     @GetMapping("/mynetwork")
-    public String showMyNetwork(Model model) {
-        User currentUser = userService.getUserById(1L); // Hardcoded as per original
+    public String showMyNetwork(Model model, Principal principal) {
+        String email = principal.getName();
+        User currentUser = userService.findByEmail(email);
         List<ConnectionRequest> pendingRequests = connectionRequestService.getPendingRequests(currentUser);
         List<User> connections = connectionRequestService.getConnections(currentUser);
         List<User> followers = userService.getFollowers(currentUser);

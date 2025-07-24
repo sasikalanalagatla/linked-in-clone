@@ -44,7 +44,7 @@ public class MessageController {
 
     @GetMapping
     public String messagePage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail, Model model) {
-        User loggedInUser = userService.getUserById(1L); // Hardcoded as per original
+        User loggedInUser = userService.getUserById(5L);
         if (loggedInUser == null || loggedInUser.getEmail() == null) {
             throw new CustomException("INVALID_USER", "Logged-in user or email cannot be null");
         }
