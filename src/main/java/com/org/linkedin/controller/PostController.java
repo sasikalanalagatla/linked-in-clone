@@ -160,15 +160,23 @@ public class PostController {
     @PostMapping("/post/react/{postId}")
     @ResponseBody
     public String reactToPost(@PathVariable Long postId, Principal principal) {
-        validatePrincipal(principal);
-        User user = getCurrentUser(principal);
+        if (principal == null) {
+            throw new CustomException("UNAUTHORIZED", "User must be logged in");
+        }
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new CustomException("USER_NOT_FOUND", "User not found");
+        }
+        User user = userOptional.get();
+
+        reactionService.toggleReaction(user, post);
         post.setTotalReactions(post.getReactions().size());
         postRepository.save(post);
-
         return "Reaction updated";
     }
 

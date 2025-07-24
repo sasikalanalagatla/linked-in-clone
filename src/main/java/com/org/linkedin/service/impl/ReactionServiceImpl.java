@@ -10,4 +10,35 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ReactionServiceImpl implements ReactionService {
+
+    private final ReactionRepository reactionRepository;
+    private final PostRepository postRepository;
+
+    public ReactionServiceImpl(ReactionRepository reactionRepository, PostRepository postRepository) {
+        this.reactionRepository = reactionRepository;
+        this.postRepository = postRepository;
+    }
+
+    @Override
+    public void toggleReaction(User user, Post post) {
+        Reaction existing = reactionRepository.findByUserAndPost(user, post);
+        if (existing != null) {
+            post.getReactions().remove(existing);
+            reactionRepository.delete(existing);
+        } else {
+            Reaction reaction = new Reaction();
+            reaction.setUser(user);
+            reaction.setPost(post);
+            reaction.setReactionType("LIKE");
+            post.getReactions().add(reaction);
+            reactionRepository.save(reaction);
+        }
+        post.setTotalReactions(post.getReactions().size());
+        postRepository.save(post);
+    }
+
+    @Override
+    public boolean hasUserLikedPost(Post post, User user) {
+        return reactionRepository.existsByUserAndPost(user, post);
+    }
 }
