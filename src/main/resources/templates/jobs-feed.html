@@ -14,7 +14,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background-color: #f3f2ef;
             color: #000000e6;
-            line-height: 1.33;
         }
 
         .navbar {
@@ -30,7 +29,7 @@
             border-bottom: 1px solid #00000017;
         }
 
-        .navbar-container {
+        .navbar-content {
             display: flex;
             align-items: center;
             max-width: 1128px;
@@ -110,7 +109,10 @@
             cursor: pointer;
             border-radius: 4px;
             transition: color 0.2s;
-            min-width: 80px;
+            min-width: 60px; /* Reduced to allow text wrapping */
+            white-space: normal; /* Allow text to wrap */
+            text-align: center;
+            line-height: 1.2; /* Adjust line height for better wrapping */
             position: relative;
         }
 
@@ -523,76 +525,30 @@
             font-size: 14px;
             color: #666;
         }
-
-        @media (max-width: 768px) {
-            .navbar .nav-items {
-                gap: 0;
-            }
-
-            .nav-item {
-                min-width: 60px;
-                padding: 6px 8px;
-                font-size: 12px;
-            }
-
-            .search-container {
-                width: 200px;
-            }
-
-            .work-divider, .premium-link {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .navbar .left-section {
-                gap: 4px;
-            }
-
-            .navbar .logo {
-                height: 30px;
-                width: 30px;
-            }
-
-            .search-container {
-                width: 150px;
-            }
-
-            .nav-item {
-                min-width: 50px;
-                font-size: 11px;
-            }
-
-            .nav-icon {
-                width: 20px;
-                height: 20px;
-            }
-
-            .nav-icon svg {
-                width: 16px;
-                height: 16px;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="navbar">
-    <div class="navbar-container">
+    <div class="navbar-content">
         <div class="left-section">
             <div class="logo">
                 <span class="logo-text">in</span>
             </div>
             <div class="search-container">
-                <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                </svg>
-                <input type="text" class="search-input" placeholder="Search">
+                <form th:action="@{/job/feed}" method="get" style="position: relative;">
+                    <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                    <input type="text" name="keyword" class="search-input"
+                           placeholder="Search jobs or skills..."
+                           th:value="${param.keyword}">
+                </form>
             </div>
         </div>
 
         <div class="nav-items">
-            <a th:href="@{/}" class="nav-item">
+            <a th:href="@{'/'}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
@@ -616,7 +572,7 @@
                 </div>
                 Jobs
             </a>
-            <a href="#" th:href="@{/chat}" class="nav-item">
+            <a href="#" th:href="@{/chat}"class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -632,9 +588,17 @@
                 </div>
                 Notifications
             </a>
-            <a th:href="@{'/profile/' + ${loggedInUser != null ? loggedInUser.userId : '1'}}" class="nav-item profile-nav">
+            <a th:href="@{'/profile/1'}" class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
+            </a>
+            <a th:href="@{/job/add}" class="nav-item">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                    </svg>
+                </div>
+                Add Jobs
             </a>
             <div class="work-divider"></div>
             <a href="#" class="nav-item">
@@ -645,6 +609,7 @@
                 </div>
                 Work
             </a>
+            <a href="#" class="premium-link">Try Premium for free</a>
         </div>
     </div>
 </div>
@@ -744,12 +709,14 @@
                 </a>
             </div>
 
+
             <div th:if="${loggedInUser != null and selectedJob.user.userId == loggedInUser.userId}">
                 <a th:href="@{'/job/edit/' + ${selectedJob.id}}" class="edit-button">Edit</a>
                 <form th:action="@{'/job/delete/' + ${selectedJob.id}}" method="post" style="display:inline;">
                     <button type="submit" class="delete-button">Delete</button>
                 </form>
             </div>
+
         </div>
 
         <div class="job-insights">
