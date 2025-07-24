@@ -4,11 +4,12 @@ import com.org.linkedin.model.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface JobService {
 
-    Job createJob(Job job);
+    Job createJob(Job job, Principal principal);
 
     Job getJobById(Long jobId);
 

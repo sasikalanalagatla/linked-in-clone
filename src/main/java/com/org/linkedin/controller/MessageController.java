@@ -13,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/message")
@@ -43,11 +45,9 @@ public class MessageController {
     }
 
     @GetMapping
-    public String messagePage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail, Model model) {
-        User loggedInUser = userService.getUserById(5L);
-        if (loggedInUser == null || loggedInUser.getEmail() == null) {
-            throw new CustomException("INVALID_USER", "Logged-in user or email cannot be null");
-        }
+    public String messagePage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail,
+                              Model model, Principal principal) {
+        User loggedInUser = userService.findByEmail(principal.getName());
 
         List<User> connections = connectionRequest.getConnections(loggedInUser);
         model.addAttribute("connections", connections != null ? connections : new ArrayList<>());
@@ -71,10 +71,10 @@ public class MessageController {
             @RequestParam("senderId") Long senderId,
             @RequestParam("receiverEmail") String receiverEmail,
             @RequestParam("content") String content,
-            Model model) {
+            Model model,Principal principal) {
         if (content == null || content.trim().isEmpty()) {
             model.addAttribute("errorMessage", "Message content cannot be empty");
-            return messagePage(receiverEmail, model);
+            return messagePage(receiverEmail, model,principal);
         }
 
         User sender = userService.getUserById(senderId);
@@ -94,7 +94,6 @@ public class MessageController {
 
         messageService.saveMessage(message);
 
-        // Redirect to refresh the chat history
         return "redirect:/message?receiverEmail=" + receiverEmail;
     }
 }

@@ -1,6 +1,5 @@
 package com.org.linkedin.controller;
 
-import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.AdditionalQuestion;
 import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Job;
@@ -20,10 +19,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class JobController {
@@ -46,13 +46,15 @@ public class JobController {
     }
 
     @GetMapping("/job/feed")
-    public String jobFeed(@RequestParam(value = "keyword", required = false) String keyword,
-                          @RequestParam(value = "range", required = false) String range,
-                          @RequestParam(value = "jobId", required = false) Long jobId,
-                          @RequestParam(value = "under10", required = false) Boolean under10,
-                          @RequestParam(value = "page", defaultValue = "0") int page,
-                          @RequestParam(value = "size", defaultValue = "5") int size,
-                          Model model) {
+    public String jobFeed(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "range", required = false) String range,
+            @RequestParam(value = "jobId", required = false) Long jobId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "5") int size,
+            Model model,
+            Principal principal
+    ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("jobCreatedAt").descending());
         Page<Job> jobPage;
 
@@ -65,33 +67,20 @@ public class JobController {
             createdAfter = LocalDateTime.now().minusDays(30);
         }
 
-        if (Boolean.TRUE.equals(under10)) {
-            if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
-                jobPage = jobRepository.filterAndSearchWithUnder10Applicants(keyword, createdAfter, pageable);
-            } else if (keyword != null && !keyword.isEmpty()) {
-                jobPage = jobRepository.searchJobsWithUnder10Applicants(keyword, pageable);
-            } else if (createdAfter != null) {
-                jobPage = jobRepository.filterByCreatedAtWithUnder10Applicants(createdAfter, pageable);
-            } else {
-                jobPage = jobRepository.findJobsWithUnder10Applicants(pageable);
-            }
+        if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
+            jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            jobPage = jobServiceImpl.searchJobs(keyword, pageable);
+        } else if (createdAfter != null) {
+            jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
         } else {
-            if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
-                jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
-            } else if (keyword != null && !keyword.isEmpty()) {
-                jobPage = jobServiceImpl.searchJobs(keyword, pageable);
-            } else if (createdAfter != null) {
-                jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
-            } else {
-                jobPage = jobServiceImpl.getAllJobs(pageable);
-            }
+            jobPage = jobServiceImpl.getAllJobs(pageable);
         }
 
         List<Job> jobs = jobPage.getContent();
         model.addAttribute("jobs", jobs);
         model.addAttribute("keyword", keyword);
         model.addAttribute("range", range);
-        model.addAttribute("under10", under10);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", jobPage.getTotalPages());
         model.addAttribute("size", size);
@@ -104,16 +93,27 @@ public class JobController {
         }
 
         model.addAttribute("selectedJob", selectedJob);
+
+        if (principal != null) {
+            Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
+            if(optionalUser.isPresent()){
+                User user = optionalUser.get();
+                model.addAttribute("loggedInUser", user);
+
+                Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserId(user.getUserId());
+                model.addAttribute("appliedJobIds", appliedJobIds);
+            }
+        }
         return "jobs-feed";
     }
+
+
 
     @PostMapping("/job/create")
     public String createPost(@ModelAttribute("job") Job job,
                              @RequestParam(required = false) String addQuestion,
-                             Model model) {
-        if (job == null) {
-            throw new CustomException("INVALID_JOB", "Job data cannot be null");
-        }
+                             Model model,Principal principal) {
+
         if (addQuestion != null) {
             job.getAdditionalQuestions().add(new AdditionalQuestion());
             model.addAttribute("job", job);
@@ -122,15 +122,9 @@ public class JobController {
         }
 
         for (AdditionalQuestion question : job.getAdditionalQuestions()) {
-            if (question.getQuestionText() == null || question.getQuestionText().trim().isEmpty()) {
-                model.addAttribute("job", job);
-                model.addAttribute("skills", skillRepository.findAll());
-                throw new CustomException("INVALID_QUESTION", "Question text cannot be empty");
-            }
             question.setJob(job);
         }
-
-        jobServiceImpl.createJob(job);
+        jobServiceImpl.createJob(job,principal);
         return "redirect:/job/feed";
     }
 
@@ -144,20 +138,21 @@ public class JobController {
     }
 
     @GetMapping("/job/get/{jobId}")
-    public String getJobById(@PathVariable("jobId") Long jobId, Model model) {
-        if (jobId == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
+    public String getJobById(@PathVariable("jobId") Long jobId, Model model, Principal principal) {
         Job job = jobServiceImpl.getJobById(jobId);
         model.addAttribute("job", job);
+
+        if (principal != null) {
+            Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
+            optionalUser.ifPresent(user -> model.addAttribute("loggedInUser", user));
+        }
+
         return "single-job";
     }
 
+
     @GetMapping("/job/apply/{jobId}")
     public String showApplyForm(@PathVariable Long jobId, Model model) {
-        if (jobId == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
         Job job = jobServiceImpl.getJobById(jobId);
         ApplyJob applyJob = new ApplyJob();
 
@@ -175,45 +170,35 @@ public class JobController {
     @PostMapping("/job/apply/{jobId}")
     public String submitApplyForm(@PathVariable Long jobId,
                                   @ModelAttribute ApplyJob applyJob,
-                                  @RequestParam("resumeFile") MultipartFile resumeFile) throws IOException {
-        if (jobId == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
-        if (applyJob == null || applyJob.getEmail() == null) {
-            throw new CustomException("INVALID_APPLICATION", "Application data or email cannot be null");
-        }
-        if (resumeFile == null || resumeFile.isEmpty()) {
-            throw new CustomException("INVALID_FILE", "Resume file cannot be null or empty");
-        }
-        Job job = jobServiceImpl.getJobById(jobId);
-        String resumeUrl = cloudinaryService.uploadFile(resumeFile);
-        applyJob.setResumeUrl(resumeUrl);
-        Optional<User> user = userRepository.findByEmail(applyJob.getEmail());
-        if (user.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User with email " + applyJob.getEmail() + " not found");
-        }
+                                  @RequestParam("resumeFile") MultipartFile resumeFile) {
+        try {
+            Job job = jobServiceImpl.getJobById(jobId);
+            String resumeUrl = cloudinaryService.uploadFile(resumeFile);
+            applyJob.setResumeUrl(resumeUrl);
+            Optional<User> optionalUser = userRepository.findByEmail(applyJob.getEmail());
+            User user = optionalUser.get();
+            applyJob.setUser(user);
 
-        applyJob.setUser(user.get());
-        applyJob.setJob(job);
-        applyJobRepository.save(applyJob);
+            applyJob.setJob(job);
+            applyJobRepository.save(applyJob);
 
-        return "redirect:/job/feed?jobId=" + jobId;
+            return "redirect:/job/feed?jobId=" + jobId;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/job/apply/" + jobId + "?error=true";
+        }
     }
 
+
     @PostMapping("/job/delete/{jobId}")
-    public String deleteJobById(@PathVariable("jobId") Long jobId) {
-        if (jobId == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
+    public String deleteJobById(@PathVariable("jobId") Long jobId){
         jobServiceImpl.deleteJobById(jobId);
         return "redirect:/job/feed";
     }
 
     @GetMapping("/job/edit/{id}")
     public String editJobForm(@PathVariable Long id, Model model) {
-        if (id == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
         Job job = jobServiceImpl.getJobById(id);
         model.addAttribute("job", job);
         return "edit-job";
@@ -221,9 +206,6 @@ public class JobController {
 
     @PostMapping("/job/update")
     public String updateJob(@ModelAttribute("job") Job updatedJob) {
-        if (updatedJob == null || updatedJob.getId() == null) {
-            throw new CustomException("INVALID_JOB", "Job data or ID cannot be null");
-        }
         jobServiceImpl.updateJob(updatedJob);
         return "redirect:/job/feed";
     }

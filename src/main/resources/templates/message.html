@@ -570,7 +570,7 @@
         </div>
         Notifications
       </a>
-      <a href="#" th:href="@{'/profile/'+1}" class="nav-item profile-nav">
+      <a href="#" th:href="@{'/profile/'+ ${sender.userId}}" class="nav-item profile-nav">
         <div class="profile-pic"></div>
         Me
       </a>

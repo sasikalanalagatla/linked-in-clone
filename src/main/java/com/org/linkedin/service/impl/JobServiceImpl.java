@@ -2,29 +2,35 @@ package com.org.linkedin.service.impl;
 
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Job;
+import com.org.linkedin.model.User;
 import com.org.linkedin.repository.JobRepository;
+import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.JobService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JobServiceImpl implements JobService {
 
     private final JobRepository jobRepository;
+    private final UserRepository userRepository;
 
-    public JobServiceImpl(JobRepository jobRepository) {
+    public JobServiceImpl(JobRepository jobRepository, UserRepository userRepository) {
         this.jobRepository = jobRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Job createJob(Job job) {
-        if (job == null) {
-            throw new CustomException("INVALID_JOB", "Job data cannot be null");
-        }
+    public Job createJob(Job job, Principal principal){
+        String email = principal.getName();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        job.setUser(optionalUser.get());
         return jobRepository.save(job);
     }
 
