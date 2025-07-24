@@ -102,6 +102,7 @@ public class PostController {
         }
 
         model.addAttribute("user", user);
+        model.addAttribute("currentUserId", user.getUserId()); // Fixed: Added currentUserId
         model.addAttribute("totalConnection", totalConnection);
         model.addAttribute("posts", posts);
         model.addAttribute("postUserLikes", postUserLikes);
@@ -109,61 +110,52 @@ public class PostController {
         return "home-page";
     }
 
-//    @GetMapping("/post/options/{id}")
-//    public String showPostOptions(@PathVariable Long id, Model model) {
-//        if (id == null) {
-//            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
-//        }
-//        Post post = postRepository.findById(id)
-//                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-//
-//        User user = userRepository.findByFullName("sasikala");
-//        Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
-//        Page<Post> postPage = postService.findAll(pageable);
-//        List<Post> posts = postPage.getContent();
-//
-//        List<User> connections = connectionRequestService.getConnections(user);
-//        Integer totalConnection = connections.size();
-//
-//        Map<Long, Boolean> postUserLikes = new HashMap<>();
-//        for (Post p : posts) {
-//            p.setTotalReactions(p.getReactions().size());
-//            boolean liked = reactionService.hasUserLikedPost(p, user);
-//            postUserLikes.put(p.getPostId(), liked);
-//        }
-//
-//        model.addAttribute("user", user);
-//        model.addAttribute("totalConnection", totalConnection);
-//        model.addAttribute("posts", posts);
-//        model.addAttribute("postUserLikes", postUserLikes);
-//        model.addAttribute("selectedPost", id);
-//
-//        return "home-page";
-//    }
-
     @GetMapping("/post/edit/{id}")
-    public String editPostForm(@PathVariable Long id, Model model) {
+    public String editPostForm(@PathVariable Long id, Model model, Principal principal) {
         if (id == null) {
             throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
+
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User currentUser = userOptional.get();
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+
+        // Check if current user is the author of the post
+        if (!post.getAuthorId().equals(currentUser.getUserId())) {
+            throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
+        }
+
         model.addAttribute("post", post);
         model.addAttribute("authorName", post.getAuthorName());
         return "edit_post";
     }
 
     @PostMapping("/post/edit/{id}")
-    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost, Model model) {
+    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost,
+                             Model model, Principal principal) {
         if (id == null) {
             throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
         if (updatedPost == null || updatedPost.getPostDescription() == null) {
             throw new CustomException("INVALID_POST", "Post data or description cannot be null");
         }
+
         try {
+            String email = principal.getName();
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            User currentUser = userOptional.get();
+
             Post post = postRepository.findById(id)
                     .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+
+            // Check if current user is the author of the post
+            if (!post.getAuthorId().equals(currentUser.getUserId())) {
+                throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
+            }
+
             post.setPostDescription(updatedPost.getPostDescription());
             post.setEdited(true);
             postRepository.save(post);
@@ -176,13 +168,24 @@ public class PostController {
     }
 
     @PostMapping("/post/delete/{id}")
-    public String deletePost(@PathVariable Long id, Model model) {
+    public String deletePost(@PathVariable Long id, Model model, Principal principal) {
         if (id == null) {
             throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
+
         try {
-            postRepository.findById(id)
+            String email = principal.getName();
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            User currentUser = userOptional.get();
+
+            Post post = postRepository.findById(id)
                     .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+
+            // Check if current user is the author of the post
+            if (!post.getAuthorId().equals(currentUser.getUserId())) {
+                throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
+            }
+
             postRepository.deleteById(id);
             return "redirect:/";
         } catch (CustomException e) {
@@ -193,34 +196,45 @@ public class PostController {
 
     @PostMapping("/post/react/{postId}")
     @ResponseBody
-    public String reactToPost(@PathVariable Long postId) {
+    public String reactToPost(@PathVariable Long postId, Principal principal) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        User dummyUser = userRepository.findByFullName("sasikala");
-        if (dummyUser == null) {
-            throw new RuntimeException("Dummy user 'sasikala' not found");
-        }
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional.get();
 
-        reactionService.toggleReaction(dummyUser, post);
+        reactionService.toggleReaction(user, post);
         return "Reaction updated";
     }
 
     @GetMapping("/post/all")
-    public String viewAllPosts(Model model) {
+    public String viewAllPosts(Model model, Principal principal) {
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional.get();
+
         List<Post> posts = postRepository.findAll();
         for (Post post : posts) {
             post.setTotalReactions(post.getReactions().size());
         }
+
         model.addAttribute("posts", posts);
+        model.addAttribute("currentUserId", user.getUserId());
         return "post_list";
     }
 
     @GetMapping("/loadMorePosts")
-    public String loadMorePosts(@RequestParam int page, Model model) {
+    public String loadMorePosts(@RequestParam int page, Model model, Principal principal) {
+        String email = principal.getName();
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userOptional.get();
+
         Pageable pageable = PageRequest.of(page, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
+
         model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("currentUserId", user.getUserId());
         return "partials/postCards :: postList";
     }
 }

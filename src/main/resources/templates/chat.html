@@ -326,12 +326,6 @@
       gap: 16px;
     }
 
-    .message-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
     .message {
       display: flex;
       align-items: flex-start;
@@ -570,7 +564,7 @@
         </div>
         Notifications
       </a>
-      <a href="#" th:href="@{'/profile/'+1}" class="nav-item profile-nav">
+      <a href="#" th:href="@{'/profile/'+ ${sender.userId}}" class="nav-item profile-nav">
         <div class="profile-pic"></div>
         Me
       </a>
@@ -593,14 +587,13 @@
   <div class="sidebar">
     <div class="messaging-header">
       <h2>Chat</h2>
-      <div>⋯ ✏️</div>
     </div>
     <div class="message-search">
       <input type="text" placeholder="Search messages">
     </div>
     <div class="user-list">
       <div th:each="conn : ${connections}">
-        <a class="user-item" th:href="@{/message(receiverEmail=${conn.email})}"
+        <a class="user-item" th:href="@{/chat(receiverEmail=${conn.email})}"
            th:class="${receiverEmail == conn.email ? 'user-item active' : 'user-item'}">
           <div class="user-avatar"
                th:text="${conn.fullName != null and conn.fullName.length() >= 2 ? conn.fullName.substring(0,2).toUpperCase() : '--'}">
@@ -623,24 +616,28 @@
         <h3 th:text="${receiver.fullName ?: 'Unknown User'}">Chat User</h3>
       </div>
     </div>
+
+    <!-- Fixed Chat Messages Section -->
     <div class="chat-messages" id="chatMessages">
-      <div th:if="${chatHistory != null}" th:each="msg, iter : ${chatHistory}">
-        <div class="message-group" th:if="${iter.first or msg.sender.userId != #lists.get(chatHistory, iter.index - 1)?.sender?.userId}">
-          <div class="message" th:class="${msg.sender.userId == sender.userId ? 'message sent' : 'message received'}">
-            <div class="user-avatar" th:if="${msg.sender.userId != sender.userId and (iter.first or msg.sender.userId != #lists.get(chatHistory, iter.index - 1)?.sender?.userId)}"
-                 th:text="${msg.sender.fullName != null and msg.sender.fullName.length() >= 2 ? msg.sender.fullName.substring(0,2).toUpperCase() : '--'}">
-            </div>
-            <div class="message-bubble" th:text="${msg.content}"></div>
+      <div th:if="${chatHistory != null}" th:each="msg : ${chatHistory}">
+        <div class="message" th:class="${msg.sender != null and msg.sender.userId == sender.userId ? 'message sent' : 'message received'}">
+          <!-- Always show avatar for received messages, never for sent messages -->
+          <div class="user-avatar"
+               th:if="${msg.sender != null and msg.sender.userId != sender.userId}"
+               th:text="${msg.sender.fullName != null and msg.sender.fullName.length() >= 2 ? msg.sender.fullName.substring(0,2).toUpperCase() : '--'}">
           </div>
+          <div class="message-bubble" th:text="${msg.content}"></div>
         </div>
       </div>
+
       <div th:if="${chatHistory == null or chatHistory.isEmpty()}" class="empty-state">
         <p th:if="${receiver}">Start a conversation with <span th:text="${receiver.fullName ?: 'Unknown User'}"></span></p>
         <p th:unless="${receiver}">Select a conversation to start messaging</p>
       </div>
     </div>
+
     <div th:if="${receiverEmail}" class="message-input-area">
-      <form th:action="@{/message/send}" method="post" id="messageForm">
+      <form th:action="@{/chat/send}" method="post" id="messageForm">
         <input type="hidden" name="receiverEmail" th:value="${receiverEmail}" />
         <input type="hidden" name="senderId" th:value="${sender.userId}" />
         <div class="message-input-container">
@@ -653,5 +650,33 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Auto-resize textarea
+  document.getElementById('messageInput')?.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+
+  // Auto-scroll to bottom of messages
+  function scrollToBottom() {
+      const chatMessages = document.getElementById('chatMessages');
+      if (chatMessages) {
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+  }
+
+  // Scroll to bottom on page load
+  window.addEventListener('load', scrollToBottom);
+
+  // Form submission handler
+  document.getElementById('messageForm')?.addEventListener('submit', function(e) {
+      const input = document.getElementById('messageInput');
+      if (!input.value.trim()) {
+          e.preventDefault();
+          return false;
+      }
+  });
+</script>
 </body>
 </html>
