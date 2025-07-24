@@ -288,6 +288,50 @@
       margin-bottom: 4px;
     }
 
+    .chat-header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: #f3f2ef;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .action-button:hover {
+      background: #e0e0e0;
+      color: #000;
+    }
+
+    .action-button.video-call {
+      background: #0a66c2;
+      color: white;
+    }
+
+    .action-button.video-call:hover {
+      background: #004182;
+    }
+
+    .action-button.calling {
+      background: #d93025;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -329,6 +373,40 @@
 
     .message.sent .message-bubble {
       background: #0a66c2;
+      color: white;
+    }
+
+    .call-message {
+      background: #e8f4fd !important;
+      color: #0a66c2 !important;
+      border: 1px solid #0a66c2;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .call-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .call-action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .accept-call {
+      background: #0a66c2;
+      color: white;
+    }
+
+    .decline-call {
+      background: #d93025;
       color: white;
     }
 
@@ -407,6 +485,207 @@
       padding: 0 16px;
     }
 
+    .video-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-modal.active {
+      display: flex;
+    }
+
+    .video-container {
+      position: relative;
+      width: 90%;
+      max-width: 1200px;
+      height: 80%;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-header {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 16px 24px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .video-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .close-video {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .video-content {
+      flex: 1;
+      position: relative;
+      display: flex;
+    }
+
+    .remote-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #333;
+    }
+
+    .local-video {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 200px;
+      height: 150px;
+      border-radius: 8px;
+      border: 2px solid #0a66c2;
+      object-fit: cover;
+      background: #333;
+    }
+
+    .video-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 12px 24px;
+      border-radius: 24px;
+    }
+
+    .control-btn {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .control-btn.end-call {
+      background: #d93025;
+    }
+
+    .control-btn.end-call:hover {
+      background: #b71c1c;
+    }
+
+    .incoming-call-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      width: 300px;
+      z-index: 9999;
+      display: none;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .incoming-call-notification.show {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .notification-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #0a66c2;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .notification-info h4 {
+      margin: 0;
+      font-size: 16px;
+      color: #000;
+    }
+
+    .notification-info p {
+      margin: 4px 0 0 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .notification-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .notification-btn.accept {
+      background: #0a66c2;
+      color: white;
+    }
+
+    .notification-btn.decline {
+      background: #f3f2ef;
+      color: #666;
+    }
+
     @media (max-width: 1024px) {
       .container {
         flex-direction: column;
@@ -415,6 +694,11 @@
       .sidebar, .chat-panel {
         width: 100%;
         min-width: unset;
+      }
+
+      .local-video {
+        width: 120px;
+        height: 90px;
       }
     }
 
@@ -435,6 +719,18 @@
 
       .work-divider, .premium-link {
         display: none;
+      }
+
+      .video-container {
+        width: 95%;
+        height: 90%;
+      }
+
+      .local-video {
+        width: 100px;
+        height: 75px;
+        top: 10px;
+        right: 10px;
       }
     }
 
@@ -465,6 +761,11 @@
       .nav-icon svg {
         width: 16px;
         height: 16px;
+      }
+
+      .incoming-call-notification {
+        width: calc(100% - 40px);
+        right: 20px;
       }
     }
   </style>
@@ -576,9 +877,16 @@
       <div class="chat-header-info">
         <h3 th:text="${receiver.fullName ?: 'Unknown User'}">Chat User</h3>
       </div>
+      <div class="chat-header-actions">
+        <button class="action-button video-call" id="videoCallBtn" title="Start video call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <div class="chat-messages">
+    <div class="chat-messages" id="chatMessages">
       <div th:if="${chatHistory != null and not chatHistory.isEmpty()}" th:each="msg : ${chatHistory}">
         <div class="message" th:class="${msg.sender != null and msg.sender.userId == sender.userId ? 'message sent' : 'message received'}">
           <div class="user-avatar"
@@ -609,45 +917,416 @@
     </div>
   </div>
 </div>
+
+<div class="video-modal" id="videoModal">
+  <div class="video-container">
+    <div class="video-header">
+      <div class="video-title">Video Call</div>
+      <button class="close-video" id="closeVideo">&times;</button>
+    </div>
+    <div class="video-content">
+      <video id="remoteVideo" class="remote-video" autoplay></video>
+      <video id="localVideo" class="local-video" autoplay muted></video>
+      <div class="video-controls">
+        <button class="control-btn" id="muteBtn" title="Mute/Unmute">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H6c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </button>
+        <button class="control-btn" id="cameraBtn" title="Turn camera on/off">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+          </svg>
+        </button>
+        <button class="control-btn end-call" id="endCallBtn" title="End call">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.7l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.1-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="incoming-call-notification" id="incomingCallNotification">
+  <div class="notification-header">
+    <div class="notification-avatar" id="callerAvatar">JD</div>
+    <div class="notification-info">
+      <h4 id="callerName">John Doe</h4>
+      <p>Incoming video call...</p>
+    </div>
+  </div>
+  <div class="notification-actions">
+    <button class="notification-btn decline" id="declineCallBtn">Decline</button>
+    <button class="notification-btn accept" id="acceptCallBtn">Accept</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script th:inline="javascript">
-  const userEmail = /*[[${senderEmail}]]*/ 'guest@example.com'; // Replace fallback with server-side email
+  // Thymeleaf variables
+  const userEmail = /*[[${senderEmail}]]*/ 'guest@example.com';
+  const currentUserId = /*[[${sender.userId}]]*/ '1';
+  const receiverId = /*[[${receiver != null ? receiver.userId : null}]]*/ null;
+  const receiverName = /*[[${receiver != null ? receiver.fullName : 'Unknown User'}]]*/ 'Unknown User';
 
-  const socket = new SockJS('/ws');
-  const stompClient = Stomp.over(socket);
+  // WebSocket and WebRTC setup
+  let stompClient = null;
+  let peerConnection = null;
+  let localStream = null;
+  let isInCall = false;
+  let isMuted = false;
+  let isCameraOff = false;
 
-  stompClient.connect({}, function (frame) {
+  const servers = {
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+  };
+
+  // DOM elements
+  const videoModal = document.getElementById('videoModal');
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  const videoCallBtn = document.getElementById('videoCallBtn');
+  const closeVideoBtn = document.getElementById('closeVideo');
+  const endCallBtn = document.getElementById('endCallBtn');
+  const muteBtn = document.getElementById('muteBtn');
+  const cameraBtn = document.getElementById('cameraBtn');
+  const incomingCallNotification = document.getElementById('incomingCallNotification');
+  const acceptCallBtn = document.getElementById('acceptCallBtn');
+  const declineCallBtn = document.getElementById('declineCallBtn');
+  const callerAvatar = document.getElementById('callerAvatar');
+  const callerName = document.getElementById('callerName');
+  const chatMessages = document.getElementById('chatMessages');
+
+  // Initialize WebSocket connection
+  function initWebSocket() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
       console.log('Connected to WebSocket: ' + frame);
 
-      // Subscribe to your personal message topic
+      // Subscribe to personal message topic
       stompClient.subscribe('/topic/messages/' + userEmail, function (message) {
-          const msg = JSON.parse(message.body);
+        const msg = JSON.parse(message.body);
+        console.log('Received message:', msg);
 
-          // Dynamically update the chat window
-          const chatMessages = document.querySelector('.chat-messages');
-
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'message received';
-
-          const avatar = document.createElement('div');
-          avatar.className = 'user-avatar';
-          avatar.textContent = msg.sender && msg.sender.fullName
-              ? msg.sender.fullName.substring(0, 2).toUpperCase()
-              : '--';
-
-          const bubble = document.createElement('div');
-          bubble.className = 'message-bubble';
-          bubble.textContent = msg.content;
-
-          messageDiv.appendChild(avatar);
-          messageDiv.appendChild(bubble);
-          chatMessages.appendChild(messageDiv);
-
-          // Optional: scroll to bottom
-          chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Check if it's a video call request
+        if (msg.type === 'video_call_request') {
+          showIncomingCallNotification(msg.sender.fullName, msg.sender.userId);
+        } else {
+          displayMessage(msg, false);
+        }
       });
+
+      // Subscribe to video call signals
+      stompClient.subscribe('/user/' + currentUserId + '/queue/video', function (message) {
+        const signal = JSON.parse(message.body);
+        console.log('Received video signal:', signal);
+        handleVideoSignal(signal);
+      });
+
+      // Subscribe to call notifications (backup method)
+      stompClient.subscribe('/user/' + currentUserId + '/queue/call', function (message) {
+        const callData = JSON.parse(message.body);
+        console.log('Received call notification:', callData);
+        handleCallNotification(callData);
+      });
+    });
+  }
+
+  // Display message in chat
+  function displayMessage(msg, isSent) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+
+    if (!isSent) {
+      const avatar = document.createElement('div');
+      avatar.className = 'user-avatar';
+      avatar.textContent = msg.sender && msg.sender.fullName
+        ? msg.sender.fullName.substring(0, 2).toUpperCase()
+        : '--';
+      messageDiv.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+
+    if (msg.type === 'video_call_request') {
+      bubble.className += ' call-message';
+      bubble.innerHTML = `
+        <div>📹 Video call request</div>
+        <div class="call-actions">
+          <button class="call-action-btn accept-call" onclick="acceptCall('${msg.senderId}')">Accept</button>
+          <button class="call-action-btn decline-call" onclick="declineCall('${msg.senderId}')">Decline</button>
+        </div>
+      `;
+    } else {
+      bubble.textContent = msg.content;
+    }
+
+    messageDiv.appendChild(bubble);
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Video call functions
+  async function initPeerConnection() {
+    peerConnection = new RTCPeerConnection(servers);
+
+    peerConnection.onicecandidate = event => {
+      if (event.candidate) {
+        sendVideoSignal("candidate", event.candidate);
+      }
+    };
+
+    peerConnection.ontrack = event => {
+      remoteVideo.srcObject = event.streams[0];
+    };
+
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+      localVideo.srcObject = localStream;
+
+      localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+      });
+    } catch (error) {
+      console.error('Error accessing media devices:', error);
+      alert('Unable to access camera/microphone. Please check permissions.');
+    }
+  }
+
+  async function startVideoCall() {
+    if (!receiverId) {
+      alert('No user selected for video call');
+      return;
+    }
+
+    try {
+      videoCallBtn.classList.add('calling');
+      videoCallBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.15-3.75-6.59-6.59l2.2-2.2c.27-.27.35-.67.24-1.02C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>';
+
+      console.log('Starting video call to receiverId:', receiverId);
+
+      await initPeerConnection();
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      sendVideoSignal("offer", peerConnection.localDescription);
+
+      // Send call notification - this should trigger the notification on receiver's side
+      sendCallNotification('video_call_request');
+
+      console.log('Call notification sent');
+
+      showVideoModal();
+      isInCall = true;
+    } catch (error) {
+      console.error('Error starting video call:', error);
+      videoCallBtn.classList.remove('calling');
+      videoCallBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+    }
+  }
+
+  async function handleVideoSignal(signal) {
+    const { type, payload, senderId } = signal;
+
+    if (!peerConnection && (type === "offer" || type === "answer" || type === "candidate")) {
+      await initPeerConnection();
+    }
+
+    try {
+      if (type === "offer") {
+        const offer = new RTCSessionDescription(JSON.parse(payload));
+        await peerConnection.setRemoteDescription(offer);
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        sendVideoSignal("answer", peerConnection.localDescription);
+        showVideoModal();
+        isInCall = true;
+      }
+      else if (type === "answer") {
+        const answer = new RTCSessionDescription(JSON.parse(payload));
+        await peerConnection.setRemoteDescription(answer);
+        videoCallBtn.classList.remove('calling');
+        videoCallBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+      }
+      else if (type === "candidate") {
+        const candidate = new RTCIceCandidate(JSON.parse(payload));
+        await peerConnection.addIceCandidate(candidate);
+      }
+      else if (type === "end_call") {
+        endCall();
+      }
+    } catch (error) {
+      console.error('Error handling video signal:', error);
+    }
+  }
+
+  function handleCallNotification(callData) {
+    if (callData.type === 'video_call_request') {
+      showIncomingCallNotification(callData.senderName, callData.senderId);
+    }
+  }
+
+  function showIncomingCallNotification(senderName, senderId) {
+    callerName.textContent = senderName;
+    callerAvatar.textContent = senderName.substring(0, 2).toUpperCase();
+    incomingCallNotification.dataset.senderId = senderId;
+    incomingCallNotification.classList.add('show');
+  }
+
+  function hideIncomingCallNotification() {
+    incomingCallNotification.classList.remove('show');
+  }
+
+  async function acceptCall(senderId) {
+    hideIncomingCallNotification();
+    // The offer will come through WebSocket, so we just need to be ready
+    // The handleVideoSignal function will handle the actual call setup
+  }
+
+  function declineCall(senderId) {
+    hideIncomingCallNotification();
+    sendVideoSignal("decline_call", { declined: true }, senderId);
+  }
+
+  function sendVideoSignal(type, payload, targetId = null) {
+    if (!stompClient) return;
+
+    const signalMessage = {
+      type: type,
+      senderId: currentUserId,
+      receiverId: targetId || receiverId,
+      payload: JSON.stringify(payload)
+    };
+    stompClient.send("/app/video.signal", {}, JSON.stringify(signalMessage));
+  }
+
+  function sendCallNotification(type) {
+    if (!stompClient || !receiverId) {
+      console.log('Cannot send call notification - missing stompClient or receiverId');
+      return;
+    }
+
+    const notification = {
+      type: type,
+      senderId: currentUserId.toString(),
+      receiverId: receiverId.toString(),
+      senderName: 'You' // This should be the current user's name from server
+    };
+
+    console.log('Sending call notification:', notification);
+    stompClient.send("/app/call.notify", {}, JSON.stringify(notification));
+  }
+
+  function showVideoModal() {
+    videoModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function hideVideoModal() {
+    videoModal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+
+  function endCall() {
+    if (isInCall) {
+      sendVideoSignal("end_call", { ended: true });
+    }
+
+    isInCall = false;
+
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+
+    if (peerConnection) {
+      peerConnection.close();
+      peerConnection = null;
+    }
+
+    localVideo.srcObject = null;
+    remoteVideo.srcObject = null;
+
+    hideVideoModal();
+    hideIncomingCallNotification();
+
+    // Reset button state
+    videoCallBtn.classList.remove('calling');
+    videoCallBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+  }
+
+  function toggleMute() {
+    if (!localStream) return;
+
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      isMuted = !audioTrack.enabled;
+
+      muteBtn.style.background = isMuted ? '#d93025' : 'rgba(255, 255, 255, 0.2)';
+      muteBtn.innerHTML = isMuted
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H6c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>';
+    }
+  }
+
+  function toggleCamera() {
+    if (!localStream) return;
+
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      isCameraOff = !videoTrack.enabled;
+
+      cameraBtn.style.background = isCameraOff ? '#d93025' : 'rgba(255, 255, 255, 0.2)';
+      cameraBtn.innerHTML = isCameraOff
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>';
+    }
+  }
+
+  // Event listeners
+  videoCallBtn?.addEventListener('click', startVideoCall);
+  closeVideoBtn.addEventListener('click', endCall);
+  endCallBtn.addEventListener('click', endCall);
+  muteBtn.addEventListener('click', toggleMute);
+  cameraBtn.addEventListener('click', toggleCamera);
+  acceptCallBtn.addEventListener('click', () => {
+    const senderId = incomingCallNotification.dataset.senderId;
+    acceptCall(senderId);
+  });
+  declineCallBtn.addEventListener('click', () => {
+    const senderId = incomingCallNotification.dataset.senderId;
+    declineCall(senderId);
+  });
+
+  // Close modal when clicking outside
+  videoModal.addEventListener('click', (e) => {
+    if (e.target === videoModal) {
+      endCall();
+    }
+  });
+
+  // Initialize WebSocket connection
+  initWebSocket();
+
+  // Handle page unload
+  window.addEventListener('beforeunload', () => {
+    if (isInCall) {
+      endCall();
+    }
   });
 </script>
 

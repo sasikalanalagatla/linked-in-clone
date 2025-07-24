@@ -162,7 +162,6 @@
             border-radius: 6px;
         }
 
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -231,10 +230,8 @@
 <div class="form-container">
     <h2 th:text="${education.educationId != null ? 'Edit Education' : 'Add Education'}">Add Education</h2>
 
-    <!-- Success Message -->
     <div th:if="${success}" class="success-message" th:text="${success}"></div>
 
-    <!-- Error Message -->
     <div th:if="${error}" class="general-error" th:text="${error}"></div>
 
     <form th:action="${education.educationId != null ? '/update/education/' + education.educationId : '/add/education/' + user.userId}"
@@ -305,7 +302,6 @@
                 <a th:href="@{'/profile/' + ${user.userId}}" class="btn-cancel">Cancel</a>
             </div>
             <div class="button-group-right">
-                <!-- Show delete button only when editing -->
                 <button type="button"
                         th:if="${education.educationId != null}"
                         class="btn-delete"
@@ -321,7 +317,6 @@
     </form>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal" th:if="${education.educationId != null}">
     <div class="modal-content">
         <div class="modal-header">
@@ -347,7 +342,6 @@
 </div>
 
 <script>
-    // Modal functions
     function openDeleteModal() {
         document.getElementById('deleteModal').style.display = 'block';
     }
@@ -356,7 +350,6 @@
         document.getElementById('deleteModal').style.display = 'none';
     }
 
-    // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('deleteModal');
         if (event.target === modal) {

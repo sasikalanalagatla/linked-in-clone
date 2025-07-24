@@ -4,7 +4,6 @@
     <title>User Profile - LinkedIn</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Reset and base styles */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +17,6 @@
             color: rgba(0,0,0,.9);
         }
 
-        /* Navbar Styles */
         .navbar {
             display: flex;
             align-items: center;
@@ -178,7 +176,6 @@
             padding: 0 8px;
         }
 
-        /* Main container with two-column layout */
         .main-container {
             max-width: 1128px;
             margin: 24px auto;
@@ -200,7 +197,6 @@
             gap: 8px;
         }
 
-        /* Profile card */
         .profile-card {
             background-color: #fff;
             border-radius: 8px;
@@ -368,7 +364,6 @@
             color: rgba(0,0,0,.6);
         }
 
-        /* Analytics section */
         .analytics-section {
             background-color: #fff;
             border-radius: 8px;
@@ -405,7 +400,6 @@
             margin-top: 4px;
         }
 
-        /* Section card */
         .section-card {
             background-color: #fff;
             border-radius: 8px;
@@ -451,7 +445,6 @@
             margin-top: 8px;
         }
 
-        /* Experience, Education, Skills, Projects, Certifications, and Posts items */
         .experience-item, .education-item, .project-item, .skill-item, .certification-item, .post-item {
             display: flex;
             gap: 16px;
@@ -546,7 +539,6 @@
             color: rgba(0,0,0,.6);
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 24px;
@@ -570,7 +562,6 @@
             font-weight: 600;
         }
 
-        /* Sidebar styles */
         .sidebar-card {
             background-color: #fff;
             border-radius: 8px;
@@ -686,7 +677,6 @@
             cursor: pointer;
         }
 
-        /* Messages */
         .success, .error {
             padding: 12px;
             margin-bottom: 16px;
@@ -703,7 +693,6 @@
             color: #d32f2f;
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             .main-container {
                 grid-template-columns: 1fr;
@@ -772,10 +761,17 @@
                 </div>
                 Notifications
             </a>
-            <a href="#" th:href="@{'/profile/'+1}" class="nav-item profile-nav active">
+            <a href="#" th:href="@{'/profile/'+ ${user.userId}}" class="nav-item profile-nav active">
                 <div class="profile-pic"></div>
                 Me
             </a>
+            <form th:action="@{/logout}" method="post" style="margin-left: 12px;">
+                <button type="submit"
+                        style="background-color: transparent; border: 1px solid #d32f2f; color: #d32f2f; padding: 6px 12px; border-radius: 20px; font-weight: 500; font-size: 14px; cursor: pointer;">
+                    Logout
+                </button>
+            </form>
+
 
             <div class="work-divider"></div>
 
@@ -793,7 +789,6 @@
 
 <div class="main-container">
     <div class="main-content">
-        <!-- Profile Section -->
         <div class="profile-card">
             <div class="cover-photo">
                 <div class="profile-actions" >
@@ -820,7 +815,8 @@
                 </p>
 
                 <div class="connection-info">
-                    <a th:href="@{/mynetwork}" class="connection-count" th:text="${totalConnection} + ' connections'">0 connections</a>
+                    <a th:href="@{/mynetwork}" class="connection-count">
+                        All connections </a>
                 </div>
                 <div class="profile-buttons">
                     <div th:if="${user.userId != currentUserId}">
@@ -890,7 +886,6 @@
             </div>
         </div>
 
-        <!-- Education Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Education</h2>
@@ -949,7 +944,6 @@
             </div>
         </div>
 
-        <!-- Projects Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Projects</h2>
@@ -976,7 +970,6 @@
             </div>
         </div>
 
-        <!-- Skills Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Skills</h2>
@@ -1000,7 +993,6 @@
             </div>
         </div>
 
-        <!-- Posts Section -->
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">Posts</h2>
@@ -1039,7 +1031,6 @@
     </div>
 
     <div class="sidebar">
-        <!-- Language Section -->
         <div class="sidebar-card">
             <div class="sidebar-title">
                 Language
@@ -1047,7 +1038,6 @@
             <div class="profile-language">English, Telugu</div>
         </div>
 
-        <!-- Viewers Section -->
         <div class="sidebar-card">
             <div class="sidebar-title">
                 People who viewed your profile also viewed
@@ -1073,7 +1063,6 @@
 </div>
 
 <script>
-    // Toggle about section
     function toggleAbout() {
         const aboutText = document.querySelector('.about-text');
         const seeMore = document.querySelector('.see-more');

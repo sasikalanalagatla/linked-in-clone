@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Call</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        video {
+            width: 300px;
+            height: 220px;
+            margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+
+        #call-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>Video Call Demo</h2>
+
+<video id="localVideo" autoplay muted></video>
+<video id="remoteVideo" autoplay></video>
+
+<button id="call-button">Call</button>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+    const currentUserId = [[${currentUserId}]];
+      const targetUserId = [[${receiverId}]];
+
+      let stompClient = null;
+      let peerConnection = null;
+
+      const localVideo = document.getElementById("localVideo");
+      const remoteVideo = document.getElementById("remoteVideo");
+
+      const servers = {
+          iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      };
+
+      function connectWebSocket() {
+          const socket = new SockJS('/ws');
+          stompClient = Stomp.over(socket);
+
+          stompClient.connect({}, () => {
+              stompClient.subscribe('/user/queue/video', message => {
+                  const signal = JSON.parse(message.body);
+                  handleSignal(signal);
+              });
+          });
+      }
+
+      function initPeer() {
+          peerConnection = new RTCPeerConnection(servers);
+
+          peerConnection.onicecandidate = event => {
+              if (event.candidate) {
+                  sendSignal("candidate", event.candidate);
+              }
+          };
+
+          peerConnection.ontrack = event => {
+              remoteVideo.srcObject = event.streams[0];
+          };
+
+          navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+              .then(stream => {
+                  localVideo.srcObject = stream;
+                  stream.getTracks().forEach(track => {
+                      peerConnection.addTrack(track, stream);
+                  });
+              });
+      }
+
+      function startCall() {
+          initPeer();
+
+          peerConnection.createOffer()
+              .then(offer => {
+                  return peerConnection.setLocalDescription(offer);
+              })
+              .then(() => {
+                  sendSignal("offer", peerConnection.localDescription);
+              });
+      }
+
+      function handleSignal(signal) {
+          const { type, payload } = signal;
+
+          if (!peerConnection) {
+              initPeer();
+          }
+
+          if (type === "offer") {
+              const offer = new RTCSessionDescription(JSON.parse(payload));
+              peerConnection.setRemoteDescription(offer)
+                  .then(() => peerConnection.createAnswer())
+                  .then(answer => {
+                      return peerConnection.setLocalDescription(answer);
+                  })
+                  .then(() => {
+                      sendSignal("answer", peerConnection.localDescription);
+                  });
+          }
+
+          else if (type === "answer") {
+              const answer = new RTCSessionDescription(JSON.parse(payload));
+              peerConnection.setRemoteDescription(answer);
+          }
+
+          else if (type === "candidate") {
+              const candidate = new RTCIceCandidate(JSON.parse(payload));
+              peerConnection.addIceCandidate(candidate);
+          }
+      }
+
+      function sendSignal(type, payload) {
+          const signalMessage = {
+              type: type,
+              senderId: currentUserId,
+              receiverId: targetUserId,
+              payload: JSON.stringify(payload)
+          };
+          stompClient.send("/app/video.signal", {}, JSON.stringify(signalMessage));
+      }
+
+      document.getElementById("call-button").addEventListener("click", startCall);
+
+      connectWebSocket();
+</script>
+</body>
+</html>

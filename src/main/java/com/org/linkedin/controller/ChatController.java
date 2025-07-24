@@ -47,7 +47,7 @@ public class ChatController {
     public String chatPage(@RequestParam(value = "receiverEmail", required = false) String receiverEmail,
                            Principal principal, Model model) {
         try {
-            User loggedInUser = userService.findByEmail(principal.getName()); // Hardcoded as per original
+            User loggedInUser = userService.findByEmail(principal.getName());
             String senderEmail = loggedInUser.getEmail();
             if (senderEmail == null) {
                 throw new CustomException("INVALID_EMAIL", "Sender email cannot be null");
@@ -131,6 +131,30 @@ public class ChatController {
 
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Failed to send message: " + e.getMessage());
+        }
+
+        return "redirect:/chat?receiverEmail=" + receiverEmail;
+    }
+
+    @PostMapping("/chat/video-call-request")
+    public String sendVideoCallRequest(@RequestParam String receiverEmail,
+                                       @RequestParam String senderId,
+                                       Principal principal) {
+
+        String senderEmail = principal.getName();
+        User sender = userService.findByEmail(senderEmail);
+        User receiver = userService.findByEmail(receiverEmail);
+
+        if (receiver != null) {
+            ChatMessage callMessage = new ChatMessage();
+            callMessage.setSender(sender);
+            callMessage.setReceiver(receiver);
+            callMessage.setContent("📹 Video call request");
+            callMessage.setType("video_call_request");
+
+            chatService.saveMessage(callMessage);
+
+            messagingTemplate.convertAndSend("/topic/messages/" + receiverEmail, callMessage);
         }
 
         return "redirect:/chat?receiverEmail=" + receiverEmail;

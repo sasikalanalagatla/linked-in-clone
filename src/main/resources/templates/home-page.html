@@ -3,7 +3,6 @@
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
-        /* Existing CSS styles remain unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -911,7 +910,6 @@
             font-size: 16px;
         }
 
-        /* ==== Comment Section Styling ==== */
 .comment-section {
     margin-top: 12px;
     padding: 12px;
@@ -924,7 +922,6 @@
     display: none;
 }
 
-/* Comment List */
 .comment-list {
     max-height: 250px;
     overflow-y: auto;
@@ -938,7 +935,6 @@
     color: #333;
 }
 
-/* Comment Input */
 .comment-form {
     display: flex;
     gap: 8px;
@@ -1137,7 +1133,8 @@
                     </div>
 
                     <div class="post-actions">
-                        <button class="post-action-btn" th:onclick="'togglePostOptionsMenu(\'post-options-' + ${post.postId} + '\')'">⋯</button>
+                        <button class="post-action-btn"
+                                th:onclick="'togglePostOptionsMenu(\'post-options-' + ${post.postId} + '\')'">⋯</button>
                         <div class="post-options-menu" th:id="'post-options-' + ${post.postId}">
                             <div th:if="${post.author != null and post.author.userId == currentUserId}">
                                 <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get" style="margin: 0;">
@@ -1149,7 +1146,8 @@
                                 </form>
                             </div>>
                             <div th:if="${post.author != null and post.author.userId == currentUserId}">
-                                <div class="post-option-item" style="color: #666; cursor: default;">No actions available</div>
+                                <div class="post-option-item" style="color: #666; cursor: default;">
+                                    No actions available</div>
                             </div>
                         </div>
                     </div>
@@ -1272,7 +1270,6 @@
 
         const isShown = menu.classList.contains('show');
 
-        // Close all other menus first
         document.querySelectorAll('.post-options-menu').forEach(m => {
             m.classList.remove('show');
         });
@@ -1360,7 +1357,7 @@
                 })
                 .then(res => {
                     if (!res.ok) throw new Error("Failed to post comment");
-                    return res.text();  // Expect HTML fragment
+                    return res.text();
                 })
                 .then(html => {
                     const temp = document.createElement("div");
@@ -1373,7 +1370,7 @@
                         existingList.innerHTML = newCommentList.innerHTML;
                     }
 
-                    input.value = ""; // Clear input after success
+                    input.value = "";
                 })
                 .catch(err => {
                     console.error("Error posting comment:", err);

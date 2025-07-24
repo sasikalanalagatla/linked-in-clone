@@ -14,6 +14,8 @@ public class ChatMessage {
     private String receiverEmail;
     private String content;
 
+    // Add this field
+    private String type = "text"; // default to "text"
 
     private LocalDateTime timestamp;
 
@@ -23,6 +25,7 @@ public class ChatMessage {
     @ManyToOne
     private User receiver;
 
+    // All your existing methods stay the same...
     public Long getId() {
         return id;
     }
@@ -77,5 +80,14 @@ public class ChatMessage {
 
     public void setReceiver(User receiver) {
         this.receiver = receiver;
+    }
+
+    // Just add these two methods for the type field
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
