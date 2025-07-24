@@ -8,7 +8,9 @@
 
         <div class="post-header">
             <div class="post-author-section">
-                <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
+                <div class="post-author-pic"
+                     th:text="${#strings.isEmpty(post.authorName) ? 'A' : #strings.substring(post.authorName, 0, 1)}">
+                </div>
                 <div class="post-author-info">
                     <h4 th:text="${post.authorName}">Author Name</h4>
                     <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>

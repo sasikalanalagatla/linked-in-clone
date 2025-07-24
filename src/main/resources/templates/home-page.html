@@ -1008,17 +1008,17 @@
 
                 <div class="post-header">
                     <div class="post-author-section">
-                        <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
+                        <span th:text="${post.authorName != null ? #strings.substring(post.authorName, 0, 1) : 'A'}"></span>
                         <div class="post-author-info">
-                            <a th:href="@{'/profile/' + ${post.authorId}}" th:text="${post.authorName}">Author Name</a>
-                            <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
+                        <span th:text="${post.author.userId}"></span>
+                        <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
                         </div>
                     </div>
                     <div class="post-actions">
                         <button class="post-action-btn" th:onclick="'togglePostOptionsMenu(\'post-options-' + ${post.postId} + '\')'">⋯</button>
                         <div class="post-options-menu" th:id="'post-options-' + ${post.postId}">
                             <!-- Only show edit/delete options if current user is the post author -->
-                            <div th:if="${post.authorId == currentUserId}">
+                            <div th:if="${post.author != null and post.author.userId == currentUserId}">
                                 <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get" style="margin: 0;">
                                     <button type="submit" class="post-option-item edit">✏️ Edit</button>
                                 </form>
@@ -1028,7 +1028,7 @@
                                 </form>
                             </div>
                             <!-- Show message if user is not the author -->
-                            <div th:unless="${post.authorId == currentUserId}">
+                            <div th:if="${post.author != null and post.author.userId == currentUserId}">
                                 <div class="post-option-item" style="color: #666; cursor: default;">No actions available</div>
                             </div>
                         </div>

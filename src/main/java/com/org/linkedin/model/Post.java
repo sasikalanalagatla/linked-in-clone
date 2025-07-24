@@ -19,8 +19,11 @@ public class Post {
     private String postDescription;
 
     private String imageUrl;
+
     private String authorProfileImage;
+
     private Integer commentsCount = 0;
+
     private Integer sharesCount = 0;
 
     @CreationTimestamp
@@ -30,7 +33,11 @@ public class Post {
     private LocalDateTime editedAt;
 
     private Boolean edited = false;
-    private Long authorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author; // Replaced authorId with User reference
+
     private String authorName;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,8 +72,8 @@ public class Post {
     public Boolean getEdited() { return edited; }
     public void setEdited(Boolean edited) { this.edited = edited; }
 
-    public Long getAuthorId() { return authorId; }
-    public void setAuthorId(Long authorId) { this.authorId = authorId; }
+    public User getAuthor() { return author; }
+    public void setAuthor(User author) { this.author = author; }
 
     public String getAuthorName() { return authorName; }
     public void setAuthorName(String authorName) { this.authorName = authorName; }
@@ -76,5 +83,4 @@ public class Post {
 
     public Integer getTotalReactions() { return totalReactions; }
     public void setTotalReactions(Integer totalReactions) { this.totalReactions = totalReactions; }
-
 }
