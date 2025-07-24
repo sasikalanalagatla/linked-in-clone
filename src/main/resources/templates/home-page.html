@@ -894,6 +894,108 @@
             margin-right: 8px;
             font-size: 16px;
         }
+
+        /* ==== Comment Section Styling ==== */
+.comment-section {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.comment-section.hidden {
+    display: none;
+}
+
+/* Comment List */
+.comment-list {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+
+.comment-list .comment-item {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Comment Input */
+.comment-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.comment-form input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.comment-form input[type="text"]:focus {
+    border-color: #007bff;
+}
+
+.comment-form button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.comment-form button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.load-more-btn {
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.load-more-btn:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+        .comment-list {
+    margin-top: 10px;
+}
+
+.comment-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.comment-author {
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.comment-text {
+    margin-top: 4px;
+    font-size: 1em;
+}
+
     </style>
 </head>
 <body>
@@ -1029,8 +1131,7 @@
                                       onsubmit="return confirm('Are you sure you want to delete this post?');">
                                     <button type="submit" class="post-option-item delete">🗑️ Delete</button>
                                 </form>
-                            </div>
-                            <!-- Show message if user is not the author -->
+                            </div>>
                             <div th:if="${post.author != null and post.author.userId == currentUserId}">
                                 <div class="post-option-item" style="color: #666; cursor: default;">No actions available</div>
                             </div>
@@ -1056,10 +1157,7 @@
                         <span class="action-icon">👍</span>
                         <span>Like</span>
                     </button>
-                    <button class="action-btn">
-                        <span class="action-icon">💬</span>
-                        <span>Comment</span>
-                    </button>
+                    <button class="comment-btn" th:attr="data-post-id=${post.postId}">💬 Comment</button>
                     <button class="action-btn">
                         <span class="action-icon">↻</span>
                         <span>Repost</span>
@@ -1069,6 +1167,16 @@
                         <span>Send</span>
                     </button>
                 </div>
+
+                <div th:id="'comment-section-' + ${post.postId}" class="comment-section hidden">
+                    <div class="comment-list"></div>
+
+                    <form class="comment-form" th:attr="data-post-id=${post.postId}">
+                        <input type="text" name="comment" placeholder="Write a comment..." required />
+                        <button type="submit">Post</button>
+                    </form>
+                </div>
+
             </div>
         </div>
 
@@ -1159,11 +1267,9 @@
             m.classList.remove('show');
         });
 
-        // Toggle the current menu
         if (!isShown) {
             menu.classList.add('show');
 
-            // Close menu when clicking outside
             setTimeout(() => {
                 document.addEventListener('click', function closeMenu(event) {
                     if (!menu.contains(event.target) && !event.target.closest('.post-action-btn')) {
@@ -1192,6 +1298,80 @@
             console.error('Error:', error);
         });
     }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const commentButtons = document.querySelectorAll(".comment-btn");
+
+        commentButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const postId = btn.dataset.postId;
+                const container = document.querySelector(`#comment-section-${postId}`);
+
+                if (!container.classList.contains("loaded")) {
+                    fetchComments(postId, 0, container);
+                    container.classList.add("loaded");
+                }
+
+                container.classList.toggle("hidden");
+            });
+        });
+
+        function fetchComments(postId, page, container) {
+            fetch(`/posts/${postId}/comments?page=${page}`)
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement("div");
+                    temp.innerHTML = html;
+
+                    const newCommentList = temp.querySelector(".comment-list");
+                    const existingList = container.querySelector(".comment-list");
+
+                    if (newCommentList && existingList) {
+                        existingList.innerHTML = newCommentList.innerHTML;
+                    }
+                })
+                .catch(err => console.error("Error loading comments:", err));
+        }
+
+        document.addEventListener("submit", function (e) {
+            if (e.target.classList.contains("comment-form")) {
+                e.preventDefault();
+                const form = e.target;
+                const postId = form.dataset.postId;
+                const input = form.querySelector("input[name='comment']");
+                const container = document.querySelector(`#comment-section-${postId}`);
+
+                fetch(`/posts/${postId}/comments`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: input.value })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to post comment");
+                    return res.text();  // Expect HTML fragment
+                })
+                .then(html => {
+                    const temp = document.createElement("div");
+                    temp.innerHTML = html;
+
+                    const newCommentList = temp.querySelector(".comment-list");
+                    const existingList = container.querySelector(".comment-list");
+
+                    if (newCommentList && existingList) {
+                        existingList.innerHTML = newCommentList.innerHTML;
+                    }
+
+                    input.value = ""; // Clear input after success
+                })
+                .catch(err => {
+                    console.error("Error posting comment:", err);
+                    alert("Failed to post comment.");
+                });
+            }
+        });
+    });
 </script>
 
 </body>

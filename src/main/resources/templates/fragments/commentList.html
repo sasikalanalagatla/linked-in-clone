@@ -1,0 +1,23 @@
+<!-- commentList.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Comment List Fragment</title>
+</head>
+<body>
+<div th:fragment="commentList(comments)">
+    <div class="comment-list">
+        <div th:if="${#lists.isEmpty(comments)}" class="no-comments">
+            <p>No comments yet. Be the first to comment!</p>
+        </div>
+        <div th:each="comment : ${comments}" class="comment-item">
+            <div class="comment-author">
+                <strong th:text="${comment.user.fullName}">Author Name</strong>
+                <small th:text="${#temporals.format(comment.commentCreatedAt, 'dd MMM yyyy • HH:mm')}">Date</small>
+            </div>
+            <p class="comment-text" th:text="${comment.commentContent}">Comment content</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
