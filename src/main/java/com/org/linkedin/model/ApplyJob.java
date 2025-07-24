@@ -26,27 +26,59 @@ public class ApplyJob {
     @JoinColumn(name = "job_id")
     private Job job;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public String getMobileNumber() { return mobileNumber; }
-    public void setMobileNumber(String mobileNumber) { this.mobileNumber = mobileNumber; }
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
 
-    public String getResumeUrl() { return resumeUrl; }
-    public void setResumeUrl(String resumeUrl) { this.resumeUrl = resumeUrl; }
+    public String getResumeUrl() {
+        return resumeUrl;
+    }
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
+    }
 
-    public List<String> getAdditionalQuestionAnswers() { return additionalQuestionAnswers; }
-    public void setAdditionalQuestionAnswers(List<String> additionalQuestionAnswers) { this.additionalQuestionAnswers = additionalQuestionAnswers; }
+    public List<String> getAdditionalQuestionAnswers() {
+        return additionalQuestionAnswers;
+    }
+    public void setAdditionalQuestionAnswers(List<String> additionalQuestionAnswers) {
+        this.additionalQuestionAnswers = additionalQuestionAnswers;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public Job getJob() { return job; }
-    public void setJob(Job job) { this.job = job; }
+    public Job getJob() {
+        return job;
+    }
+    public void setJob(Job job) {
+        this.job = job;
+    }
 }

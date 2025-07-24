@@ -1,19 +1,10 @@
 package com.org.linkedin.controller;
 
-import com.org.linkedin.model.AdditionalQuestion;
-import com.org.linkedin.model.ApplyJob;
-import com.org.linkedin.model.Job;
-import com.org.linkedin.model.User;
-import com.org.linkedin.repository.ApplyJobRepository;
-import com.org.linkedin.repository.JobRepository;
-import com.org.linkedin.repository.SkillRepository;
-import com.org.linkedin.repository.UserRepository;
+import com.org.linkedin.model.*;
+import com.org.linkedin.repository.*;
 import com.org.linkedin.service.impl.CloudinaryService;
 import com.org.linkedin.service.impl.JobServiceImpl;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class JobController {
@@ -35,8 +24,12 @@ public class JobController {
     private final ApplyJobRepository applyJobRepository;
     private final CloudinaryService cloudinaryService;
 
-    public JobController(SkillRepository skillRepository, JobServiceImpl jobServiceImpl, JobRepository jobRepository,
-                         UserRepository userRepository, ApplyJobRepository applyJobRepository, CloudinaryService cloudinaryService) {
+    public JobController(SkillRepository skillRepository,
+                         JobServiceImpl jobServiceImpl,
+                         JobRepository jobRepository,
+                         UserRepository userRepository,
+                         ApplyJobRepository applyJobRepository,
+                         CloudinaryService cloudinaryService) {
         this.skillRepository = skillRepository;
         this.jobServiceImpl = jobServiceImpl;
         this.jobRepository = jobRepository;
@@ -46,15 +39,14 @@ public class JobController {
     }
 
     @GetMapping("/job/feed")
-    public String jobFeed(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "range", required = false) String range,
-            @RequestParam(value = "jobId", required = false) Long jobId,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "5") int size,
-            Model model,
-            Principal principal
-    ) {
+    public String jobFeed(@RequestParam(value = "keyword", required = false) String keyword,
+                          @RequestParam(value = "range", required = false) String range,
+                          @RequestParam(value = "jobId", required = false) Long jobId,
+                          @RequestParam(value = "page", defaultValue = "0") int page,
+                          @RequestParam(value = "size", defaultValue = "5") int size,
+                          Model model,
+                          Principal principal) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("jobCreatedAt").descending());
         Page<Job> jobPage;
 
@@ -85,34 +77,39 @@ public class JobController {
         model.addAttribute("totalPages", jobPage.getTotalPages());
         model.addAttribute("size", size);
 
-        Job selectedJob = null;
-        if (jobId != null) {
-            selectedJob = jobServiceImpl.getJobById(jobId);
-        } else if (!jobs.isEmpty()) {
-            selectedJob = jobs.get(0);
-        }
+        Job selectedJob = (jobId != null)
+                ? jobServiceImpl.getJobById(jobId)
+                : jobs.isEmpty() ? null : jobs.get(0);
 
         model.addAttribute("selectedJob", selectedJob);
 
         if (principal != null) {
-            Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
-            if(optionalUser.isPresent()){
-                User user = optionalUser.get();
+            userRepository.findByEmail(principal.getName()).ifPresent(user -> {
                 model.addAttribute("loggedInUser", user);
-
                 Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserId(user.getUserId());
                 model.addAttribute("appliedJobIds", appliedJobIds);
-            }
+            });
         }
+
         return "jobs-feed";
     }
 
+    @GetMapping("/job/add")
+    public String showForm(Model model) {
+        Job job = new Job();
+        job.getAdditionalQuestions().add(new AdditionalQuestion());
 
+        model.addAttribute("job", job);
+        model.addAttribute("skills", skillRepository.findAll());
+
+        return "add-job";
+    }
 
     @PostMapping("/job/create")
     public String createPost(@ModelAttribute("job") Job job,
                              @RequestParam(required = false) String addQuestion,
-                             Model model,Principal principal) {
+                             Model model,
+                             Principal principal) {
 
         if (addQuestion != null) {
             job.getAdditionalQuestions().add(new AdditionalQuestion());
@@ -124,32 +121,25 @@ public class JobController {
         for (AdditionalQuestion question : job.getAdditionalQuestions()) {
             question.setJob(job);
         }
-        jobServiceImpl.createJob(job,principal);
+
+        jobServiceImpl.createJob(job, principal);
         return "redirect:/job/feed";
     }
 
-    @GetMapping("/job/add")
-    public String showForm(Model model) {
-        Job job = new Job();
-        job.getAdditionalQuestions().add(new AdditionalQuestion());
-        model.addAttribute("job", job);
-        model.addAttribute("skills", skillRepository.findAll());
-        return "add-job";
-    }
-
     @GetMapping("/job/get/{jobId}")
-    public String getJobById(@PathVariable("jobId") Long jobId, Model model, Principal principal) {
+    public String getJobById(@PathVariable("jobId") Long jobId,
+                             Model model,
+                             Principal principal) {
         Job job = jobServiceImpl.getJobById(jobId);
         model.addAttribute("job", job);
 
         if (principal != null) {
-            Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
-            optionalUser.ifPresent(user -> model.addAttribute("loggedInUser", user));
+            userRepository.findByEmail(principal.getName()).ifPresent(user ->
+                    model.addAttribute("loggedInUser", user));
         }
 
         return "single-job";
     }
-
 
     @GetMapping("/job/apply/{jobId}")
     public String showApplyForm(@PathVariable Long jobId, Model model) {
@@ -164,6 +154,7 @@ public class JobController {
 
         model.addAttribute("applyJob", applyJob);
         model.addAttribute("job", job);
+
         return "job-apply-form";
     }
 
@@ -175,11 +166,12 @@ public class JobController {
             Job job = jobServiceImpl.getJobById(jobId);
             String resumeUrl = cloudinaryService.uploadFile(resumeFile);
             applyJob.setResumeUrl(resumeUrl);
-            Optional<User> optionalUser = userRepository.findByEmail(applyJob.getEmail());
-            User user = optionalUser.get();
-            applyJob.setUser(user);
 
+            User user = userRepository.findByEmail(applyJob.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            applyJob.setUser(user);
             applyJob.setJob(job);
+
             applyJobRepository.save(applyJob);
 
             return "redirect:/job/feed?jobId=" + jobId;
@@ -190,9 +182,8 @@ public class JobController {
         }
     }
 
-
     @PostMapping("/job/delete/{jobId}")
-    public String deleteJobById(@PathVariable("jobId") Long jobId){
+    public String deleteJobById(@PathVariable("jobId") Long jobId) {
         jobServiceImpl.deleteJobById(jobId);
         return "redirect:/job/feed";
     }

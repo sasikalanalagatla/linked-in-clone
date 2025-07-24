@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
-
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 

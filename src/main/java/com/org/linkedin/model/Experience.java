@@ -1,8 +1,6 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -36,36 +34,91 @@ public class Experience {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public Long getExperienceId() {
+        return experienceId;
+    }
 
-    public Long getExperienceId() { return experienceId; }
-    public void setExperienceId(Long experienceId) { this.experienceId = experienceId; }
+    public void setExperienceId(Long experienceId) {
+        this.experienceId = experienceId;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getEmploymentType() { return employmentType; }
-    public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getEmploymentType() {
+        return employmentType;
+    }
 
-    public String getStartDate() { return startDate; }
-    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public void setEmploymentType(String employmentType) {
+        this.employmentType = employmentType;
+    }
 
-    public String getEndDate() { return endDate; }
-    public void setEndDate(String endDate) { this.endDate = endDate; }
+    public String getCompanyName() {
+        return companyName;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 
-    public String getWorkType() { return workType; }
-    public void setWorkType(String workType) { this.workType = workType; }
+    public String getStartDate() {
+        return startDate;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
 
-    public List<Skill> getSkills() { return skills; }
-    public void setSkills(List<Skill> skills) { this.skills = skills; }
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(String workType) {
+        this.workType = workType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<Skill> skills) {
+        this.skills = skills;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

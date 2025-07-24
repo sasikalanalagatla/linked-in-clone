@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -41,7 +40,8 @@ public class UserController {
                               Model model,
                               HttpSession session) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        User user = optionalUser.get();
+        User user = optionalUser.orElse(null);
+
         if (user == null || !user.getPassword().equals(password)) {
             model.addAttribute("error", "Invalid email or password");
             return "login";
@@ -51,30 +51,24 @@ public class UserController {
         return "redirect:/";
     }
 
-
     @GetMapping("/user/profile")
     public String viewProfile(Model model, Principal principal) {
         String email = principal.getName();
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        model.addAttribute("user", optionalUser.get());
+        model.addAttribute("user", optionalUser.orElse(null));
         return "user-profile";
     }
 
     @GetMapping("/signup")
     public String signupForm(Model model) {
         model.addAttribute("user", new User());
-        System.out.println("Hello");
         return "signup";
     }
 
     @PostMapping("/register")
-    public String signupSubmit(@ModelAttribute("user") User user){
-
+    public String signupSubmit(@ModelAttribute("user") User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-
         return "redirect:/login";
     }
-
-
 }

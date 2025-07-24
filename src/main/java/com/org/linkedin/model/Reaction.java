@@ -22,15 +22,35 @@ public class Reaction {
         this.reactionType = "LIKE";
     }
 
-    public String getReactionType() { return reactionType; }
-    public void setReactionType(String reactionType) { this.reactionType = reactionType; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public User getUser() {
+        return user;
+    }
 
-    public Post getPost() { return post; }
-    public void setPost(Post post) { this.post = post; }
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public String getReactionType() {
+        return reactionType;
+    }
+
+    public void setReactionType(String reactionType) {
+        this.reactionType = reactionType;
+    }
 }

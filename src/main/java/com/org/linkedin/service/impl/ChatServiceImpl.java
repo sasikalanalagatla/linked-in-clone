@@ -6,7 +6,6 @@ import com.org.linkedin.model.User;
 import com.org.linkedin.repository.ChatMessageRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ChatService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,25 +15,27 @@ import java.util.Optional;
 @Service
 public class ChatServiceImpl implements ChatService {
 
-    @Autowired
-    private ChatMessageRepository chatMessageRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public ChatServiceImpl(ChatMessageRepository chatMessageRepository, UserRepository userRepository) {
+        this.chatMessageRepository = chatMessageRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public ChatMessage saveMessage(ChatMessage chatMessage) {
+    public void saveMessage(ChatMessage chatMessage) {
         if (chatMessage == null || chatMessage.getSenderEmail() == null || chatMessage.getReceiverEmail() == null) {
             throw new CustomException("INVALID_MESSAGE", "Chat message or sender/receiver email cannot be null");
         }
 
         Optional<User> senderOpt = userRepository.findByEmail(chatMessage.getSenderEmail());
-        if (!senderOpt.isPresent()) {
+        if (senderOpt.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "Sender with email " + chatMessage.getSenderEmail() + " not found");
         }
 
         Optional<User> receiverOpt = userRepository.findByEmail(chatMessage.getReceiverEmail());
-        if (!receiverOpt.isPresent()) {
+        if (receiverOpt.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "Receiver with email " + chatMessage.getReceiverEmail() + " not found");
         }
 
@@ -42,7 +43,7 @@ public class ChatServiceImpl implements ChatService {
         chatMessage.setReceiver(receiverOpt.get());
         chatMessage.setTimestamp(LocalDateTime.now());
 
-        return chatMessageRepository.save(chatMessage);
+        chatMessageRepository.save(chatMessage);
     }
 
     @Override
@@ -54,7 +55,6 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMessage> list1 = chatMessageRepository.findBySenderEmailAndReceiverEmailOrderByTimestamp(user1Email, user2Email);
         List<ChatMessage> list2 = chatMessageRepository.findBySenderEmailAndReceiverEmailOrderByTimestamp(user2Email, user1Email);
 
-        // Ensure all messages have proper sender/receiver objects populated
         populateUserObjects(list1);
         populateUserObjects(list2);
 
@@ -66,16 +66,10 @@ public class ChatServiceImpl implements ChatService {
     private void populateUserObjects(List<ChatMessage> messages) {
         for (ChatMessage msg : messages) {
             if (msg.getSender() == null && msg.getSenderEmail() != null) {
-                Optional<User> senderOpt = userRepository.findByEmail(msg.getSenderEmail());
-                if (senderOpt.isPresent()) {
-                    msg.setSender(senderOpt.get());
-                }
+                userRepository.findByEmail(msg.getSenderEmail()).ifPresent(msg::setSender);
             }
             if (msg.getReceiver() == null && msg.getReceiverEmail() != null) {
-                Optional<User> receiverOpt = userRepository.findByEmail(msg.getReceiverEmail());
-                if (receiverOpt.isPresent()) {
-                    msg.setReceiver(receiverOpt.get());
-                }
+                userRepository.findByEmail(msg.getReceiverEmail()).ifPresent(msg::setReceiver);
             }
         }
     }

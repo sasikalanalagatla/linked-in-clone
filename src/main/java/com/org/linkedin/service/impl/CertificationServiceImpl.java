@@ -4,7 +4,6 @@ import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Certification;
 import com.org.linkedin.repository.CertificationRepository;
 import com.org.linkedin.service.CertificationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +11,11 @@ import java.util.List;
 @Service
 public class CertificationServiceImpl implements CertificationService {
 
-    @Autowired
-    private CertificationRepository certificationRepository;
+    private final CertificationRepository certificationRepository;
+
+    public CertificationServiceImpl(CertificationRepository certificationRepository) {
+        this.certificationRepository = certificationRepository;
+    }
 
     @Override
     public List<Certification> getCertificationsByUserId(Long userId) {
@@ -29,8 +31,7 @@ public class CertificationServiceImpl implements CertificationService {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");
         }
         return certificationRepository.findById(certificationId)
-                .orElseThrow(() -> new CustomException("CERTIFICATION_NOT_FOUND", "Certification with ID "
-                        + certificationId + " not found"));
+                .orElseThrow(() -> new CustomException("CERTIFICATION_NOT_FOUND", "Certification with ID " + certificationId + " not found"));
     }
 
     @Override
@@ -47,8 +48,7 @@ public class CertificationServiceImpl implements CertificationService {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");
         }
         if (!certificationRepository.existsById(certificationId)) {
-            throw new CustomException("CERTIFICATION_NOT_FOUND", "Certification with ID " +
-                    certificationId + " not found");
+            throw new CustomException("CERTIFICATION_NOT_FOUND", "Certification with ID " + certificationId + " not found");
         }
         certificationRepository.deleteById(certificationId);
     }

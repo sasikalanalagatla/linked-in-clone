@@ -8,7 +8,6 @@ import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.EducationService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,14 +19,6 @@ public class EducationServiceImpl implements EducationService {
     public EducationServiceImpl(EducationRepository educationRepository, UserRepository userRepository) {
         this.educationRepository = educationRepository;
         this.userRepository = userRepository;
-    }
-
-    @Override
-    public List<Education> getAllEducationsByUserId(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        return educationRepository.findByUserUserId(userId);
     }
 
     @Override
@@ -75,22 +66,6 @@ public class EducationServiceImpl implements EducationService {
             throw new CustomException("EDUCATION_NOT_FOUND", "Education with ID " + educationId + " not found");
         }
         educationRepository.deleteById(educationId);
-    }
-
-    @Override
-    public void saveOrUpdate(Long userId, Education education) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (education == null) {
-            throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
-        }
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
-        }
-        education.setUser(user.get());
-        educationRepository.save(education);
     }
 
     @Override

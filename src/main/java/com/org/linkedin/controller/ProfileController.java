@@ -37,7 +37,6 @@ public class ProfileController {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
-
         String email = principal.getName();
         User loggedInUser = userService.findByEmail(email);
         User viewedUser = userService.getUserById(userId);
@@ -55,8 +54,6 @@ public class ProfileController {
 
         return "user-profile";
     }
-
-
 
     @GetMapping("/profile/edit/{id}")
     public String showEditProfileForm(@PathVariable Long id, Model model) {

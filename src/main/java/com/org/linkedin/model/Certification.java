@@ -35,24 +35,59 @@ public class Certification {
         this.certificationImageUrl = certificationImageUrl;
     }
 
-    public Long getCertificationId() { return certificationId; }
-    public void setCertificationId(Long certificationId) { this.certificationId = certificationId; }
+    public Long getCertificationId() {
+        return certificationId;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setCertificationId(Long certificationId) {
+        this.certificationId = certificationId;
+    }
 
-    public String getCertificationName() { return certificationName; }
-    public void setCertificationName(String certificationName) { this.certificationName = certificationName; }
+    public User getUser() {
+        return user;
+    }
 
-    public String getIssuingOrganization() { return issuingOrganization; }
-    public void setIssuingOrganization(String issuingOrganization) { this.issuingOrganization = issuingOrganization; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public LocalDate getIssueDate() { return issueDate; }
-    public void setIssueDate(LocalDate issueDate) { this.issueDate = issueDate; }
+    public String getCertificationName() {
+        return certificationName;
+    }
 
-    public LocalDate getExpirationDate() { return expirationDate; }
-    public void setExpirationDate(LocalDate expirationDate) { this.expirationDate = expirationDate; }
+    public void setCertificationName(String certificationName) {
+        this.certificationName = certificationName;
+    }
 
-    public String getCertificationImageUrl() { return certificationImageUrl; }
-    public void setCertificationImageUrl(String certificationImageUrl) { this.certificationImageUrl = certificationImageUrl; }
+    public String getIssuingOrganization() {
+        return issuingOrganization;
+    }
+
+    public void setIssuingOrganization(String issuingOrganization) {
+        this.issuingOrganization = issuingOrganization;
+    }
+
+    public LocalDate getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDate issueDate) {
+        this.issueDate = issueDate;
+    }
+
+    public LocalDate getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public String getCertificationImageUrl() {
+        return certificationImageUrl;
+    }
+
+    public void setCertificationImageUrl(String certificationImageUrl) {
+        this.certificationImageUrl = certificationImageUrl;
+    }
 }

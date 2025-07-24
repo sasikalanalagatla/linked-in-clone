@@ -25,20 +25,27 @@ public class ExperienceController {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+
         User user = userService.getUserById(userId);
+
         model.addAttribute("user", user);
         model.addAttribute("experience", new Experience());
+
         return "add-experience";
     }
 
     @PostMapping("/add/experience/{userId}")
-    public String addExperience(@PathVariable Long userId, @ModelAttribute Experience experience, Model model) {
+    public String addExperience(@PathVariable Long userId,
+                                @ModelAttribute Experience experience,
+                                Model model) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+
         if (experience == null) {
             throw new CustomException("INVALID_EXPERIENCE", "Experience data cannot be null");
         }
+
         try {
             experienceService.addExperience(userId, experience);
             return "redirect:/profile/" + userId;
@@ -56,20 +63,27 @@ public class ExperienceController {
         if (experienceId == null) {
             throw new CustomException("INVALID_EXPERIENCE_ID", "Experience ID cannot be null");
         }
+
         Experience experience = experienceService.getExperienceById(experienceId);
+
         model.addAttribute("experience", experience);
         model.addAttribute("user", experience.getUser());
+
         return "add-experience";
     }
 
     @PostMapping("/update/experience/{experienceId}")
-    public String updateExperience(@PathVariable Long experienceId, @ModelAttribute Experience experience, Model model) {
+    public String updateExperience(@PathVariable Long experienceId,
+                                   @ModelAttribute Experience experience,
+                                   Model model) {
         if (experienceId == null) {
             throw new CustomException("INVALID_EXPERIENCE_ID", "Experience ID cannot be null");
         }
+
         if (experience == null) {
             throw new CustomException("INVALID_EXPERIENCE", "Experience data cannot be null");
         }
+
         try {
             Experience updated = experienceService.updateExperience(experienceId, experience);
             return "redirect:/profile/" + updated.getUser().getUserId();
@@ -87,10 +101,13 @@ public class ExperienceController {
         if (experienceId == null) {
             throw new CustomException("INVALID_EXPERIENCE_ID", "Experience ID cannot be null");
         }
+
         try {
             Experience experience = experienceService.getExperienceById(experienceId);
             Long userId = experience.getUser().getUserId();
+
             experienceService.deleteExperience(experienceId);
+
             return "redirect:/profile/" + userId;
         } catch (CustomException e) {
             model.addAttribute("error", "Error deleting experience: " + e.getMessage());

@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +26,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job createJob(Job job, Principal principal){
+    public Job createJob(Job job, Principal principal) {
         String email = principal.getName();
         Optional<User> optionalUser = userRepository.findByEmail(email);
         job.setUser(optionalUser.get());
@@ -44,20 +43,6 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job editJobById(Long jobId) {
-        if (jobId == null) {
-            throw new CustomException("INVALID_JOB_ID", "Job ID cannot be null");
-        }
-        return jobRepository.findById(jobId)
-                .orElseThrow(() -> new CustomException("JOB_NOT_FOUND", "Job with ID " + jobId + " not found"));
-    }
-
-    @Override
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
-    }
-
-    @Override
     public Page<Job> getAllJobs(Pageable pageable) {
         if (pageable == null) {
             throw new CustomException("INVALID_PAGEABLE", "Pageable cannot be null");
@@ -67,11 +52,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Page<Job> searchJobs(String keyword, Pageable pageable) {
-        if (pageable == null) {
-            throw new CustomException("INVALID_PAGEABLE", "Pageable cannot be null");
-        }
         if (keyword == null) {
             throw new CustomException("INVALID_KEYWORD", "Search keyword cannot be null");
+        }
+        if (pageable == null) {
+            throw new CustomException("INVALID_PAGEABLE", "Pageable cannot be null");
         }
         return jobRepository.searchJobsByTitleOrSkill(keyword, pageable);
     }

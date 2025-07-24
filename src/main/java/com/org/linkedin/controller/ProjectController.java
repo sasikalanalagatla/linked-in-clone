@@ -18,9 +18,7 @@ public class ProjectController {
 
     @GetMapping("/add/project/{userId}")
     public String showAddProjectForm(@PathVariable Long userId, Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         model.addAttribute("project", new Project());
         model.addAttribute("userId", userId);
         model.addAttribute("skillsString", "");
@@ -29,9 +27,7 @@ public class ProjectController {
 
     @GetMapping("/new/project/{userId}")
     public String showNewProjectForm(@PathVariable Long userId, Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         model.addAttribute("project", new Project());
         model.addAttribute("userId", userId);
         model.addAttribute("skillsString", "");
@@ -44,12 +40,8 @@ public class ProjectController {
                              BindingResult result,
                              @RequestParam("skillsString") String skillsString,
                              Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (project == null) {
-            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        if (project == null) throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
@@ -65,12 +57,8 @@ public class ProjectController {
                                 BindingResult result,
                                 @RequestParam("skillsString") String skillsString,
                                 Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (project == null) {
-            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        if (project == null) throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
@@ -82,12 +70,8 @@ public class ProjectController {
 
     @GetMapping("/edit/project/{userId}/{projectId}")
     public String showEditProjectForm(@PathVariable Long userId, @PathVariable Long projectId, Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (projectId == null) {
-            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        if (projectId == null) throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
         Project project = projectService.getProjectById(projectId);
         String skillsString = projectService.getSkillsStringForProject(projectId);
         model.addAttribute("project", project);
@@ -103,15 +87,9 @@ public class ProjectController {
                               BindingResult result,
                               @RequestParam("skillsString") String skillsString,
                               Model model) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (projectId == null) {
-            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
-        }
-        if (project == null) {
-            throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        if (projectId == null) throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
+        if (project == null) throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
         if (result.hasErrors()) {
             model.addAttribute("userId", userId);
             model.addAttribute("skillsString", skillsString);
@@ -123,12 +101,8 @@ public class ProjectController {
 
     @PostMapping("/delete/project/{userId}/{projectId}")
     public String deleteProject(@PathVariable Long userId, @PathVariable Long projectId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        if (projectId == null) {
-            throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
-        }
+        if (userId == null) throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        if (projectId == null) throw new CustomException("INVALID_PROJECT_ID", "Project ID cannot be null");
         projectService.deleteProject(projectId);
         return "redirect:/profile/" + userId;
     }

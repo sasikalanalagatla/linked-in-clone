@@ -20,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class PostController {
@@ -48,15 +45,8 @@ public class PostController {
 
     @GetMapping("/post/create")
     public String showCreatePostForm(Model model, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-        String email = principal.getName();
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = optionalUser.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         model.addAttribute("post", new Post());
         model.addAttribute("authorName", user.getFullName());
@@ -67,19 +57,12 @@ public class PostController {
     public String createPost(@ModelAttribute("post") Post post,
                              @RequestParam("imageFile") MultipartFile imageFile,
                              Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
-        post.setAuthor(user); // Set User entity
-        post.setAuthorName(post.getAuthor().getFullName()); // Or getUserName() depending on your field        post.setAuthor(user);
-        post.setTotalReactions(0); // Initialize totalReactions
+        post.setAuthor(user);
+        post.setAuthorName(user.getFullName());
+        post.setTotalReactions(0);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
@@ -91,20 +74,13 @@ public class PostController {
         }
 
         postRepository.save(post);
-        return "redirect:/profile/" + user.getUserId(); // Redirect to profile
+        return "redirect:/profile/" + user.getUserId();
     }
 
     @GetMapping("/")
     public String getPostFeed(Model model, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
@@ -113,43 +89,24 @@ public class PostController {
         List<User> connections = connectionRequestService.getConnections(user);
         Integer totalConnection = connections.size();
 
-        Map<Long, Boolean> postUserLikes = new HashMap<>();
-        for (Post post : posts) {
-            post.setTotalReactions(post.getReactions().size());
-            boolean liked = reactionService.hasUserLikedPost(post, user);
-            postUserLikes.put(post.getPostId(), liked);
-        }
-
         model.addAttribute("user", user);
         model.addAttribute("currentUserId", user.getUserId());
         model.addAttribute("totalConnection", totalConnection);
         model.addAttribute("posts", posts);
-        model.addAttribute("postUserLikes", postUserLikes);
 
         return "home-page";
     }
 
     @GetMapping("/post/edit/{id}")
     public String editPostForm(@PathVariable Long id, Model model, Principal principal) {
-        if (id == null) {
-            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
-        }
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User currentUser = userOptional.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-        if (!post.getAuthor().getUserId().equals(currentUser.getUserId())) {
-            throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
+        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+            throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
         }
 
         model.addAttribute("post", post);
@@ -158,117 +115,70 @@ public class PostController {
     }
 
     @PostMapping("/post/edit/{id}")
-    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost,
-                             Model model, Principal principal) {
-        if (id == null) {
-            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
-        }
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
+    public String updatePost(@PathVariable Long id,
+                             @ModelAttribute("post") Post updatedPost,
+                             Model model,
+                             Principal principal) {
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
+
         if (updatedPost == null || updatedPost.getPostDescription() == null) {
             throw new CustomException("INVALID_POST", "Post data or description cannot be null");
         }
 
-        try {
-            String email = principal.getName();
-            Optional<User> userOptional = userRepository.findByEmail(email);
-            if (userOptional.isEmpty()) {
-                throw new CustomException("USER_NOT_FOUND", "User not found");
-            }
-            User currentUser = userOptional.get();
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-            Post post = postRepository.findById(id)
-                    .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-
-            if (!post.getAuthor().getUserId().equals(currentUser.getUserId())) {
-                throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
-            }
-
-            post.setPostDescription(updatedPost.getPostDescription());
-            post.setEdited(true);
-            post.setTotalReactions(post.getReactions().size()); // Update totalReactions
-            postRepository.save(post);
-            return "redirect:/profile/" + currentUser.getUserId(); // Redirect to profile
-        } catch (CustomException e) {
-            model.addAttribute("post", updatedPost);
-            model.addAttribute("error", "Error updating post: " + e.getMessage());
-            return "edit_post";
+        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+            throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
         }
+
+        post.setPostDescription(updatedPost.getPostDescription());
+        post.setEdited(true);
+        post.setTotalReactions(post.getReactions().size());
+        postRepository.save(post);
+
+        return "redirect:/profile/" + user.getUserId();
     }
 
     @PostMapping("/post/delete/{id}")
     public String deletePost(@PathVariable Long id, Model model, Principal principal) {
-        if (id == null) {
-            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+
+        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+            throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
         }
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
 
-        try {
-            String email = principal.getName();
-            Optional<User> userOptional = userRepository.findByEmail(email);
-            if (userOptional.isEmpty()) {
-                throw new CustomException("USER_NOT_FOUND", "User not found");
-            }
-            User currentUser = userOptional.get();
-
-            Post post = postRepository.findById(id)
-                    .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-
-            if (!post.getAuthor().getUserId().equals(currentUser.getUserId())) {
-                throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
-            }
-
-            postRepository.deleteById(id);
-            return "redirect:/profile/" + currentUser.getUserId(); // Redirect to profile
-        } catch (CustomException e) {
-            model.addAttribute("error", "Error deleting post: " + e.getMessage());
-            return "error";
-        }
+        postRepository.deleteById(id);
+        return "redirect:/profile/" + user.getUserId();
     }
 
     @PostMapping("/post/react/{postId}")
     @ResponseBody
     public String reactToPost(@PathVariable Long postId, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
-
-        reactionService.toggleReaction(user, post);
-        post.setTotalReactions(post.getReactions().size()); // Update totalReactions
+        post.setTotalReactions(post.getReactions().size());
         postRepository.save(post);
+
         return "Reaction updated";
     }
 
     @GetMapping("/post/all")
     public String viewAllPosts(Model model, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         List<Post> posts = postRepository.findAll();
-        for (Post post : posts) {
-            post.setTotalReactions(post.getReactions().size());
-        }
+        posts.forEach(post -> post.setTotalReactions(post.getReactions().size()));
 
         model.addAttribute("posts", posts);
         model.addAttribute("currentUserId", user.getUserId());
@@ -277,26 +187,29 @@ public class PostController {
 
     @GetMapping("/loadMorePosts")
     public String loadMorePosts(@RequestParam int page, Model model, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
-        }
-
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("postId").descending());
         Page<Post> postPage = postService.findAll(pageable);
         List<Post> posts = postPage.getContent();
-        for (Post post : posts) {
-            post.setTotalReactions(post.getReactions().size());
-        }
+
+        posts.forEach(post -> post.setTotalReactions(post.getReactions().size()));
 
         model.addAttribute("posts", posts);
         model.addAttribute("currentUserId", user.getUserId());
         return "partials/postCards :: postList";
+    }
+
+    private void validatePrincipal(Principal principal) {
+        if (principal == null) {
+            throw new CustomException("UNAUTHORIZED", "User must be logged in");
+        }
+    }
+
+    private User getCurrentUser(Principal principal) {
+        String email = principal.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found"));
     }
 }

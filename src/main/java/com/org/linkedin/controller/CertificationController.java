@@ -14,20 +14,25 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/certifications")
 public class CertificationController {
 
-    @Autowired
-    private CertificationService certificationService;
+    private final CertificationService certificationService;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public CertificationController(CertificationService certificationService, UserService userService) {
+        this.certificationService = certificationService;
+        this.userService = userService;
+    }
 
     @GetMapping("/new/{userId}")
     public String newCertification(@PathVariable Long userId, Model model) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
-        User user = userService.getUserById(userId);
+
+        userService.getUserById(userId);
         model.addAttribute("certification", new Certification());
         model.addAttribute("userId", userId);
+
         return "certification-form";
     }
 
@@ -39,6 +44,7 @@ public class CertificationController {
         if (certification == null) {
             throw new CustomException("INVALID_CERTIFICATION", "Certification data cannot be null");
         }
+
         try {
             User user = userService.getUserById(userId);
             certification.setUser(user);
@@ -57,9 +63,11 @@ public class CertificationController {
         if (id == null) {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");
         }
+
         Certification certification = certificationService.getCertificationById(id);
         model.addAttribute("certification", certification);
         model.addAttribute("userId", certification.getUser().getUserId());
+
         return "certification-form";
     }
 
@@ -74,6 +82,7 @@ public class CertificationController {
         if (certification == null) {
             throw new CustomException("INVALID_CERTIFICATION", "Certification data cannot be null");
         }
+
         try {
             User user = userService.getUserById(userId);
             certification.setUser(user);
@@ -93,13 +102,16 @@ public class CertificationController {
         if (id == null) {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");
         }
+
         try {
             Certification certification = certificationService.getCertificationById(id);
             Long userId = certification.getUser().getUserId();
             certificationService.deleteCertification(id);
+
             return "redirect:/profile/" + userId;
         } catch (CustomException e) {
             model.addAttribute("error", "Error deleting certification: " + e.getMessage());
+
             return "error";
         }
     }

@@ -1,8 +1,6 @@
 package com.org.linkedin.model;
 
-import com.org.linkedin.model.User;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity

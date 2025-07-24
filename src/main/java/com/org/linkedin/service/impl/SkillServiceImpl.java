@@ -22,20 +22,20 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public Skill saveSkillForUser(Long userId, Skill skill) {
+    public void saveSkillForUser(Long userId, Skill skill) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
         if (skill == null) {
             throw new CustomException("INVALID_SKILL", "Skill data cannot be null");
         }
+
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
         }
 
         Skill savedSkill;
-
         if (skill.getSkillId() != null) {
             savedSkill = skillRepository.findById(skill.getSkillId())
                     .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + skill.getSkillId() + " not found"));
@@ -52,7 +52,6 @@ public class SkillServiceImpl implements SkillService {
             userRepository.save(user.get());
         }
 
-        return savedSkill;
     }
 
     @Override
@@ -63,10 +62,12 @@ public class SkillServiceImpl implements SkillService {
         if (skillId == null) {
             throw new CustomException("INVALID_SKILL_ID", "Skill ID cannot be null");
         }
+
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
         }
+
         Skill skill = skillRepository.findById(skillId)
                 .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + skillId + " not found"));
 
@@ -79,6 +80,7 @@ public class SkillServiceImpl implements SkillService {
         if (id == null) {
             throw new CustomException("INVALID_SKILL_ID", "Skill ID cannot be null");
         }
+
         return skillRepository.findById(id)
                 .orElseThrow(() -> new CustomException("SKILL_NOT_FOUND", "Skill with ID " + id + " not found"));
     }

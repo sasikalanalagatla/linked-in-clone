@@ -58,7 +58,6 @@ public class ConnectionRequest {
 
     public void setStatus(String status) {
         this.status = status;
-        this.accepted = "ACCEPTED".equals(status);
     }
 
     public Boolean getAccepted() {

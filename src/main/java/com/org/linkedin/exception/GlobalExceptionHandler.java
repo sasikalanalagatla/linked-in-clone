@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ModelAndView handleCustomException(CustomException exception) {
         ErrorResponse errorResponse = new ErrorResponse(
-                (String) exception.getErrorCode(),
+                exception.getErrorCode(),
                 exception.getMessage(),
                 LocalDateTime.now().toString()
         );

@@ -3,8 +3,8 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Education;
 import com.org.linkedin.model.User;
-import com.org.linkedin.service.impl.EducationServiceImpl;
 import com.org.linkedin.service.UserService;
+import com.org.linkedin.service.impl.EducationServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +25,12 @@ public class EducationController {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+
         User user = userService.getUserById(userId);
+
         model.addAttribute("user", user);
         model.addAttribute("education", new Education());
+
         return "add-education";
     }
 
@@ -38,9 +41,11 @@ public class EducationController {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
+
         if (education == null) {
             throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
         }
+
         try {
             educationService.addEducation(userId, education);
             return "redirect:/profile/" + userId;
@@ -58,10 +63,13 @@ public class EducationController {
         if (educationId == null) {
             throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
         }
+
         Education education = educationService.getEducationById(educationId);
         User user = userService.getUserById(education.getUser().getUserId());
+
         model.addAttribute("education", education);
         model.addAttribute("user", user);
+
         return "add-education";
     }
 
@@ -72,9 +80,11 @@ public class EducationController {
         if (educationId == null) {
             throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
         }
+
         if (education == null) {
             throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
         }
+
         try {
             Education updatedEducation = educationService.updateEducation(educationId, education);
             return "redirect:/profile/" + updatedEducation.getUser().getUserId();
@@ -88,11 +98,11 @@ public class EducationController {
     }
 
     @PostMapping("/delete/education/{educationId}")
-    public String deleteEducation(@PathVariable("educationId") Long educationId,
-                                  Model model) {
+    public String deleteEducation(@PathVariable("educationId") Long educationId, Model model) {
         if (educationId == null) {
             throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
         }
+
         try {
             Education education = educationService.getEducationById(educationId);
             Long userId = education.getUser().getUserId();
@@ -105,8 +115,7 @@ public class EducationController {
     }
 
     @GetMapping("/delete/education/{educationId}")
-    public String deleteEducationGet(@PathVariable("educationId") Long educationId,
-                                     Model model) {
+    public String deleteEducationGet(@PathVariable("educationId") Long educationId, Model model) {
         return deleteEducation(educationId, model);
     }
 }

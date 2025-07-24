@@ -8,7 +8,6 @@ import com.org.linkedin.repository.ProjectRepository;
 import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
@@ -18,14 +17,15 @@ import java.util.List;
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
+    private final SkillRepository skillRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private SkillRepository skillRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    public ProjectServiceImpl(ProjectRepository projectRepository, SkillRepository skillRepository, UserRepository userRepository) {
+        this.projectRepository = projectRepository;
+        this.skillRepository = skillRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void saveProject(Long userId, Project project, String skillsString, BindingResult result) {
@@ -35,13 +35,11 @@ public class ProjectServiceImpl implements ProjectService {
         if (project == null) {
             throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
         }
-        // Validate skillsString
         if (skillsString == null || skillsString.trim().isEmpty()) {
             result.rejectValue("skills", "skills.empty", "Skills cannot be empty");
             throw new CustomException("INVALID_SKILLS", "Skills cannot be empty");
         }
 
-        // Parse skills
         String[] skillNamesArray = skillsString.split(",");
         List<String> skillNames = new ArrayList<>();
         for (String skillName : skillNamesArray) {
@@ -56,25 +54,23 @@ public class ProjectServiceImpl implements ProjectService {
             throw new CustomException("INVALID_SKILLS", "At least one valid skill is required");
         }
 
-        // Fetch User and set it
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found"));
-        project.setUser(user); // Set User object first, as requested
+        project.setUser(user);
 
-        // Save project
         projectRepository.save(project);
 
-        // Save skills
         List<Skill> skills = new ArrayList<>();
         for (String name : skillNames) {
             Skill skill = skillRepository.findBySkillNameIgnoreCase(name)
                     .orElseGet(() -> {
                         Skill newSkill = new Skill();
                         newSkill.setSkillName(name);
-                        return skillRepository.save(newSkill); // Save new skill to avoid transient issue
+                        return skillRepository.save(newSkill);
                     });
             skills.add(skill);
         }
+
         project.setSkills(skills);
         projectRepository.save(project);
     }
@@ -90,21 +86,19 @@ public class ProjectServiceImpl implements ProjectService {
         if (project == null) {
             throw new CustomException("INVALID_PROJECT", "Project data cannot be null");
         }
+
         Project existingProject = projectRepository.findById(projectId)
                 .orElseThrow(() -> new CustomException("PROJECT_NOT_FOUND", "Project with ID " + projectId + " not found"));
 
-        // Validate user ownership
         if (!existingProject.getUser().getUserId().equals(userId)) {
             throw new CustomException("UNAUTHORIZED_ACCESS", "Unauthorized access to project");
         }
 
-        // Validate skillsString
         if (skillsString == null || skillsString.trim().isEmpty()) {
             result.rejectValue("skills", "skills.empty", "Skills cannot be empty");
             throw new CustomException("INVALID_SKILLS", "Skills cannot be empty");
         }
 
-        // Parse skills
         String[] skillNamesArray = skillsString.split(",");
         List<String> skillNames = new ArrayList<>();
         for (String skillName : skillNamesArray) {
@@ -119,23 +113,21 @@ public class ProjectServiceImpl implements ProjectService {
             throw new CustomException("INVALID_SKILLS", "At least one valid skill is required");
         }
 
-        // Update project fields
         existingProject.setName(project.getName());
         existingProject.setDescription(project.getDescription());
 
-        // Update skills
         List<Skill> skills = new ArrayList<>();
         for (String name : skillNames) {
             Skill skill = skillRepository.findBySkillNameIgnoreCase(name)
                     .orElseGet(() -> {
                         Skill newSkill = new Skill();
                         newSkill.setSkillName(name);
-                        return skillRepository.save(newSkill); // Save new skill to avoid transient issue
+                        return skillRepository.save(newSkill);
                     });
             skills.add(skill);
         }
-        existingProject.setSkills(skills);
 
+        existingProject.setSkills(skills);
         projectRepository.save(existingProject);
     }
 
@@ -164,16 +156,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         return skillsString.toString();
-    }
-
-    @Override
-    public List<Project> getProjectsByUserId(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found"));
-        return projectRepository.findByUserUserId(userId);
     }
 
     @Override

@@ -23,14 +23,6 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public List<Experience> getAllExperiencesByUserId(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        return experienceRepository.findByUserUserId(userId);
-    }
-
-    @Override
     public Experience addExperience(Long userId, Experience experience) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");

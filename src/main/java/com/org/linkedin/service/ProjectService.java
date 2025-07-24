@@ -10,6 +10,5 @@ public interface ProjectService {
     void updateProject(Long userId, Long projectId, Project project, String skillsString, BindingResult result);
     Project getProjectById(Long projectId);
     String getSkillsStringForProject(Long projectId);
-    List<Project> getProjectsByUserId(Long userId);
     void deleteProject(Long projectId);
 }

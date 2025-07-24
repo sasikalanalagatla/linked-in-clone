@@ -36,7 +36,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private User author; // Replaced authorId with User reference
+    private User author;
 
     private String authorName;
 
@@ -45,42 +45,107 @@ public class Post {
 
     private Integer totalReactions = 0;
 
-    public Long getPostId() { return postId; }
-    public void setPostId(Long postId) { this.postId = postId; }
+    public Long getPostId() {
+        return postId;
+    }
 
-    public String getPostDescription() { return postDescription; }
-    public void setPostDescription(String postDescription) { this.postDescription = postDescription; }
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public String getPostDescription() {
+        return postDescription;
+    }
 
-    public String getAuthorProfileImage() { return authorProfileImage; }
-    public void setAuthorProfileImage(String authorProfileImage) { this.authorProfileImage = authorProfileImage; }
+    public void setPostDescription(String postDescription) {
+        this.postDescription = postDescription;
+    }
 
-    public Integer getCommentsCount() { return commentsCount; }
-    public void setCommentsCount(Integer commentsCount) { this.commentsCount = commentsCount; }
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-    public Integer getSharesCount() { return sharesCount; }
-    public void setSharesCount(Integer sharesCount) { this.sharesCount = sharesCount; }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getAuthorProfileImage() {
+        return authorProfileImage;
+    }
 
-    public LocalDateTime getEditedAt() { return editedAt; }
-    public void setEditedAt(LocalDateTime editedAt) { this.editedAt = editedAt; }
+    public void setAuthorProfileImage(String authorProfileImage) {
+        this.authorProfileImage = authorProfileImage;
+    }
 
-    public Boolean getEdited() { return edited; }
-    public void setEdited(Boolean edited) { this.edited = edited; }
+    public Integer getCommentsCount() {
+        return commentsCount;
+    }
 
-    public User getAuthor() { return author; }
-    public void setAuthor(User author) { this.author = author; }
+    public void setCommentsCount(Integer commentsCount) {
+        this.commentsCount = commentsCount;
+    }
 
-    public String getAuthorName() { return authorName; }
-    public void setAuthorName(String authorName) { this.authorName = authorName; }
+    public Integer getSharesCount() {
+        return sharesCount;
+    }
 
-    public List<Reaction> getReactions() { return reactions; }
-    public void setReactions(List<Reaction> reactions) { this.reactions = reactions; }
+    public void setSharesCount(Integer sharesCount) {
+        this.sharesCount = sharesCount;
+    }
 
-    public Integer getTotalReactions() { return totalReactions; }
-    public void setTotalReactions(Integer totalReactions) { this.totalReactions = totalReactions; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getEditedAt() {
+        return editedAt;
+    }
+
+    public void setEditedAt(LocalDateTime editedAt) {
+        this.editedAt = editedAt;
+    }
+
+    public Boolean getEdited() {
+        return edited;
+    }
+
+    public void setEdited(Boolean edited) {
+        this.edited = edited;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public List<Reaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
+    }
+
+    public Integer getTotalReactions() {
+        return totalReactions;
+    }
+
+    public void setTotalReactions(Integer totalReactions) {
+        this.totalReactions = totalReactions;
+    }
 }

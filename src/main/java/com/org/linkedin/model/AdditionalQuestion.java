@@ -16,12 +16,24 @@ public class AdditionalQuestion {
     @JoinColumn(name = "job_id")
     private Job job;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getQuestionText() { return questionText; }
-    public void setQuestionText(String questionText) { this.questionText = questionText; }
+    public String getQuestionText() {
+        return questionText;
+    }
+    public void setQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
 
-    public Job getJob() { return job; }
-    public void setJob(Job job) { this.job = job; }
+    public Job getJob() {
+        return job;
+    }
+    public void setJob(Job job) {
+        this.job = job;
+    }
 }
