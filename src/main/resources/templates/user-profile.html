@@ -820,19 +820,30 @@
                 <div class="connection-info">
                     <a th:href="@{/mynetwork}" class="connection-count" th:text="${totalConnection} + ' connections'">0 connections</a>
                 </div>
-
                 <div class="profile-buttons">
-                    <form th:action="@{/follow/{userId}(userId=${user.userId})}" method="post" th:if="${user.userId != currentUserId}" style="display:inline;">
-                        <button type="submit" class="btn-secondary">Follow</button>
-                    </form>
-                    <form th:action="@{/connect/{userId}(userId=${user.userId})}" method="post" th:if="${user.userId != currentUserId}" style="display:inline;">
-                        <button type="submit" class="btn-primary">Connect</button>
+                    <div th:if="${user.userId != currentUserId}">
+                        <form th:if="${not alreadyFollowing}" th:action="@{/follow/{userId}(userId=${user.userId})}" method="post" style="display:inline;">
+                            <button type="submit" style="padding:6px 12px; background:#0a66c2; color:white; border:none; border-radius:4px;">Follow</button>
+                        </form>
+                        <button th:if="${alreadyFollowing}" type="button" disabled style="padding:6px 12px; background:#e5e5e5; color:#555; border:none; border-radius:4px;">Followed</button>
+                    </div>
+                </div>
+
+
+
+                <div th:if="${not isConnected}" class="profile-buttons">
+                    <form th:action="@{/connect/{userId}(userId=${user.userId})}" method="post">
+                        <button type="submit" th:if="${connectionStatus == 'NONE'}">Connect</button>
+                        <button type="button" th:if="${connectionStatus == 'PENDING'}" disabled>Request Sent</button>
+                        <button type="button" th:if="${connectionStatus == 'CONNECTED'}" disabled>Connected</button>
                     </form>
                 </div>
+
+
             </div>
         </div>
 
-        <!-- About Section -->
+
         <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">About</h2>

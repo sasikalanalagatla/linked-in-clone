@@ -13,4 +13,5 @@ public interface ConnectionRequestService {
     List<ConnectionRequest> getPendingRequests(User user);
     List<User> getConnections(User user);
     Optional<ConnectionRequest> getRequestById(Long requestId);
+    String getConnectionStatus(User loggedInUser, User profileUser);
 }

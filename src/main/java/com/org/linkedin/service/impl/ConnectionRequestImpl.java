@@ -89,4 +89,27 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
         }
         return connectionRequestRepository.findById(requestId);
     }
+
+    @Override
+    public String getConnectionStatus(User loggedInUser, User profileUser) {
+        if (loggedInUser.getUserId().equals(profileUser.getUserId())) {
+            return "SELF";
+        }
+
+        Optional<ConnectionRequest> request = connectionRequestRepository
+                .findBySenderAndReceiverOrReceiverAndSender(loggedInUser, profileUser);
+
+        if (request.isPresent()) {
+            String status = request.get().getStatus();
+            if ("PENDING".equals(status)) {
+                return "PENDING";
+            } else if ("ACCEPTED".equals(status)) {
+                return "CONNECTED";
+            }
+        }
+
+        return "NONE";
+    }
+
+
 }

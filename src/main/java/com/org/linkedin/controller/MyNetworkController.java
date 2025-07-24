@@ -3,7 +3,9 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.ConnectionRequest;
 import com.org.linkedin.model.User;
+import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ConnectionRequestService;
+import com.org.linkedin.service.FollowService;
 import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +21,14 @@ public class MyNetworkController {
 
     private final ConnectionRequestService connectionRequestService;
     private final UserService userService;
+    private final UserRepository userRepository;
+    private final FollowService followService;
 
-    public MyNetworkController(ConnectionRequestService connectionRequestService, UserService userService) {
+    public MyNetworkController(ConnectionRequestService connectionRequestService, UserService userService, UserRepository userRepository, FollowService followService) {
         this.connectionRequestService = connectionRequestService;
         this.userService = userService;
+        this.userRepository = userRepository;
+        this.followService = followService;
     }
 
     @GetMapping("/mynetwork")
@@ -82,12 +88,14 @@ public class MyNetworkController {
     }
 
     @PostMapping("/connect/{receiverId}")
-    public String sendConnectionRequest(@PathVariable Long receiverId, Model model) {
+    public String sendConnectionRequest(@PathVariable Long receiverId, Model model,Principal principal) {
+        String email = principal.getName();
+        User user = userService.findByEmail(email);
         if (receiverId == null) {
             throw new CustomException("INVALID_USER_ID", "Receiver ID cannot be null");
         }
         try {
-            User sender = userService.getUserById(1L); // Hardcoded as per original
+            User sender = userService.getUserById(user.getUserId());
             User receiver = userService.getUserById(receiverId);
             connectionRequestService.sendRequest(sender, receiver);
             return "redirect:/profile/" + receiverId;
@@ -96,4 +104,12 @@ public class MyNetworkController {
             return "error";
         }
     }
+
+    @PostMapping("/follow/{userId}")
+    public String followUser(@PathVariable Long userId, Principal principal) {
+        Long currentUserId = userRepository.findByEmail(principal.getName()).get().getUserId();
+        followService.followUser(currentUserId, userId);
+        return "redirect:/profile/" + userId;
+    }
+
 }

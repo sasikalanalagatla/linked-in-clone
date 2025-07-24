@@ -58,7 +58,7 @@
 <body>
 <div class="container">
     <h1>Edit Profile</h1>
-    <form th:action="@{/profile/update}" th:object="${user}" method="post">
+    <form th:action="@{/profile/update}" th:object="${user}" method="post" enctype="multipart/form-data">
         <input type="hidden" th:field="*{userId}"/>
         <input type="hidden" th:field="*{email}"/>
 
@@ -84,8 +84,8 @@
         <label>About</label>
         <textarea th:field="*{about}"></textarea>
 
-        <label>Profile Picture URL</label>
-        <input type="text" th:field="*{profilePictureUrl}"/>
+        <label>Profile Picture</label>
+        <input type="file" name="profileImage" accept="image/*"/>
 
         <button type="submit">Save Changes</button>
     </form>
