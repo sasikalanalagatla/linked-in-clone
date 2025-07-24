@@ -28,6 +28,19 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
         if (sender.equals(receiver)) {
             throw new CustomException("INVALID_REQUEST", "Cannot send connection request to self");
         }
+
+        Optional<ConnectionRequest> existingRequest = connectionRequestRepository
+                .findConnectionBetweenUsers(sender, receiver);
+
+        if (existingRequest.isPresent()) {
+            String status = existingRequest.get().getStatus();
+            if ("PENDING".equals(status)) {
+                throw new CustomException("REQUEST_ALREADY_EXISTS", "Connection request already pending");
+            } else if ("ACCEPTED".equals(status)) {
+                throw new CustomException("ALREADY_CONNECTED", "Users are already connected");
+            }
+        }
+
         ConnectionRequest request = new ConnectionRequest();
         request.setSender(sender);
         request.setReceiver(receiver);
@@ -42,6 +55,11 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
         }
         ConnectionRequest request = connectionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException("REQUEST_NOT_FOUND", "Request with ID " + requestId + " not found"));
+
+        if (!"PENDING".equals(request.getStatus())) {
+            throw new CustomException("INVALID_REQUEST_STATUS", "Request is not in pending status");
+        }
+
         request.setStatus("ACCEPTED");
         connectionRequestRepository.save(request);
     }
@@ -53,6 +71,11 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
         }
         ConnectionRequest request = connectionRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException("REQUEST_NOT_FOUND", "Request with ID " + requestId + " not found"));
+
+        if (!"PENDING".equals(request.getStatus())) {
+            throw new CustomException("INVALID_REQUEST_STATUS", "Request is not in pending status");
+        }
+
         request.setStatus("IGNORED");
         connectionRequestRepository.save(request);
     }
@@ -70,7 +93,7 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
         if (user == null) {
             throw new CustomException("INVALID_USER", "User cannot be null");
         }
-        List<ConnectionRequest> acceptedRequests = connectionRequestRepository.findBySenderOrReceiverAndStatus(user, user, "ACCEPTED");
+        List<ConnectionRequest> acceptedRequests = connectionRequestRepository.findAcceptedConnectionsForUser(user);
         List<User> connections = new ArrayList<>();
         for (ConnectionRequest request : acceptedRequests) {
             if (request.getSender().equals(user)) {
@@ -96,20 +119,19 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
             return "SELF";
         }
 
-        Optional<ConnectionRequest> request = connectionRequestRepository
-                .findBySenderAndReceiverOrReceiverAndSender(loggedInUser, profileUser);
+        Optional<ConnectionRequest> pendingRequest = connectionRequestRepository
+                .findPendingConnectionBetweenUsers(loggedInUser, profileUser);
 
-        if (request.isPresent()) {
-            String status = request.get().getStatus();
-            if ("PENDING".equals(status)) {
-                return "PENDING";
-            } else if ("ACCEPTED".equals(status)) {
-                return "CONNECTED";
-            }
+        if (pendingRequest.isPresent()) {
+            return "PENDING";
         }
 
+        Optional<ConnectionRequest> acceptedRequest = connectionRequestRepository
+                .findAcceptedConnectionBetweenUsers(loggedInUser, profileUser);
+
+        if (acceptedRequest.isPresent()) {
+            return "CONNECTED";
+        }
         return "NONE";
     }
-
-
 }

@@ -825,23 +825,31 @@
                 <div class="profile-buttons">
                     <div th:if="${user.userId != currentUserId}">
                         <form th:if="${not alreadyFollowing}" th:action="@{/follow/{userId}(userId=${user.userId})}" method="post" style="display:inline;">
-                            <button type="submit" style="padding:6px 12px; background:#0a66c2; color:white; border:none; border-radius:4px;">Follow</button>
+                            <button type="submit" style="padding:6px 16px; background-color:#0a66c2; color:white; border:none; border-radius:20px; font-weight:500; font-size:14px; cursor:pointer;">Follow</button>
                         </form>
-                        <button th:if="${alreadyFollowing}" type="button" disabled style="padding:6px 12px; background:#e5e5e5; color:#555; border:none; border-radius:4px;">Followed</button>
+                        <button th:if="${alreadyFollowing}" type="button" disabled
+                                style="padding:6px 16px; background-color:#e5e5e5; color:#555; border:none; border-radius:20px; font-weight:500; font-size:14px;">Followed</button>
                     </div>
                 </div>
 
-
-
                 <div th:if="${not isConnected}" class="profile-buttons">
                     <form th:action="@{/connect/{userId}(userId=${user.userId})}" method="post">
-                        <button type="submit" th:if="${connectionStatus == 'NONE'}">Connect</button>
-                        <button type="button" th:if="${connectionStatus == 'PENDING'}" disabled>Request Sent</button>
-                        <button type="button" th:if="${connectionStatus == 'CONNECTED'}" disabled>Connected</button>
+                        <button type="submit" th:if="${connectionStatus == 'NONE'}"
+                                style="padding:6px 16px; background-color:#0a66c2; color:white; border:none; border-radius:20px; font-weight:500; font-size:14px; cursor:pointer;">
+                            Connect
+                        </button>
+
+                        <button type="button" th:if="${connectionStatus == 'PENDING'}" disabled
+                                style="padding:6px 16px; background-color:#e5e5e5; color:#555; border:none; border-radius:20px; font-weight:500; font-size:14px;">
+                            Request Sent
+                        </button>
+
+                        <button type="button" th:if="${connectionStatus == 'CONNECTED'}" disabled
+                                style="padding:6px 16px; background-color:#e5e5e5; color:#555; border:none; border-radius:20px; font-weight:500; font-size:14px;">
+                            Connected
+                        </button>
                     </form>
                 </div>
-
-
             </div>
         </div>
 

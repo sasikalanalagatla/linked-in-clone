@@ -61,20 +61,16 @@ public class ChatController {
             if (receiverEmail != null && !receiverEmail.trim().isEmpty()) {
                 model.addAttribute("receiverEmail", receiverEmail);
 
-                // Get receiver User object
                 User receiver = userService.findByEmail(receiverEmail);
                 model.addAttribute("receiver", receiver);
 
                 List<ChatMessage> history = chatService.getChatHistory(senderEmail, receiverEmail);
-
-                // Ensure all messages have proper sender/receiver objects
                 if (history != null) {
                     for (ChatMessage msg : history) {
                         if (msg.getSender() == null && msg.getSenderEmail() != null) {
                             try {
                                 msg.setSender(userService.findByEmail(msg.getSenderEmail()));
                             } catch (Exception e) {
-                                // Handle case where sender might not exist
                                 System.err.println("Could not find sender for email: " + msg.getSenderEmail());
                             }
                         }
@@ -82,7 +78,6 @@ public class ChatController {
                             try {
                                 msg.setReceiver(userService.findByEmail(msg.getReceiverEmail()));
                             } catch (Exception e) {
-                                // Handle case where receiver might not exist
                                 System.err.println("Could not find receiver for email: " + msg.getReceiverEmail());
                             }
                         }
@@ -107,7 +102,6 @@ public class ChatController {
                               @RequestParam String content,
                               Model model) {
         try {
-            // Validate input
             if (content == null || content.trim().isEmpty()) {
                 model.addAttribute("errorMessage", "Message content cannot be empty");
                 return "redirect:/chat?receiverEmail=" + receiverEmail;
@@ -131,7 +125,7 @@ public class ChatController {
 
             chatService.saveMessage(chatMessage);
 
-            // Send via WebSocket
+
             String to = "/topic/messages/" + receiverEmail;
             messagingTemplate.convertAndSend(to, chatMessage);
 
