@@ -3,6 +3,7 @@
 <head>
     <title>LinkedIn Clone - Feed</title>
     <style>
+        /* Existing CSS styles remain unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -175,7 +176,6 @@
             padding: 0 8px;
         }
 
-        /* Container and Layout */
         .container {
             display: flex;
             max-width: 1128px;
@@ -343,10 +343,16 @@
         .post-action-btn {
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            padding: 0;
+            padding: 4px 8px;
             color: #666;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .post-action-btn:hover {
+            background-color: #f3f2ef;
         }
 
         .post-options-menu {
@@ -356,19 +362,19 @@
             right: 0;
             background-color: white;
             border: 1px solid #00000017;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 4px 0;
-            z-index: 10;
-            min-width: 120px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            z-index: 1000;
+            min-width: 140px;
         }
 
         .post-options-menu.show {
-            display: block;
+            display: block !important;
         }
 
         .post-option-item {
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 14px;
             color: #000;
             cursor: pointer;
@@ -376,6 +382,7 @@
             width: 100%;
             background: none;
             border: none;
+            display: block;
         }
 
         .post-option-item:hover {
@@ -387,30 +394,6 @@
         }
 
         .post-option-item.delete {
-            color: #cc1016;
-        }
-
-        .post-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .post-action-link {
-            color: #0A66C2;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-
-        .post-action-link:hover {
-            background-color: #f3f2ef;
-        }
-
-        .post-action-link.delete {
             color: #cc1016;
         }
 
@@ -428,7 +411,6 @@
             margin-bottom: 12px;
         }
 
-        /* Reaction Counts Display */
         .reaction-counts {
             display: flex;
             align-items: center;
@@ -512,7 +494,6 @@
             color: #666;
         }
 
-        /* Actions Bar */
         .actions {
             display: flex;
             justify-content: space-around;
@@ -571,7 +552,6 @@
             color: #8b5a9f;
         }
 
-        /* Reaction Picker */
         .reaction-picker {
             position: absolute;
             bottom: 100%;
@@ -704,7 +684,6 @@
             margin-top: 8px;
         }
 
-        /* Responsive adjustments */
         @media (max-width: 768px) {
             .reaction-picker {
                 transform: translateX(-20px);
@@ -712,7 +691,6 @@
             }
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -830,55 +808,6 @@
             justify-content: center;
         }
 
-        .reaction-option {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: transform 0.2s;
-            position: relative;
-        }
-
-        .reaction-option:hover {
-            transform: scale(1.2);
-        }
-
-        .reaction-option::after {
-            content: attr(data-type);
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: white;
-            white-space: nowrap;
-            background: rgba(0,0,0,0.8);
-            padding: 4px 8px;
-            border-radius: 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-
-        .reaction-option:hover::after {
-            opacity: 1;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
         .post-engagement {
             display: flex;
             justify-content: space-between;
@@ -919,7 +848,6 @@
             font-size: 16px;
         }
 
-        /* Updated post input container */
         .post-input-container {
             position: relative;
             display: flex;
@@ -974,12 +902,11 @@
     <div class="navbar-container">
         <div class="left-section">
             <div class="logo">
-                <span class="logo-text" >in</span>
+                <span class="logo-text">in</span>
             </div>
             <div class="search-container">
                 <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0
-                    1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                 </svg>
                 <input type="text" class="search-input" placeholder="Search">
             </div>
@@ -997,8 +924,7 @@
             <a href="#" th:href="@{/mynetwork}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5
-                        3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+                        <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
                     </svg>
                 </div>
                 My Network
@@ -1006,13 +932,12 @@
             <a href="#" th:href="@{/job/feed}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0
-                         011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
                     </svg>
                 </div>
                 Jobs
             </a>
-            <a href="#"  th:href="@{/message}" class="nav-item">
+            <a href="#" th:href="@{/chat}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -1083,39 +1008,46 @@
 
                 <div class="post-header">
                     <div class="post-author-section">
-                        <div class="post-author-pic" th:text="${post.authorName.substring(0,1)}"></div>
+                        <span th:text="${post.authorName != null ? #strings.substring(post.authorName, 0, 1) : 'A'}"></span>
                         <div class="post-author-info">
-                            <a th:href="@{'/profile/' + ${post.authorId}}" th:text="${post.authorName}">Author Name</a>
-                            <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
+                        <span th:text="${post.author.userId}"></span>
+                        <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
                         </div>
                     </div>
                     <div class="post-actions">
-                        <button class="post-action-btn" onclick="togglePostOptionsMenu('post-options-${post.postId}')">⋯</button>
-                        <div class="post-options-menu" th:id="'post-options-' + ${post.postId}" th:if="${post.authorId == currentUserId}">
-                            <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get">
-                                <button type="submit" class="post-option-item edit">Edit</button>
-                            </form>
-                            <form th:action="@{/post/delete/{id}(id=${post.postId})}" method="post"
-                                  onsubmit="return confirm('Are you sure you want to delete this post?');">
-                                <button type="submit" class="post-option-item delete">Delete</button>
-                            </form>
+                        <button class="post-action-btn" th:onclick="'togglePostOptionsMenu(\'post-options-' + ${post.postId} + '\')'">⋯</button>
+                        <div class="post-options-menu" th:id="'post-options-' + ${post.postId}">
+                            <!-- Only show edit/delete options if current user is the post author -->
+                            <div th:if="${post.author != null and post.author.userId == currentUserId}">
+                                <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get" style="margin: 0;">
+                                    <button type="submit" class="post-option-item edit">✏️ Edit</button>
+                                </form>
+                                <form th:action="@{/post/delete/{id}(id=${post.postId})}" method="post" style="margin: 0;"
+                                      onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                    <button type="submit" class="post-option-item delete">🗑️ Delete</button>
+                                </form>
+                            </div>
+                            <!-- Show message if user is not the author -->
+                            <div th:if="${post.author != null and post.author.userId == currentUserId}">
+                                <div class="post-option-item" style="color: #666; cursor: default;">No actions available</div>
+                            </div>
                         </div>
-
-
                     </div>
                 </div>
+
                 <div class="post-content">
                     <p th:text="${post.postDescription}">Post content</p>
-
                     <div th:if="${post.imageUrl != null}">
                         <img th:src="${post.imageUrl}" alt="Post Image"
                              style="max-width: 100%; margin-top: 10px; border-radius: 10px;" />
                     </div>
                 </div>
+
                 <div class="post-engagement">
                     <span th:text="${post.totalReactions + ' reactions'}">0 reactions</span>
                     <span>0 comments</span>
                 </div>
+
                 <div class="post-actions-bar">
                     <button class="action-btn" th:onclick="'reactToPost(' + ${post.postId} + ', \'LIKE\')'">
                         <span class="action-icon">👍</span>
@@ -1153,7 +1085,6 @@
     <div class="right-sidebar">
         <h3>LinkedIn News</h3>
         <p>Latest updates from your network</p>
-
         <div class="news-item">
             <h4>Tech industry growing rapidly</h4>
             <p>2h ago • 5,234 readers</p>
@@ -1175,23 +1106,28 @@
             loading = true;
             page += 1;
 
-            const response = await fetch(`/loadMorePosts?page=${page}`);
-            const html = await response.text();
+            try {
+                const response = await fetch(`/loadMorePosts?page=${page}`);
+                const html = await response.text();
 
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
 
-            const newPosts = tempDiv.querySelectorAll('.post-card');
-            const container = document.getElementById('postsContainer');
+                const newPosts = tempDiv.querySelectorAll('.post-card');
+                const container = document.getElementById('postsContainer');
 
-            newPosts.forEach(post => container.appendChild(post));
+                newPosts.forEach(post => container.appendChild(post));
 
-            setTimeout(() => {
-                const posts = container.querySelectorAll('.post-card');
-                const newTrigger = posts[page * 10 - 5];
-                if (newTrigger) observer.observe(newTrigger);
+                setTimeout(() => {
+                    const posts = container.querySelectorAll('.post-card');
+                    const newTrigger = posts[page * 10 - 5];
+                    if (newTrigger) observer.observe(newTrigger);
+                    loading = false;
+                }, 500);
+            } catch (error) {
+                console.error('Error loading more posts:', error);
                 loading = false;
-            }, 500);
+            }
         }
     }, {
         threshold: 1.0
@@ -1202,27 +1138,55 @@
         if (trigger) observer.observe(trigger);
     });
 
-    function openPostModal(){
+    function openPostModal() {
         window.location.href = '/post/create';
     }
 
     function togglePostOptionsMenu(menuId) {
         const menu = document.getElementById(menuId);
+        if (!menu) {
+            console.log(`Menu with ID ${menuId} not found.`);
+            return;
+        }
+
         const isShown = menu.classList.contains('show');
 
+        // Close all other menus first
         document.querySelectorAll('.post-options-menu').forEach(m => {
             m.classList.remove('show');
         });
 
+        // Toggle the current menu
         if (!isShown) {
             menu.classList.add('show');
-        }
 
-        document.addEventListener('click', function closeMenu(event) {
-            if (!menu.contains(event.target) && !event.target.closest('.post-action-btn')) {
-                menu.classList.remove('show');
-                document.removeEventListener('click', closeMenu);
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(event) {
+                    if (!menu.contains(event.target) && !event.target.closest('.post-action-btn')) {
+                        menu.classList.remove('show');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 100);
+        }
+    }
+
+    function reactToPost(postId, reactionType) {
+        fetch(`/post/react/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             }
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('Reaction updated:', data);
+            // Optionally refresh the page or update the UI
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
     }
 </script>
