@@ -2,6 +2,7 @@ package com.org.linkedin.controller;
 
 import com.org.linkedin.model.Comment;
 import com.org.linkedin.service.CommentService;
+import com.org.linkedin.service.PostService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +14,11 @@ import java.util.Map;
 public class CommentController {
 
     private final CommentService commentService;
+    private final PostService postService;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, PostService postService) {
         this.commentService = commentService;
+        this.postService = postService;
     }
 
     @GetMapping("/posts/{postId}/comments")
@@ -36,7 +39,6 @@ public class CommentController {
     public String addComment(@PathVariable Long postId,
                              @RequestBody Map<String, String> payload) {
         String text = payload.get("text");
-        System.out.println("========================== +++++++++++++++++++++" + text);
         Comment comment = commentService.addComment(postId, text);
         return "redirect:/posts/{postId}/comments";
     }

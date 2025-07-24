@@ -234,7 +234,6 @@
     </style>
 </head>
 <body>
-<!-- Navbar -->
 <div class="navbar">
     <div class="navbar-container">
         <div class="left-section">
@@ -249,7 +248,7 @@
             </div>
         </div>
         <div class="nav-items">
-            <a href="#" class="nav-item">
+            <a th:href="@{/}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
@@ -257,7 +256,7 @@
                 </div>
                 Home
             </a>
-            <a href="/mynetwork" class="nav-item active">
+            <a href="#" th:href="@{/mynetwork}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
@@ -265,7 +264,7 @@
                 </div>
                 My Network
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" th:href="@{/job/feed}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
@@ -273,7 +272,7 @@
                 </div>
                 Jobs
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" th:href="@{/chat}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -289,7 +288,7 @@
                 </div>
                 Notifications
             </a>
-            <a href="#" class="nav-item profile-nav">
+            <a th:href="@{/profile/{id}(id=${currentUserId})}" class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
             </a>

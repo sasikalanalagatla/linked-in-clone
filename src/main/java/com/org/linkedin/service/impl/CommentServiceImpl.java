@@ -24,31 +24,31 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    private final CommentRepository commentRepo;
-    private final PostRepository postRepo;
-    private final UserRepository userRepo;
+    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public CommentServiceImpl(CommentRepository commentRepo, PostRepository postRepo, UserRepository userRepo) {
-        this.commentRepo = commentRepo;
-        this.postRepo = postRepo;
-        this.userRepo = userRepo;
+        this.commentRepository = commentRepo;
+        this.postRepository = postRepo;
+        this.userRepository = userRepo;
     }
 
     @Override
     public List<Comment> getComments(Long postId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("commentCreatedAt").descending());
-        return commentRepo.findCommentsByPostId(postId, pageable).getContent();
+        return commentRepository.findCommentsByPostId(postId, pageable).getContent();
     }
 
     @Override
     public boolean hasMore(Long postId, int page, int size) {
-        long total = commentRepo.countCommentsByPostId(postId);
+        long total = commentRepository.countCommentsByPostId(postId);
         return (page + 1) * size < total;
     }
 
     @Override
     public Comment addComment(Long postId, String text) {
-        Post post = postRepo.findById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         User user = getCurrentUser();
@@ -58,13 +58,13 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(user);
         comment.setPost(post);
         comment.setCommentEdited(false);
-
-        return commentRepo.save(comment);
+        post.setCommentsCount(post.getCommentsCount()+1);
+        return commentRepository.save(comment);
     }
 
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepo.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

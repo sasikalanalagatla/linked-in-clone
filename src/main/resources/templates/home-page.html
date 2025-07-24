@@ -1165,8 +1165,9 @@
 
                 <div class="post-engagement">
                     <span th:text="${post.totalReactions + ' reactions'}">0 reactions</span>
-                    <span>0 comments</span>
+                    <span th:text="${post.commentsCount + ' comments'}">0 comments</span>
                 </div>
+
 
                 <div class="post-actions-bar">
                     <button class="action-btn" th:onclick="'reactToPost(' + ${post.postId} + ', \'LIKE\')'">
@@ -1174,14 +1175,7 @@
                         <span>Like</span>
                     </button>
                     <button class="comment-btn" th:attr="data-post-id=${post.postId}">💬 Comment</button>
-                    <button class="action-btn">
-                        <span class="action-icon">↻</span>
-                        <span>Repost</span>
-                    </button>
-                    <button class="action-btn">
-                        <span class="action-icon">✉️</span>
-                        <span>Send</span>
-                    </button>
+
                 </div>
 
                 <div th:id="'comment-section-' + ${post.postId}" class="comment-section hidden">
