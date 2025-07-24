@@ -908,9 +908,7 @@
                 <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                 </svg>
-                <input type="text" name="keyword" class="search-input"
-                       placeholder="Search jobs or skills..."
-                       th:value="${param.keyword}">
+                <input type="text" class="search-input" placeholder="Search">
             </div>
         </div>
 
@@ -999,8 +997,8 @@
             <h3>Start a post</h3>
             <div class="post-input-container">
                 <img th:src="${user.profilePictureUrl != null} ? ${user.profilePictureUrl} : @{/images/default-profile.png}"
-                      alt="Profile Picture"
-                      class="profile-pic-small" />
+                     alt="Profile Picture"
+                     class="profile-pic-small" />
                 <input type="text" class="post-input" placeholder="What do you want to talk about?"
                        onclick="openPostModal()" readonly>
             </div>
@@ -1012,16 +1010,17 @@
 
                 <div class="post-header">
                     <div class="post-author-section">
-                        <span th:text="${post.authorName != null ? #strings.substring(post.authorName, 0, 1) : 'A'}"></span>
+                        <img th:src="${post.author.profilePictureUrl != null} ? ${post.author.profilePictureUrl} : @{/images/default-profile.png}"
+                             alt="Author Pic" class="post-author-pic"/>
                         <div class="post-author-info">
-                        <span th:text="${post.author.userId}"></span>
-                        <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
+                            <a th:href="@{'/profile/' + ${post.author.userId}}" th:text="${post.author.fullName}">Author Name</a>
+                            <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>
                         </div>
                     </div>
+
                     <div class="post-actions">
                         <button class="post-action-btn" th:onclick="'togglePostOptionsMenu(\'post-options-' + ${post.postId} + '\')'">⋯</button>
                         <div class="post-options-menu" th:id="'post-options-' + ${post.postId}">
-                            <!-- Only show edit/delete options if current user is the post author -->
                             <div th:if="${post.author != null and post.author.userId == currentUserId}">
                                 <form th:action="@{/post/edit/{id}(id=${post.postId})}" method="get" style="margin: 0;">
                                     <button type="submit" class="post-option-item edit">✏️ Edit</button>
