@@ -12,6 +12,6 @@ public interface JobService {
     Job getJobById(Long jobId);
     String deleteJobById(Long jobId);
     Page<Job> getAllJobs(Pageable pageable);
-    void updateJob(Job job);
+    void updateJob(Job job,Principal principal);
     Page<Job> searchJobs(String keyword, Pageable pageable);
 }

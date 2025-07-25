@@ -74,13 +74,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void updateJob(Job job) {
+    public void updateJob(Job job, Principal principal) {
         if (job == null || job.getId() == null) {
             throw new CustomException("INVALID_JOB", "Job data or ID cannot be null");
         }
         if (!jobRepository.existsById(job.getId())) {
             throw new CustomException("JOB_NOT_FOUND", "Job with ID " + job.getId() + " not found");
         }
+        String email = principal.getName();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = optionalUser.get();
+        job.setUser(user);
         jobRepository.save(job);
     }
 }

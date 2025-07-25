@@ -1095,7 +1095,7 @@
             </div>
         </div>
         <div class="sidebar-content">
-            <a th:href="@{'/profile/' + ${user.userId}}" class="profile-name" th:text="${user.fullName}">John Doe</a>
+            <a th:href="@{'/profile/' + ${user.userId}}" th:src="${user.profilePictureUrl}" class="profile-name" th:text="${user.fullName}">John Doe</a>
             <div class="profile-headline" th:text="${user.headline}">Software Engineer at Tech Corp</div>
         </div>
         <div class="profile-stats">

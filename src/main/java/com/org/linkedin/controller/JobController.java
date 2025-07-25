@@ -196,8 +196,8 @@ public class JobController {
     }
 
     @PostMapping("/job/update")
-    public String updateJob(@ModelAttribute("job") Job updatedJob) {
-        jobServiceImpl.updateJob(updatedJob);
+    public String updateJob(@ModelAttribute("job") Job updatedJob, Principal principal) {
+        jobServiceImpl.updateJob(updatedJob,principal);
         return "redirect:/job/feed";
     }
 }
