@@ -93,8 +93,8 @@
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script>
-    const currentUserId = [[${currentUserId}]];
-    const targetUserId = [[${receiverId}]];
+    const currentUserId = 1; // Replace with actual user ID
+    const targetUserId = 2; // Replace with actual target user ID
 
     // DOM Elements
     const localVideo = document.getElementById("localVideo");
@@ -138,6 +138,8 @@
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, () => {
+            console.log("WebSocket connected");
+
             // Subscribe to video signals
             stompClient.subscribe('/user/queue/video', message => {
                 const signal = JSON.parse(message.body);
@@ -147,6 +149,7 @@
             // Subscribe to call notifications
             stompClient.subscribe('/user/queue/call', message => {
                 const notification = JSON.parse(message.body);
+                console.log("Received call notification:", notification);
                 handleCallNotification(notification);
             });
         }, error => {
@@ -157,6 +160,10 @@
 
     // Initialize peer connection
     function initPeerConnection() {
+        if (peerConnection) {
+            peerConnection.close();
+        }
+
         peerConnection = new RTCPeerConnection(iceServers);
 
         peerConnection.onicecandidate = event => {
@@ -166,6 +173,7 @@
         };
 
         peerConnection.ontrack = event => {
+            console.log("Received remote stream");
             if (!remoteVideo.srcObject) {
                 remoteVideo.srcObject = event.streams[0];
             }
@@ -173,38 +181,75 @@
 
         peerConnection.onconnectionstatechange = () => {
             console.log("Connection state:", peerConnection.connectionState);
-            if (peerConnection.connectionState === "disconnected") {
+            if (peerConnection.connectionState === "disconnected" ||
+                peerConnection.connectionState === "failed") {
                 endCall();
             }
         };
     }
 
-    // Start a new call
+    // Get user media
+    async function getUserMedia() {
+        try {
+            console.log("=== GETUSERMEDIA DEBUG ===");
+            console.log("Current state when requesting media:", currentState);
+            console.log("Existing localStream:", localStream);
+
+            if (!localStream) {
+                console.log("Requesting camera/microphone access...");
+
+                // Check if getUserMedia is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error("getUserMedia is not supported");
+                }
+
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+
+                console.log("Media access granted, setting local video");
+                localVideo.srcObject = localStream;
+            } else {
+                console.log("Using existing localStream");
+            }
+
+            console.log("Final localStream:", localStream);
+            console.log("=========================");
+            return localStream;
+        } catch (error) {
+            console.error("=== GETUSERMEDIA ERROR ===");
+            console.error("Error getting user media:", error);
+            console.error("Error name:", error.name);
+            console.error("Error message:", error.message);
+            console.error("=========================");
+            throw error;
+        }
+    }
+
+    // Start a call (initiator)
     async function startCall() {
         try {
+            console.log("Starting call...");
             changeState(states.CALLING);
 
-            // Get user media
-            localStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
-            localVideo.srcObject = localStream;
+            // Get user media first
+            await getUserMedia();
 
             // Initialize peer connection
             initPeerConnection();
 
-            // Add local stream tracks
+            // Add tracks to peer connection
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
 
-            // Send call request
-            sendCallNotification("call_request");
-
-            // Create offer
+            // Create and send offer
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
+
+            // Send call request with offer
+            sendCallNotification("call_request", offer);
 
         } catch (error) {
             console.error("Error starting call:", error);
@@ -213,39 +258,39 @@
         }
     }
 
-    // Accept incoming call
+    // Accept incoming call (receiver)
     async function acceptCall() {
         try {
+            console.log("Accepting call...");
             changeState(states.ACTIVE);
 
             // Get user media
-            localStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            });
-            localVideo.srcObject = localStream;
+            await getUserMedia();
 
-            // Initialize peer connection
-            initPeerConnection();
+            // Initialize peer connection if not already done
+            if (!peerConnection) {
+                initPeerConnection();
+            }
 
-            // Add local stream tracks
+            // Add tracks to peer connection
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
 
-            // Send call accepted notification
+            // Send acceptance notification
             sendCallNotification("call_accepted");
 
-            // Set remote description and create answer
-            const offer = new RTCSessionDescription(JSON.parse(pendingOffer));
-            await peerConnection.setRemoteDescription(offer);
+            // Handle pending offer if exists
+            if (pendingOffer) {
+                console.log("Processing pending offer");
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(pendingOffer));
 
-            const answer = await peerConnection.createAnswer();
-            await peerConnection.setLocalDescription(answer);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                sendSignal("answer", answer);
 
-            // Send answer to caller
-            sendSignal("answer", peerConnection.localDescription);
-
+                pendingOffer = null;
+            }
         } catch (error) {
             console.error("Error accepting call:", error);
             updateStatus("Failed to accept call");
@@ -255,7 +300,9 @@
 
     // Reject incoming call
     function rejectCall() {
+        console.log("Rejecting call");
         sendCallNotification("call_rejected");
+        pendingOffer = null;
         changeState(states.IDLE);
     }
 
@@ -263,6 +310,7 @@
     function endCall() {
         if (currentState === states.ENDING || currentState === states.IDLE) return;
 
+        console.log("Ending call");
         changeState(states.ENDING);
 
         // Stop all media tracks
@@ -278,21 +326,29 @@
             peerConnection = null;
         }
 
-        // Notify the other user
+        // Clear remote video
+        remoteVideo.srcObject = null;
+
+        // Notify the other user if not already ending
         if (currentState !== states.IDLE) {
             sendCallNotification("call_ended");
         }
 
-        // Reset after cleanup
+        // Reset state
+        pendingOffer = null;
         setTimeout(() => {
-            remoteVideo.srcObject = null;
             changeState(states.IDLE);
-        }, 1000);
+        }, 500);
     }
 
     // Handle incoming call notifications
     function handleCallNotification(notification) {
-        console.log("Received notification:", notification);
+        console.log("=== NOTIFICATION DEBUG ===");
+        console.log("Notification type:", notification.type);
+        console.log("Current state:", currentState);
+        console.log("Local video srcObject:", localVideo.srcObject);
+        console.log("Local stream:", localStream);
+        console.log("========================");
 
         if (notification.senderName && notification.senderName !== "You") {
             remoteUserName.textContent = notification.senderName;
@@ -302,65 +358,99 @@
         switch (notification.type) {
             case "call_request":
                 if (currentState === states.IDLE) {
-                    pendingOffer = notification.payload;
-                    changeState(states.RINGING);
-                    updateStatus(`Incoming call from ${remoteUserNameValue}`);
+                    console.log("===============================");
+                } else {
+                    // Busy - reject the call
+                    console.log("Rejecting call - busy");
+                    sendCallNotification("call_rejected");
                 }
                 break;
 
             case "call_accepted":
                 if (currentState === states.CALLING) {
+                    console.log("Call accepted");
                     changeState(states.ACTIVE);
-                    updateStatus(`Call with ${remoteUserNameValue}`);
-
-                    // Send the offer now that call is accepted
-                    if (peerConnection && peerConnection.localDescription) {
-                        sendSignal("offer", peerConnection.localDescription);
-                    }
                 }
                 break;
 
             case "call_rejected":
                 if (currentState === states.CALLING) {
-                    updateStatus(`${remoteUserNameValue} rejected your call`);
+                    console.log("Call rejected");
+                    updateStatus(`${remoteUserNameValue || 'User'} rejected your call`);
                     endCall();
                 }
                 break;
 
             case "call_ended":
-                if (currentState !== states.IDLE) {
-                    updateStatus(`${remoteUserNameValue} ended the call`);
+                if (currentState !== states.IDLE && currentState !== states.ENDING) {
+                    console.log("Call ended by remote user");
+                    updateStatus(`${remoteUserNameValue || 'User'} ended the call`);
                     endCall();
                 }
                 break;
         }
-    }
+    }== INCOMING CALL PROCESSING ===");
+                    console.log("Before processing - Local video srcObject:", localVideo.srcObject);
+
+                    // Store the offer but DON'T process it yet
+                    if (notification.payload) {
+                        try {
+                            pendingOffer = typeof notification.payload === 'string'
+                                ? JSON.parse(notification.payload)
+                                : notification.payload;
+                            console.log("Stored pending offer");
+                        } catch (e) {
+                            console.error("Error parsing offer:", e);
+                            pendingOffer = notification.payload;
+                        }
+                    }
+
+                    // IMPORTANT: Do NOT initialize media here
+                    console.log("Changing to RINGING state - NO media should be accessed");
+                    changeState(states.RINGING);
+                    updateStatus(`Incoming call from ${notification.senderName || 'User'}`);
+
+                    console.log("After processing - Local video srcObject:", localVideo.srcObject);
+                    console.log("After processing - Local stream:", localStream);
+                    console.log("=
 
     // Handle WebRTC signaling
     async function handleSignal(signal) {
         try {
+            console.log("Handling signal:", signal.type);
+
             if (!peerConnection) {
-                initPeerConnection();
+                console.log("No peer connection, ignoring signal");
+                return;
+            }
+
+            let payload;
+            try {
+                payload = typeof signal.payload === 'string'
+                    ? JSON.parse(signal.payload)
+                    : signal.payload;
+            } catch (e) {
+                console.error("Error parsing signal payload:", e);
+                return;
             }
 
             if (signal.type === "offer") {
-                const offer = new RTCSessionDescription(JSON.parse(signal.payload));
-                await peerConnection.setRemoteDescription(offer);
+                console.log("Received offer");
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
 
-                // Only create answer if we're the callee
-                if (currentState === states.RINGING) {
+                if (currentState === states.ACTIVE) {
                     const answer = await peerConnection.createAnswer();
                     await peerConnection.setLocalDescription(answer);
-                    sendSignal("answer", peerConnection.localDescription);
+                    sendSignal("answer", answer);
                 }
             }
             else if (signal.type === "answer") {
-                const answer = new RTCSessionDescription(JSON.parse(signal.payload));
-                await peerConnection.setRemoteDescription(answer);
+                console.log("Received answer");
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
             }
             else if (signal.type === "candidate") {
-                const candidate = new RTCIceCandidate(JSON.parse(signal.payload));
-                await peerConnection.addIceCandidate(candidate);
+                console.log("Received ICE candidate");
+                await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
             }
         } catch (error) {
             console.error("Error handling signal:", error);
@@ -369,31 +459,45 @@
 
     // Send WebRTC signal
     function sendSignal(type, payload) {
+        if (!stompClient) {
+            console.error("WebSocket not connected");
+            return;
+        }
+
         const signalMessage = {
             type: type,
             senderId: currentUserId.toString(),
             receiverId: targetUserId.toString(),
             payload: JSON.stringify(payload)
         };
+
+        console.log("Sending signal:", type);
         stompClient.send("/app/video.signal", {}, JSON.stringify(signalMessage));
     }
 
     // Send call notification
-    function sendCallNotification(type) {
+    function sendCallNotification(type, payload = null) {
+        if (!stompClient) {
+            console.error("WebSocket not connected");
+            return;
+        }
+
         const notification = {
             type: type,
             senderId: currentUserId.toString(),
             receiverId: targetUserId.toString(),
             senderName: "You",
-            payload: peerConnection ? JSON.stringify(peerConnection.localDescription) : null
+            payload: payload ? JSON.stringify(payload) : null
         };
+
+        console.log("Sending notification:", type);
         stompClient.send("/app/call.notify", {}, JSON.stringify(notification));
     }
 
     // Update UI based on state
     function changeState(newState) {
+        console.log(`State changing from ${currentState} to ${newState}`);
         currentState = newState;
-        console.log("State changed to:", newState);
 
         // Reset all buttons first
         callButton.style.display = "none";
@@ -410,6 +514,7 @@
                 break;
 
             case states.CALLING:
+                callButton.style.display = "inline-block";
                 callButton.disabled = true;
                 updateStatus("Calling...");
                 break;
@@ -417,11 +522,12 @@
             case states.RINGING:
                 acceptButton.style.display = "inline-block";
                 rejectButton.style.display = "inline-block";
+                updateStatus(`Incoming call from ${remoteUserNameValue || 'User'}`);
                 break;
 
             case states.ACTIVE:
                 endButton.style.display = "inline-block";
-                updateStatus(`In call with ${remoteUserNameValue}`);
+                updateStatus(`In call with ${remoteUserNameValue || 'User'}`);
                 break;
 
             case states.ENDING:
@@ -441,8 +547,21 @@
     rejectButton.addEventListener("click", rejectCall);
     endButton.addEventListener("click", endCall);
 
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (currentState !== states.IDLE) {
+            endCall();
+        }
+    });
+
     // Initialize on load
-    window.addEventListener('beforeunload', endCall);
+    console.log("=== PAGE LOAD DEBUG ===");
+    console.log("Page loaded, current protocol:", window.location.protocol);
+    console.log("Page loaded, current host:", window.location.host);
+    console.log("getUserMedia available:", !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia));
+    console.log("Initial local video srcObject:", localVideo.srcObject);
+    console.log("======================");
+
     connectWebSocket();
 </script>
 </body>

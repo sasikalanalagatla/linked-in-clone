@@ -34,37 +34,34 @@ public class VideoCallController {
         this.chatService = chatService;
         this.userRepository = userRepository;
     }
-
     @MessageMapping("/video.signal")
     public void handleVideoSignal(VideoSignalMessage message) {
-        System.out.println("Received video signal: " + message.getType() + " from " + message.getSenderId() + " to " + message.getReceiverId());
+        // Only allow signaling after call is accepted
+        if (!"call_request".equals(message.getType())) {
+            Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
+            if (senderOptional.isPresent()) {
+                message.setSenderName(senderOptional.get().getFullName());
+            }
 
-        Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
-        if (senderOptional.isPresent()) {
-            message.setSenderName(senderOptional.get().getFullName());
+            messagingTemplate.convertAndSendToUser(
+                    message.getReceiverId(),
+                    "/queue/video",
+                    message
+            );
         }
-
-        messagingTemplate.convertAndSendToUser(
-                message.getReceiverId(),
-                "/queue/video",
-                message
-        );
     }
 
     @MessageMapping("/call.notify")
     public void handleCallNotification(CallNotificationMessage message) {
-        System.out.println("Received call notification: " + message.getType() + " from " + message.getSenderId() + " to " + message.getReceiverId());
-
         Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
         Optional<User> receiverOptional = userRepository.findById(Long.parseLong(message.getReceiverId()));
 
         if (senderOptional.isPresent() && receiverOptional.isPresent()) {
             User sender = senderOptional.get();
             User receiver = receiverOptional.get();
-
             message.setSenderName(sender.getFullName());
 
-            // Send call notification to receiver
+            // Only send notifications for call requests/responses
             messagingTemplate.convertAndSendToUser(
                     message.getReceiverId(),
                     "/queue/call",
@@ -72,21 +69,14 @@ public class VideoCallController {
             );
 
             if ("call_request".equals(message.getType())) {
+                // Save chat message for the call request
                 ChatMessage callMessage = new ChatMessage();
-                callMessage.setSender(sender);
-                callMessage.setReceiver(receiver);
-                callMessage.setSenderEmail(sender.getEmail());
-                callMessage.setReceiverEmail(receiver.getEmail());
-                callMessage.setContent("📹 Video call request");
+                callMessage.setContent("📞 Incoming video call");
                 callMessage.setType("video_call_request");
-                callMessage.setTimestamp(LocalDateTime.now());
                 chatService.saveMessage(callMessage);
-
-                messagingTemplate.convertAndSend("/topic/messages/" + receiver.getEmail(), callMessage);
             }
         }
     }
-
     @GetMapping("/video-call/{receiverId}")
     public String showVideoCallPage(@PathVariable String receiverId, Model model, Principal principal) {
         String email = principal.getName();
