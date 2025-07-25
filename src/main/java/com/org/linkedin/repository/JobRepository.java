@@ -15,6 +15,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Query("SELECT DISTINCT j FROM Job j LEFT JOIN j.requiredSkills s " +
             "WHERE LOWER(j.jobTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(j.company) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(j.jobLocation) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(s.skillName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<Job> searchJobsByTitleOrSkill(@Param("keyword") String keyword, Pageable pageable);
 

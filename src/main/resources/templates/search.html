@@ -572,14 +572,13 @@
         <h2 class="section-header">People</h2>
         <div th:each="user : ${peopleResults}" class="result-card">
             <div class="people-result">
-                <div class="people-avatar" th:text="${#strings.substring(user.fullName, 0, 1)}">U</div>
+                <div class="people-avatar" th:if="${user.profilePictureUrl != null}">
+                    <img th:src="${user.profilePictureUrl}" alt="Profile Picture" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;">
+                </div>
+                <div class="people-avatar" th:if="${user.profilePictureUrl == null}" th:text="${#strings.substring(user.fullName, 0, 1)}">U</div>
                 <div class="people-info">
                     <a th:href="@{'/profile/' + ${user.userId}}" class="people-name" th:text="${user.fullName}">Full Name</a>
                     <div class="people-headline" th:text="${user.headline ?: 'Professional'}">Headline or Title</div>
-                    <div class="people-actions">
-                        <button class="connect-btn">Connect</button>
-                        <button class="message-btn">Message</button>
-                    </div>
                 </div>
             </div>
         </div>
