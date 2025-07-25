@@ -39,20 +39,16 @@ public class VideoCallController {
     public void handleVideoSignal(VideoSignalMessage message) {
         System.out.println("Received video signal: " + message.getType() + " from " + message.getSenderId() + " to " + message.getReceiverId());
 
-        // Get sender details
         Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
         if (senderOptional.isPresent()) {
             message.setSenderName(senderOptional.get().getFullName());
         }
 
-        // Only send offer/answer/candidate if it's not a call initiation request
-        if (!"call_request".equals(message.getType())) {
-            messagingTemplate.convertAndSendToUser(
-                    message.getReceiverId(),
-                    "/queue/video",
-                    message
-            );
-        }
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiverId(),
+                "/queue/video",
+                message
+        );
     }
 
     @MessageMapping("/call.notify")
@@ -75,7 +71,6 @@ public class VideoCallController {
                     message
             );
 
-            // Only create chat message for initial call request
             if ("call_request".equals(message.getType())) {
                 ChatMessage callMessage = new ChatMessage();
                 callMessage.setSender(sender);
@@ -90,7 +85,6 @@ public class VideoCallController {
                 messagingTemplate.convertAndSend("/topic/messages/" + receiver.getEmail(), callMessage);
             }
         }
-    
     }
 
     @GetMapping("/video-call/{receiverId}")

@@ -9,40 +9,59 @@
             flex-direction: column;
             align-items: center;
             font-family: Arial, sans-serif;
+            background: #f5f5f5;
         }
         .video-container {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         video {
             width: 400px;
             height: 300px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             background: #000;
+            object-fit: cover;
         }
         #localVideo {
-            transform: scaleX(-1); /* Mirror effect */
+            transform: scaleX(-1);
         }
         .button-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-top: 20px;
         }
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 16px;
             cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
         }
-        #accept-button { background: #4CAF50; color: white; }
-        #reject-button { background: #f44336; color: white; }
-        #end-button { background: #f44336; color: white; }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #call-button { background: #4285f4; color: white; }
+        #accept-button { background: #34a853; color: white; }
+        #reject-button { background: #ea4335; color: white; }
+        #end-button { background: #ea4335; color: white; }
         .call-status {
             margin: 20px 0;
             font-size: 18px;
             font-weight: bold;
+            color: #333;
+            min-height: 27px;
+        }
+        .user-name {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
@@ -50,8 +69,14 @@
 <h2>Video Call</h2>
 
 <div class="video-container">
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
+    <div>
+        <video id="localVideo" autoplay muted></video>
+        <div class="user-name" id="localUserName">You</div>
+    </div>
+    <div>
+        <video id="remoteVideo" autoplay></video>
+        <div class="user-name" id="remoteUserName">Remote user</div>
+    </div>
 </div>
 
 <div id="call-controls">
@@ -71,12 +96,7 @@
     const currentUserId = [[${currentUserId}]];
     const targetUserId = [[${receiverId}]];
 
-    let stompClient = null;
-    let peerConnection = null;
-    let localStream = null;
-    let isCaller = false;
-    let callActive = false;
-
+    // DOM Elements
     const localVideo = document.getElementById("localVideo");
     const remoteVideo = document.getElementById("remoteVideo");
     const callButton = document.getElementById("call-button");
@@ -84,11 +104,35 @@
     const rejectButton = document.getElementById("reject-button");
     const endButton = document.getElementById("end-button");
     const callStatus = document.getElementById("call-status");
+    const remoteUserName = document.getElementById("remoteUserName");
 
-    const servers = {
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    // WebRTC variables
+    let stompClient = null;
+    let peerConnection = null;
+    let localStream = null;
+    let pendingOffer = null;
+    let remoteUserNameValue = "";
+
+    // State management
+    const states = {
+        IDLE: 'idle',
+        CALLING: 'calling',
+        RINGING: 'ringing',
+        ACTIVE: 'active',
+        ENDING: 'ending'
+    };
+    let currentState = states.IDLE;
+
+    // ICE Servers configuration
+    const iceServers = {
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun2.l.google.com:19302" }
+        ]
     };
 
+    // Initialize WebSocket connection
     function connectWebSocket() {
         const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
@@ -105,11 +149,15 @@
                 const notification = JSON.parse(message.body);
                 handleCallNotification(notification);
             });
+        }, error => {
+            console.error("WebSocket error:", error);
+            updateStatus("Connection error. Please refresh.");
         });
     }
 
+    // Initialize peer connection
     function initPeerConnection() {
-        peerConnection = new RTCPeerConnection(servers);
+        peerConnection = new RTCPeerConnection(iceServers);
 
         peerConnection.onicecandidate = event => {
             if (event.candidate) {
@@ -123,26 +171,33 @@
             }
         };
 
-        // Add local stream tracks if available
-        if (localStream) {
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
-        }
+        peerConnection.onconnectionstatechange = () => {
+            console.log("Connection state:", peerConnection.connectionState);
+            if (peerConnection.connectionState === "disconnected") {
+                endCall();
+            }
+        };
     }
 
+    // Start a new call
     async function startCall() {
-        callStatus.textContent = "Calling...";
-        isCaller = true;
-        callButton.disabled = true;
-
         try {
-            // Get local media
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            changeState(states.CALLING);
+
+            // Get user media
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            });
             localVideo.srcObject = localStream;
 
             // Initialize peer connection
             initPeerConnection();
+
+            // Add local stream tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
 
             // Send call request
             sendCallNotification("call_request");
@@ -151,32 +206,37 @@
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
 
-            // Send offer (will be sent after call is accepted)
         } catch (error) {
             console.error("Error starting call:", error);
+            updateStatus("Failed to start call");
             endCall();
         }
     }
 
+    // Accept incoming call
     async function acceptCall() {
-        callStatus.textContent = "Call in progress";
-        acceptButton.style.display = "none";
-        rejectButton.style.display = "none";
-        endButton.style.display = "inline-block";
-        callActive = true;
-
         try {
-            // Get local media
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            changeState(states.ACTIVE);
+
+            // Get user media
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            });
             localVideo.srcObject = localStream;
 
             // Initialize peer connection
             initPeerConnection();
 
+            // Add local stream tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+
             // Send call accepted notification
             sendCallNotification("call_accepted");
 
-            // Create answer
+            // Set remote description and create answer
             const offer = new RTCSessionDescription(JSON.parse(pendingOffer));
             await peerConnection.setRemoteDescription(offer);
 
@@ -188,82 +248,117 @@
 
         } catch (error) {
             console.error("Error accepting call:", error);
+            updateStatus("Failed to accept call");
             endCall();
         }
     }
 
+    // Reject incoming call
     function rejectCall() {
         sendCallNotification("call_rejected");
-        resetCallUI();
+        changeState(states.IDLE);
     }
 
+    // End current call
     function endCall() {
+        if (currentState === states.ENDING || currentState === states.IDLE) return;
+
+        changeState(states.ENDING);
+
+        // Stop all media tracks
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localVideo.srcObject = null;
+            localStream = null;
+        }
+
+        // Close peer connection
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null;
         }
 
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
+        // Notify the other user
+        if (currentState !== states.IDLE) {
+            sendCallNotification("call_ended");
         }
 
-        sendCallNotification("call_ended");
-        resetCallUI();
-
-        // Clear video streams
-        localVideo.srcObject = null;
-        remoteVideo.srcObject = null;
+        // Reset after cleanup
+        setTimeout(() => {
+            remoteVideo.srcObject = null;
+            changeState(states.IDLE);
+        }, 1000);
     }
 
-    function resetCallUI() {
-        callStatus.textContent = "Ready to call";
-        callButton.style.display = "inline-block";
-        callButton.disabled = false;
-        acceptButton.style.display = "none";
-        rejectButton.style.display = "none";
-        endButton.style.display = "none";
-        callActive = false;
-        isCaller = false;
-    }
-
-    let pendingOffer = null;
-
+    // Handle incoming call notifications
     function handleCallNotification(notification) {
-        if (notification.type === "call_request" && !isCaller && !callActive) {
-            callStatus.textContent = `Incoming call from ${notification.senderName}`;
-            callButton.style.display = "none";
-            acceptButton.style.display = "inline-block";
-            rejectButton.style.display = "inline-block";
+        console.log("Received notification:", notification);
 
-            // Store the sender ID for response
-            pendingOffer = notification.payload;
-        } else if (notification.type === "call_accepted" && isCaller) {
-            callStatus.textContent = "Call connected";
-            callButton.style.display = "none";
-            endButton.style.display = "inline-block";
-            callActive = true;
+        if (notification.senderName && notification.senderName !== "You") {
+            remoteUserName.textContent = notification.senderName;
+            remoteUserNameValue = notification.senderName;
+        }
 
-            // Now that call is accepted, send the offer
-            sendSignal("offer", peerConnection.localDescription);
-        } else if (notification.type === "call_rejected" && isCaller) {
-            callStatus.textContent = "Call rejected";
-            setTimeout(resetCallUI, 2000);
-        } else if (notification.type === "call_ended") {
-            callStatus.textContent = "Call ended";
-            setTimeout(resetCallUI, 2000);
+        switch (notification.type) {
+            case "call_request":
+                if (currentState === states.IDLE) {
+                    pendingOffer = notification.payload;
+                    changeState(states.RINGING);
+                    updateStatus(`Incoming call from ${remoteUserNameValue}`);
+                }
+                break;
+
+            case "call_accepted":
+                if (currentState === states.CALLING) {
+                    changeState(states.ACTIVE);
+                    updateStatus(`Call with ${remoteUserNameValue}`);
+
+                    // Send the offer now that call is accepted
+                    if (peerConnection && peerConnection.localDescription) {
+                        sendSignal("offer", peerConnection.localDescription);
+                    }
+                }
+                break;
+
+            case "call_rejected":
+                if (currentState === states.CALLING) {
+                    updateStatus(`${remoteUserNameValue} rejected your call`);
+                    endCall();
+                }
+                break;
+
+            case "call_ended":
+                if (currentState !== states.IDLE) {
+                    updateStatus(`${remoteUserNameValue} ended the call`);
+                    endCall();
+                }
+                break;
         }
     }
 
+    // Handle WebRTC signaling
     async function handleSignal(signal) {
         try {
+            if (!peerConnection) {
+                initPeerConnection();
+            }
+
             if (signal.type === "offer") {
                 const offer = new RTCSessionDescription(JSON.parse(signal.payload));
                 await peerConnection.setRemoteDescription(offer);
-            } else if (signal.type === "answer") {
+
+                // Only create answer if we're the callee
+                if (currentState === states.RINGING) {
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    sendSignal("answer", peerConnection.localDescription);
+                }
+            }
+            else if (signal.type === "answer") {
                 const answer = new RTCSessionDescription(JSON.parse(signal.payload));
                 await peerConnection.setRemoteDescription(answer);
-            } else if (signal.type === "candidate") {
+            }
+            else if (signal.type === "candidate") {
                 const candidate = new RTCIceCandidate(JSON.parse(signal.payload));
                 await peerConnection.addIceCandidate(candidate);
             }
@@ -272,6 +367,7 @@
         }
     }
 
+    // Send WebRTC signal
     function sendSignal(type, payload) {
         const signalMessage = {
             type: type,
@@ -282,15 +378,61 @@
         stompClient.send("/app/video.signal", {}, JSON.stringify(signalMessage));
     }
 
+    // Send call notification
     function sendCallNotification(type) {
         const notification = {
             type: type,
             senderId: currentUserId.toString(),
             receiverId: targetUserId.toString(),
-            senderName: "You", // This will be set by server
+            senderName: "You",
             payload: peerConnection ? JSON.stringify(peerConnection.localDescription) : null
         };
         stompClient.send("/app/call.notify", {}, JSON.stringify(notification));
+    }
+
+    // Update UI based on state
+    function changeState(newState) {
+        currentState = newState;
+        console.log("State changed to:", newState);
+
+        // Reset all buttons first
+        callButton.style.display = "none";
+        acceptButton.style.display = "none";
+        rejectButton.style.display = "none";
+        endButton.style.display = "none";
+        callButton.disabled = false;
+
+        // Update UI based on state
+        switch (currentState) {
+            case states.IDLE:
+                callButton.style.display = "inline-block";
+                updateStatus("Ready to call");
+                break;
+
+            case states.CALLING:
+                callButton.disabled = true;
+                updateStatus("Calling...");
+                break;
+
+            case states.RINGING:
+                acceptButton.style.display = "inline-block";
+                rejectButton.style.display = "inline-block";
+                break;
+
+            case states.ACTIVE:
+                endButton.style.display = "inline-block";
+                updateStatus(`In call with ${remoteUserNameValue}`);
+                break;
+
+            case states.ENDING:
+                updateStatus("Ending call...");
+                break;
+        }
+    }
+
+    // Update status message
+    function updateStatus(message) {
+        callStatus.textContent = message;
     }
 
     // Event listeners
@@ -299,7 +441,8 @@
     rejectButton.addEventListener("click", rejectCall);
     endButton.addEventListener("click", endCall);
 
-    // Initialize
+    // Initialize on load
+    window.addEventListener('beforeunload', endCall);
     connectWebSocket();
 </script>
 </body>
