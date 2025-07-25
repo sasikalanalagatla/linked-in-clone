@@ -578,7 +578,10 @@
             <div th:each="connection : ${connections}" class="connection-card">
                 <div class="profile-image" th:text="${connection.fullName != null} ? ${connection.fullName.substring(0,1)} : 'U'"></div>
                 <div class="connection-info">
-                    <div class="connection-name" th:text="${connection.fullName} + ' ✓'"></div>
+                    <div class="connection-name">
+                        <a th:href="@{'/profile/' + ${connection.userId}}"
+                           th:text="${connection.fullName + ' ✓'}"></a>
+                    </div>
                     <div class="connection-title" th:text="${connection.headline != null} ? ${connection.headline} : 'No title provided'"></div>
                 </div>
             </div>

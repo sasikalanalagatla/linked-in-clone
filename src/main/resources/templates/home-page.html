@@ -910,104 +910,166 @@
             font-size: 16px;
         }
 
-.comment-section {
-    margin-top: 12px;
-    padding: 12px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
+        .comment-section {
+            margin-top: 12px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
 
-.comment-section.hidden {
-    display: none;
-}
-
-.comment-list {
-    max-height: 250px;
-    overflow-y: auto;
-    margin-bottom: 12px;
-}
-
-.comment-list .comment-item {
-    padding: 8px;
-    border-bottom: 1px solid #e0e0e0;
-    font-size: 14px;
-    color: #333;
-}
-
-.comment-form {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.comment-form input[type="text"] {
-    flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.comment-form input[type="text"]:focus {
-    border-color: #007bff;
-}
-
-.comment-form button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.comment-form button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-.load-more-btn {
-    background-color: transparent;
-    color: #007bff;
-    border: 1px solid #007bff;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 6px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.load-more-btn:hover {
-    background-color: #007bff;
-    color: white;
-}
+        .comment-section.hidden {
+            display: none;
+        }
 
         .comment-list {
-    margin-top: 10px;
-}
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
 
-.comment-item {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
-}
+        .comment-list .comment-item {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #333;
+        }
 
-.comment-author {
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9em;
-    color: #555;
-}
+        .comment-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
 
-.comment-text {
-    margin-top: 4px;
-    font-size: 1em;
-}
+        .comment-form input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
 
+        .comment-form input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        .comment-form button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .comment-form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .load-more-btn {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 6px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .load-more-btn:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .comment-list {
+            margin-top: 10px;
+        }
+
+        .comment-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .comment-text {
+            margin-top: 4px;
+            font-size: 1em;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 280px;
+            margin: 0;
+            padding: 0;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background-color: #edf3f8;
+            border-radius: 4px;
+            border: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 6px 8px 6px 40px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            height: 34px;
+        }
+
+        input[type="text"]::placeholder {
+            color: #666;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            background: #edf3f8;
+        }
+
+        /* Magnifying glass icon using search-icon class */
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .search-container {
+                max-width: 100%;
+            }
+
+            input[type="text"] {
+                font-size: 13px;
+                padding: 6px 8px 6px 36px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1020,8 +1082,8 @@
             </div>
             <div class="search-container">
                 <form th:action="@{/search}" method="get">
+                    <span class="search-icon">🔍</span>
                     <input type="text" name="query" placeholder="Search..." required />
-                    <button type="submit">Search</button>
                 </form>
             </div>
         </div>
@@ -1166,14 +1228,12 @@
                     <span th:text="${post.commentsCount + ' comments'}">0 comments</span>
                 </div>
 
-
                 <div class="post-actions-bar">
                     <button class="action-btn" th:onclick="'reactToPost(' + ${post.postId} + ', \'LIKE\')'">
                         <span class="action-icon">👍</span>
                         <span>Like</span>
                     </button>
                     <button class="comment-btn" th:attr="data-post-id=${post.postId}">💬 Comment</button>
-
                 </div>
 
                 <div th:id="'comment-section-' + ${post.postId}" class="comment-section hidden">
@@ -1184,7 +1244,6 @@
                         <button type="submit">Post</button>
                     </form>
                 </div>
-
             </div>
         </div>
 
@@ -1298,7 +1357,6 @@
         .then(response => response.text())
         .then(data => {
             console.log('Reaction updated:', data);
-            // Optionally refresh the page or update the UI
             location.reload();
         })
         .catch(error => {
