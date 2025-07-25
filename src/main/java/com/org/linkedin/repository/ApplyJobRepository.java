@@ -14,6 +14,7 @@ import java.util.Set;
 @Repository
 public interface ApplyJobRepository extends JpaRepository<ApplyJob, Long> {
     Page<ApplyJob> findByUserUserId(Long userId, Pageable pageable);
-    Set<Long> findAppliedJobIdsByUserUserId(Long userId);
+    @Query("SELECT a.job.id FROM ApplyJob a WHERE a.user.userId = :userId")
+    Set<Long> findAppliedJobIdsByUserUserId(@Param("userId") Long userId);
     Long countByJobId(Long jobId);
 }

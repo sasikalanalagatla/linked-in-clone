@@ -170,6 +170,82 @@
             margin: 0 12px;
         }
 
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            z-index: 1001;
+            top: 100%;
+            margin-top: 0px;
+            border: 1px solid #00000017;
+            overflow: hidden;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        .dropdown .nav-item {
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Bridge to prevent dropdown from closing */
+        .dropdown::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #000000e6;
+            font-size: 14px;
+            font-weight: 400;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f3f2ef;
+        }
+
+        .dropdown-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            fill: currentColor;
+        }
+
+        .dropdown-arrow {
+            margin-left: 4px;
+            transition: transform 0.2s;
+        }
+
+        .dropdown:hover .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
         .container {
             max-width: 1128px;
             margin: 0 auto;
@@ -367,31 +443,34 @@
                 <div class="profile-pic"></div>
                 Me
             </a>
-            <a th:href="@{/job/add}" class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
-                    </svg>
-                </div>
-                Add Jobs
-            </a>
             <div class="work-divider"></div>
-            <a href="#" class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+            <div class="dropdown">
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+                        </svg>
+                    </div>
+                    Work
+                    <svg class="dropdown-arrow" width="8" height="5" viewBox="0 0 8 5" fill="currentColor">
+                        <path d="M0 0l4 4 4-4H0z"/>
                     </svg>
+                </a>
+                <div class="dropdown-content">
+                    <a th:href="@{/job/add}" class="dropdown-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+                        </svg>
+                        Add Jobs
+                    </a>
+                    <a th:href="@{/company/add}" class="dropdown-item">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                        Add Company
+                    </a>
                 </div>
-                Work
-            </a>
-            <a th:href="@{/company/add}" class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
-                    </svg>
-                </div>
-                Add Company
-            </a>
+            </div>
         </div>
     </div>
 </div>
@@ -401,10 +480,10 @@
     <div class="company-panel">
         <h2 th:text="${company.name}">Company Name</h2>
         <div class="company-logo" th:text="${company.name != null and company.name.length() > 0} ? ${company.name.substring(0,1).toUpperCase()} : 'C'">C</div>        <div class="company-info">
-            <p th:if="${company.description}" th:text="${company.description}">No description available</p>
-            <p th:if="${company.location}"><strong>Location:</strong> <span th:text="${company.location}">Not specified</span></p>
-            <p th:if="${company.website}"><strong>Website:</strong> <a th:href="${company.website}" th:text="${company.website}" target="_blank">Not specified</a></p>
-        </div>
+        <p th:if="${company.description}" th:text="${company.description}">No description available</p>
+        <p th:if="${company.location}"><strong>Location:</strong> <span th:text="${company.location}">Not specified</span></p>
+        <p th:if="${company.website}"><strong>Website:</strong> <a th:href="${company.website}" th:text="${company.website}" target="_blank">Not specified</a></p>
+    </div>
         <div th:if="${loggedInUser != null and company.user != null and loggedInUser.userId == company.user.userId}" style="margin-top: 16px;">
             <a th:href="@{'/company/edit/' + ${company.id}}" class="apply-button" style="margin-right: 12px;">Edit Company</a>
             <form th:action="@{'/company/delete/' + ${company.id}}" method="post" style="display:inline;">
@@ -417,9 +496,9 @@
         <div th:if="${jobs != null and !jobs.isEmpty()}">
             <div th:each="job : ${jobs}" class="job-item">
                 <div class="job-info">
-                    <div class="job-title" th:text="${job.title}">Job Title</div>
+                    <div class="job-title" th:text="${job.jobTitle}">Job Title</div>
                     <div class="job-details">
-                        <span th:text="${job.location != null ? job.location : 'Location not specified'}">Location</span> |
+                        <span th:text="${job.jobLocation != null ? job.jobLocation : 'Location not specified'}">Location</span> |
                         <span th:text="${job.applicationsCount} + ' applications'">0 applications</span>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
@@ -36,4 +37,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     Page<Job> findByUserUserId(Long userId, Pageable pageable);
 
     List<Job> findByCompanyId(Long companyId);
+
+    @Query("SELECT j FROM Job j LEFT JOIN FETCH j.applyJobList aj LEFT JOIN FETCH aj.user WHERE j.id = :id")
+    Optional<Job> findByIdWithApplicants(@Param("id") Long id);
 }

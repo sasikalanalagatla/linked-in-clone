@@ -35,6 +35,9 @@ public class Job {
     @Column
     private String experienceLevel;
 
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ApplyJob> applyJobList = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -186,5 +189,13 @@ public class Job {
 
     public void setApplicationsCount(Long applicationsCount) {
         this.applicationsCount = applicationsCount;
+    }
+
+    public List<ApplyJob> getApplyJobList() {
+        return applyJobList;
+    }
+
+    public void setApplyJobList(List<ApplyJob> applyJobList) {
+        this.applyJobList = applyJobList;
     }
 }

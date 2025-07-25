@@ -318,11 +318,13 @@
 
 <div class="container">
     <div class="job-header">
-        <div class="company-logo-large" th:text="${job.company.substring(0,1).toUpperCase()}">C</div>
+        <div class="company-logo-large">
+            <span th:text="${job.company.name.substring(0,1).toUpperCase()}">C</span>
+        </div>
         <div class="job-details-info">
             <h1 th:text="${job.jobTitle}">Software Engineer</h1>
             <div class="job-meta">
-                <div th:text="${job.company}">Company</div>
+                <div th:text="${job.company.name}">Company</div>
                 <div th:text="${job.jobLocation}">Location</div>
                 <div th:text="${#temporals.format(job.jobCreatedAt, 'dd MMM yyyy')}">Created At</div>
             </div>
@@ -335,10 +337,10 @@
     </div>
 
     <div class="applicant-section"
-         th:if="${loggedInUser != null and job.user != null and loggedInUser.userId == job.user.userId}">
+         th:if="${loggedInUser != null and job?.user?.userId == loggedInUser.userId}">
         <h3>Applicants</h3>
 
-        <table class="applicant-table" th:if="${job.applyJobList != null and !job.applyJobList.isEmpty()}">
+        <table class="applicant-table" th:if="${not #lists.isEmpty(job?.applyJobList ?: {})}">
             <thead>
             <tr>
                 <th>Name</th>
@@ -349,21 +351,22 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="applicant : ${job.applyJobList}">
-                <td th:text="${applicant.userName}">Name</td>
-                <td th:text="${applicant.email}">Email</td>
-                <td th:text="${applicant.mobileNumber}">Mobile</td>
-                <td><a th:href="@{${applicant.resumeUrl}}" target="_blank">View</a></td>
+            <tr th:each="applicant : ${job?.applyJobList}" th:if="${applicant != null}">
+                <td th:text="${applicant.user != null ? applicant.user.fullName : 'N/A'}">Name</td>
+                <td th:text="${applicant.user != null ? applicant.user.email : 'N/A'}">Email</td>
+                <td th:text="${applicant.user != null ? applicant.user.phoneNumber : 'N/A'}">Mobile</td>
+                <td>
+                    <a th:href="${applicant?.resumeUrl ?: '#'}" target="_blank">View</a>                </td>
                 <td>
                     <ul style="padding-left: 16px; margin: 0;">
-                        <li th:each="ans : ${applicant.additionalQuestionAnswers}" th:text="${ans}">Answer</li>
+                        <li th:each="ans : ${applicant?.additionalQuestionAnswers ?: {}}"
+                            th:text="${ans ?: 'N/A'}">Answer</li>
                     </ul>
                 </td>
             </tr>
             </tbody>
         </table>
-
-        <p class="empty-message" th:if="${job.applyJobList == null or job.applyJobList.isEmpty()}">
+        <p class="empty-message" th:if="${#lists.isEmpty(job?.applyJobList ?: {})}">
             No applicants have applied for this job yet.
         </p>
     </div>

@@ -185,6 +185,11 @@ public class JobController {
         try {
             logger.info("Accessing /job/get/{}", jobId);
             Job job = jobServiceImpl.getJobById(jobId);
+
+            if (job.getApplyJobList() == null) {
+                job.setApplyJobList(new ArrayList<>());
+            }
+
             model.addAttribute("job", job);
 
             if (principal != null) {

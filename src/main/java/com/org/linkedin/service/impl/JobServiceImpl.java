@@ -43,11 +43,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Job getJobById(Long jobId) {
-        if (jobId == null) {
-            throw new CustomException("JOB_ID_NULL", "Job ID cannot be null");
-        }
-        return jobRepository.findById(jobId)
-                .orElseThrow(() -> new CustomException("JOB_NOT_FOUND", "Job not found with ID: " + jobId));
+        return jobRepository.findByIdWithApplicants(jobId)
+                .orElseThrow(() -> new CustomException("JOB_NOT_FOUND", "Job not found with id: " + jobId));
     }
 
     @Override

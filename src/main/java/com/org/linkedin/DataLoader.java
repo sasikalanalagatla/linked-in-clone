@@ -1,4 +1,3 @@
-/*
 package com.org.linkedin;
 
 import com.org.linkedin.model.Post;
@@ -63,4 +62,3 @@ public class DataLoader implements CommandLineRunner {
         System.out.println("✅ " + postCount + " dummy posts inserted!");
     }
 }
-*/
