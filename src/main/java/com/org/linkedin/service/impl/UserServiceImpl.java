@@ -76,4 +76,9 @@ public class UserServiceImpl implements UserService {
         List<User> following = user.getFollowing();
         return following != null ? following : new ArrayList<>();
     }
+
+    @Override
+    public List<User> searchByName(String query) {
+        return userRepository.findByFullNameContainingIgnoreCase(query);
+    }
 }

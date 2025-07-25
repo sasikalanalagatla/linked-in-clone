@@ -9,4 +9,5 @@ public interface UserService {
     void updateUser(User updatedUser);
     List<User> getFollowers(User user);
     List<User> getFollowing(User user);
+    public List<User> searchByName(String query);
     }

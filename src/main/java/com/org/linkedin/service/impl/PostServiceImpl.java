@@ -27,4 +27,9 @@ public class PostServiceImpl implements PostService {
         }
         return postRepository.findAll(pageable);
     }
+
+    @Override
+    public List<Post> searchByContent(String query) {
+        return postRepository.findByPostDescriptionContainingIgnoreCase(query);
+    }
 }

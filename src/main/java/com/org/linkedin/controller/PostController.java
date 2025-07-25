@@ -8,6 +8,7 @@ import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ConnectionRequestService;
 import com.org.linkedin.service.PostService;
 import com.org.linkedin.service.ReactionService;
+import com.org.linkedin.service.UserService;
 import com.org.linkedin.service.impl.CloudinaryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,16 +32,18 @@ public class PostController {
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
     private final PostService postService;
+    private final UserService userService;
 
     public PostController(PostRepository postRepository, UserRepository userRepository,
                           ReactionService reactionService, CloudinaryService cloudinaryService,
-                          ConnectionRequestService connectionRequestService, PostService postService) {
+                          ConnectionRequestService connectionRequestService, PostService postService, UserService userService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.reactionService = reactionService;
         this.cloudinaryService = cloudinaryService;
         this.connectionRequestService = connectionRequestService;
         this.postService = postService;
+        this.userService = userService;
     }
 
     @GetMapping("/post/create")
@@ -220,4 +223,22 @@ public class PostController {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found"));
     }
+
+    @GetMapping("/search")
+    public String search(
+            @RequestParam("query") String query,
+            @RequestParam(value = "filter", defaultValue = "all") String filter,
+            Model model
+    ) {
+        List<User> peopleResults = filter.equals("posts") ? List.of() : userService.searchByName(query);
+        List<Post> postResults = filter.equals("people") ? List.of() : postService.searchByContent(query);
+
+        model.addAttribute("query", query);
+        model.addAttribute("filter", filter);
+        model.addAttribute("peopleResults", peopleResults);
+        model.addAttribute("postResults", postResults);
+
+        return "search";
+    }
+
 }
