@@ -15,7 +15,6 @@ public class CallNotificationMessage {
         this.senderName = senderName;
     }
 
-    // Getters and Setters
     public String getType() {
         return type;
     }

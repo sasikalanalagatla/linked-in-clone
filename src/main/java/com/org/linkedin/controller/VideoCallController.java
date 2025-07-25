@@ -39,69 +39,58 @@ public class VideoCallController {
     public void handleVideoSignal(VideoSignalMessage message) {
         System.out.println("Received video signal: " + message.getType() + " from " + message.getSenderId() + " to " + message.getReceiverId());
 
-        Optional<User> user = userRepository.findById(Long.parseLong(message.getSenderId()));
-        User sender = user.get();
-        if (sender != null) {
-            message.setSenderName(sender.getFullName());
+        // Get sender details
+        Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
+        if (senderOptional.isPresent()) {
+            message.setSenderName(senderOptional.get().getFullName());
         }
 
-        // Send video signal to the specific user
-        messagingTemplate.convertAndSendToUser(
-                message.getReceiverId(),
-                "/queue/video",
-                message
-        );
-
-        System.out.println("Video signal sent to user: " + message.getReceiverId());
+        // Only send offer/answer/candidate if it's not a call initiation request
+        if (!"call_request".equals(message.getType())) {
+            messagingTemplate.convertAndSendToUser(
+                    message.getReceiverId(),
+                    "/queue/video",
+                    message
+            );
+        }
     }
 
     @MessageMapping("/call.notify")
     public void handleCallNotification(CallNotificationMessage message) {
         System.out.println("Received call notification: " + message.getType() + " from " + message.getSenderId() + " to " + message.getReceiverId());
 
+        Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
+        Optional<User> receiverOptional = userRepository.findById(Long.parseLong(message.getReceiverId()));
 
-
-        Optional<User> user = userRepository.findById(Long.parseLong(message.getSenderId()));
-        User sender = user.get();
-
-        Optional<User> optionalUser = userRepository.findById(Long.parseLong(message.getSenderId()));
-        User receiver = optionalUser.get();
-
-        if (sender != null && receiver != null) {
-            System.out.println("Sender: " + sender.getFullName() + ", Receiver: " + receiver.getFullName());
+        if (senderOptional.isPresent() && receiverOptional.isPresent()) {
+            User sender = senderOptional.get();
+            User receiver = receiverOptional.get();
 
             message.setSenderName(sender.getFullName());
 
-            // Create and save a chat message for the video call request
-            ChatMessage callMessage = new ChatMessage();
-            callMessage.setSender(sender);
-            callMessage.setReceiver(receiver);
-            callMessage.setSenderEmail(sender.getEmail());
-            callMessage.setReceiverEmail(receiver.getEmail());
-            callMessage.setContent("📹 Video call request");
-            callMessage.setType("video_call_request");
-            callMessage.setTimestamp(LocalDateTime.now());
-
-            // Save to database
-            chatService.saveMessage(callMessage);
-            System.out.println("Video call message saved to database");
-
-            // Send real-time notification to receiver via regular message channel
-            messagingTemplate.convertAndSend("/topic/messages/" + receiver.getEmail(), callMessage);
-            System.out.println("Call message sent to topic: /topic/messages/" + receiver.getEmail());
-
-            // Also send direct call notification
+            // Send call notification to receiver
             messagingTemplate.convertAndSendToUser(
                     message.getReceiverId(),
                     "/queue/call",
                     message
             );
-            System.out.println("Direct call notification sent to user: " + message.getReceiverId());
-        } else {
-            System.out.println("Error: Could not find sender or receiver");
-            if (sender == null) System.out.println("Sender not found for ID: " + message.getSenderId());
-            if (receiver == null) System.out.println("Receiver not found for ID: " + message.getReceiverId());
+
+            // Only create chat message for initial call request
+            if ("call_request".equals(message.getType())) {
+                ChatMessage callMessage = new ChatMessage();
+                callMessage.setSender(sender);
+                callMessage.setReceiver(receiver);
+                callMessage.setSenderEmail(sender.getEmail());
+                callMessage.setReceiverEmail(receiver.getEmail());
+                callMessage.setContent("📹 Video call request");
+                callMessage.setType("video_call_request");
+                callMessage.setTimestamp(LocalDateTime.now());
+                chatService.saveMessage(callMessage);
+
+                messagingTemplate.convertAndSend("/topic/messages/" + receiver.getEmail(), callMessage);
+            }
         }
+    
     }
 
     @GetMapping("/video-call/{receiverId}")
