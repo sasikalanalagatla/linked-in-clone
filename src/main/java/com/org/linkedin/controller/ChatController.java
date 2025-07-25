@@ -56,7 +56,7 @@ public class ChatController {
             List<User> connections = connectionRequest.getConnections(loggedInUser);
             model.addAttribute("connections", connections != null ? connections : new ArrayList<>());
             model.addAttribute("senderEmail", senderEmail);
-            model.addAttribute("sender", loggedInUser); // Add sender User object
+            model.addAttribute("sender", loggedInUser);
 
             if (receiverEmail != null && !receiverEmail.trim().isEmpty()) {
                 model.addAttribute("receiverEmail", receiverEmail);
