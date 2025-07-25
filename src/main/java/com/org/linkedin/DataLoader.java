@@ -62,4 +62,5 @@ public class DataLoader implements CommandLineRunner {
 
         System.out.println("✅ " + postCount + " dummy posts inserted!");
     }
-}*/
+}
+*/

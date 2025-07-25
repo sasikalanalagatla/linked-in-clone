@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add Job</title>
+    <title>Add Job | LinkedIn Clone</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,7 +26,7 @@
             margin-top: 10px;
             display: block;
         }
-        input[type="text"], input[type="email"], textarea, select, input[type="datetime-local"] {
+        input[type="text"], input[type="email"], textarea, select {
             width: 100%;
             padding: 10px;
             margin-top: 6px;
@@ -60,21 +60,33 @@
         .question-box input[type="text"] {
             margin-bottom: 0;
         }
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Enter Your Job Details</h2>
+    <div th:if="${error != null}" class="error-message" th:text="${error}"></div>
     <form th:action="@{/job/create}" th:object="${job}" method="post">
-
         <label for="jobTitle">Job Title</label>
         <input type="text" id="jobTitle" th:field="*{jobTitle}" placeholder="e.g. Java Developer" required>
 
-        <label for="company">Company Name</label>
-        <input type="text" id="company" th:field="*{company}" placeholder="e.g. Infosys" required>
+        <label for="company">Company</label>
+        <select id="company" th:field="*{company.id}" required>
+            <option value="" disabled selected>Select a company</option>
+            <option th:if="${companies != null and not #lists.isEmpty(companies)}"
+                    th:each="company : ${companies}"
+                    th:value="${company.id}"
+                    th:text="${company.name != null} ? ${company.name} : 'Unnamed Company'">Company</option>
+            <option th:if="${companies == null or #lists.isEmpty(companies)}" value="" disabled>No companies available</option>
+        </select>
 
         <label for="jobLocation">Location</label>
-        <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India">
+        <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India" required>
 
         <label for="jobTypes">Job Type</label>
         <select id="jobTypes" th:field="*{jobTypes}" required>
@@ -93,15 +105,23 @@
         <label for="recruiterEmail">Recruiter Email</label>
         <input type="email" id="recruiterEmail" th:field="*{recruiterEmail}" placeholder="e.g. hr@company.com">
 
+        <label for="experienceLevel">Experience Level</label>
+        <input type="text" id="experienceLevel" th:field="*{experienceLevel}" placeholder="e.g. Mid-Senior level" required>
+
         <label for="jobDescription">Job Description</label>
         <textarea id="jobDescription" th:field="*{jobDescription}" rows="8"
-                  placeholder="Describe the responsibilities, qualifications, etc."></textarea>
+                  placeholder="Describe the responsibilities, qualifications, etc." required></textarea>
 
         <label>Additional Questions</label>
-        <div th:each="q, stat : *{additionalQuestions}" class="question-box">
-            <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
-            <input type="text" th:field="*{additionalQuestions[__${stat.index}__].questionText}"
-                   placeholder="Enter a question">
+        <div id="questions-container">
+            <div th:if="${#lists.isEmpty(job.additionalQuestions)}">
+                <p>No questions added yet.</p>
+            </div>
+            <div th:each="q, stat : *{additionalQuestions}" class="question-box">
+                <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
+                <input type="text" th:field="*{additionalQuestions[__${stat.index}__].question}"
+                       placeholder="Enter a question">
+            </div>
         </div>
 
         <button type="submit" name="addQuestion">Add Question</button>

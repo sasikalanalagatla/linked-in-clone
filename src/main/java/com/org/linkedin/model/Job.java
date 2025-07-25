@@ -3,17 +3,15 @@ package com.org.linkedin.model;
 import com.org.linkedin.enums.JobType;
 import com.org.linkedin.enums.WorkPlaceType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Job {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,44 +19,54 @@ public class Job {
     @Column(nullable = false)
     private String jobTitle;
 
-    @Column(nullable = false)
-    private String company;
-
     @Column(columnDefinition = "TEXT")
     private String jobDescription;
 
     private String jobLocation;
 
     @Enumerated(EnumType.STRING)
-    private WorkPlaceType jobWorkPlaceTypes;
-
-    @Enumerated(EnumType.STRING)
     private JobType jobTypes;
 
-    @CreationTimestamp
-    private LocalDateTime jobCreatedAt;
+    @Enumerated(EnumType.STRING)
+    private WorkPlaceType jobWorkPlaceTypes;
 
     private String recruiterEmail;
 
-    private boolean isJobPostEdited;
-
-    private Long applicationsCount;
-
+    @Column
     private String experienceLevel;
 
-    private Long companyId;
-
-    @ManyToMany
-    private List<Skill> requiredSkills;
-
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    @Column(updatable = false)
+    private LocalDateTime jobCreatedAt;
+
+    @Column
+    private boolean jobPostEdited;
+
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AdditionalQuestion> additionalQuestions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ApplyJob> applyJobList = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "job_skill",
+            joinColumns = @JoinColumn(name = "job_id"),
+            inverseJoinColumns = @JoinColumn(name = "skill_id")
+    )
+    private Set<Skill> requiredSkills;
+
+    @Transient
+    private Long applicationsCount;
+
+    @PrePersist
+    protected void onCreate() {
+        this.jobCreatedAt = LocalDateTime.now();
+    }
 
     public Long getId() {
         return id;
@@ -74,14 +82,6 @@ public class Job {
 
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
     }
 
     public String getJobDescription() {
@@ -100,14 +100,6 @@ public class Job {
         this.jobLocation = jobLocation;
     }
 
-    public WorkPlaceType getJobWorkPlaceTypes() {
-        return jobWorkPlaceTypes;
-    }
-
-    public void setJobWorkPlaceTypes(WorkPlaceType jobWorkPlaceTypes) {
-        this.jobWorkPlaceTypes = jobWorkPlaceTypes;
-    }
-
     public JobType getJobTypes() {
         return jobTypes;
     }
@@ -116,12 +108,12 @@ public class Job {
         this.jobTypes = jobTypes;
     }
 
-    public LocalDateTime getJobCreatedAt() {
-        return jobCreatedAt;
+    public WorkPlaceType getJobWorkPlaceTypes() {
+        return jobWorkPlaceTypes;
     }
 
-    public void setJobCreatedAt(LocalDateTime jobCreatedAt) {
-        this.jobCreatedAt = jobCreatedAt;
+    public void setJobWorkPlaceTypes(WorkPlaceType jobWorkPlaceTypes) {
+        this.jobWorkPlaceTypes = jobWorkPlaceTypes;
     }
 
     public String getRecruiterEmail() {
@@ -132,44 +124,12 @@ public class Job {
         this.recruiterEmail = recruiterEmail;
     }
 
-    public boolean isJobPostEdited() {
-        return isJobPostEdited;
-    }
-
-    public void setJobPostEdited(boolean jobPostEdited) {
-        isJobPostEdited = jobPostEdited;
-    }
-
-    public Long getApplicationsCount() {
-        return applicationsCount;
-    }
-
-    public void setApplicationsCount(Long applicationsCount) {
-        this.applicationsCount = applicationsCount;
-    }
-
     public String getExperienceLevel() {
         return experienceLevel;
     }
 
     public void setExperienceLevel(String experienceLevel) {
         this.experienceLevel = experienceLevel;
-    }
-
-    public Long getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Long companyId) {
-        this.companyId = companyId;
-    }
-
-    public List<Skill> getRequiredSkills() {
-        return requiredSkills;
-    }
-
-    public void setRequiredSkills(List<Skill> requiredSkills) {
-        this.requiredSkills = requiredSkills;
     }
 
     public User getUser() {
@@ -180,6 +140,30 @@ public class Job {
         this.user = user;
     }
 
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+
+    public LocalDateTime getJobCreatedAt() {
+        return jobCreatedAt;
+    }
+
+    public void setJobCreatedAt(LocalDateTime jobCreatedAt) {
+        this.jobCreatedAt = jobCreatedAt;
+    }
+
+    public boolean isJobPostEdited() {
+        return jobPostEdited;
+    }
+
+    public void setJobPostEdited(boolean jobPostEdited) {
+        this.jobPostEdited = jobPostEdited;
+    }
+
     public List<AdditionalQuestion> getAdditionalQuestions() {
         return additionalQuestions;
     }
@@ -188,11 +172,19 @@ public class Job {
         this.additionalQuestions = additionalQuestions;
     }
 
-    public List<ApplyJob> getApplyJobList() {
-        return applyJobList;
+    public Set<Skill> getRequiredSkills() {
+        return requiredSkills;
     }
 
-    public void setApplyJobList(List<ApplyJob> applyJobList) {
-        this.applyJobList = applyJobList;
+    public void setRequiredSkills(Set<Skill> requiredSkills) {
+        this.requiredSkills = requiredSkills;
+    }
+
+    public Long getApplicationsCount() {
+        return applicationsCount;
+    }
+
+    public void setApplicationsCount(Long applicationsCount) {
+        this.applicationsCount = applicationsCount;
     }
 }

@@ -205,10 +205,9 @@
             border-radius: 50%;
             border: 2px solid white;
             position: absolute;
-            top: 18px;
-            left: 50%;
+            top: 59px;
+            left: 60%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             object-fit: cover;
         }
 
@@ -243,6 +242,15 @@
             font-size: 12px;
             margin-bottom: 8px;
             color: #666;
+        }
+
+        .stat-item a {
+            color: #0a66c2;
+            text-decoration: none;
+        }
+
+        .stat-item a:hover {
+            text-decoration: underline;
         }
 
         .stat-item:last-child {
@@ -308,7 +316,6 @@
             height: 48px;
             border-radius: 50%;
             margin-right: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -873,7 +880,6 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin-right: 8px;
             color: white;
             display: flex;
@@ -1152,19 +1158,25 @@
 <div class="container">
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="profile-pic-large">
-                <img th:src="${user.profilePictureUrl}" alt="Profile Picture"
-                     style="width:70px; height:70px; border-radius: 50%;">
+            <div class="profile-picture">
+                <img th:src="${user.profilePictureUrl}" alt="Profile Picture" th:if="${user.profilePictureUrl != null}" class="profile-pic-large" />
+                <span th:unless="${user.profilePictureUrl}" class="profile-pic-large">👤</span>
             </div>
         </div>
         <div class="sidebar-content">
-            <a th:href="@{'/profile/' + ${user.userId}}" th:src="${user.profilePictureUrl}" class="profile-name" th:text="${user.fullName}">John Doe</a>
+            <a th:href="@{'/profile/' + ${user.userId}}" th:text="${user.fullName}" class="profile-name">John Doe</a>
             <div class="profile-headline" th:text="${user.headline}">Software Engineer at Tech Corp</div>
         </div>
         <div class="profile-stats">
             <div class="stat-item">
                 <span>Connections</span>
                 <span th:text="${totalConnection}">500</span>
+            </div>
+            <div class="stat-item">
+                <a th:href="@{/job/posted}">Posted Jobs</a>
+            </div>
+            <div class="stat-item">
+                <a th:href="@{/job/applied}">Applied Jobs</a>
             </div>
         </div>
     </div>
@@ -1173,9 +1185,10 @@
         <div class="post-box">
             <h3>Start a post</h3>
             <div class="post-input-container">
-                <img th:src="${user.profilePictureUrl != null} ? ${user.profilePictureUrl} : @{/images/default-profile.png}"
-                     alt="Profile Picture"
-                     class="profile-pic-small" />
+                <div class="profile-picture">
+                    <img th:src="${user.profilePictureUrl}" alt="Profile Picture" th:if="${user.profilePictureUrl != null}" class="profile-pic-small" />
+                    <span th:unless="${user.profilePictureUrl}" class="profile-pic-small">👤</span>
+                </div>
                 <input type="text" class="post-input" placeholder="What do you want to talk about?"
                        onclick="openPostModal()" readonly>
             </div>
@@ -1187,8 +1200,10 @@
 
                 <div class="post-header">
                     <div class="post-author-section">
-                        <img th:src="${post.author.profilePictureUrl != null} ? ${post.author.profilePictureUrl} : @{/images/default-profile.png}"
-                             alt="Author Pic" class="post-author-pic"/>
+                        <div class="profile-picture">
+                            <img th:src="${post.author.profilePictureUrl}" alt="Author Pic" th:if="${post.author.profilePictureUrl != null}" class="post-author-pic" />
+                            <span th:unless="${post.author.profilePictureUrl}" class="post-author-pic">👤</span>
+                        </div>
                         <div class="post-author-info">
                             <a th:href="@{'/profile/' + ${post.author.userId}}" th:text="${post.author.fullName}">Author Name</a>
                             <p th:text="${'Posted on ' + #temporals.format(post.createdAt, 'dd MMM yyyy • HH:mm')}">Post date</p>

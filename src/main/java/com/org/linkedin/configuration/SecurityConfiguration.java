@@ -21,7 +21,7 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/signup", "/register", "/job/feed").permitAll()
+                        .requestMatchers("/login", "/signup", "/register", "/job/feed","/company/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

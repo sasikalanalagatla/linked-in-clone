@@ -109,10 +109,10 @@
             cursor: pointer;
             border-radius: 4px;
             transition: color 0.2s;
-            min-width: 60px; /* Reduced to allow text wrapping */
-            white-space: normal; /* Allow text to wrap */
+            min-width: 60px;
+            white-space: normal;
             text-align: center;
-            line-height: 1.2; /* Adjust line height for better wrapping */
+            line-height: 1.2;
             position: relative;
         }
 
@@ -538,7 +538,7 @@
             <div class="search-container">
                 <form th:action="@{/job/feed}" method="get" style="position: relative;">
                     <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 1 1 11 0z"/>
                     </svg>
                     <input type="text" name="keyword" class="search-input"
                            placeholder="Search jobs or skills..."
@@ -572,7 +572,7 @@
                 </div>
                 Jobs
             </a>
-            <a href="#" th:href="@{/chat}"class="nav-item">
+            <a href="#" th:href="@{/chat}" class="nav-item">
                 <div class="nav-icon">
                     <svg viewBox="0 0 24 24">
                         <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
@@ -588,7 +588,9 @@
                 </div>
                 Notifications
             </a>
-            <a th:href="@{'/profile/' + ${loggedInUser.userId}}" class="nav-item profile-nav">
+            <a th:if="${loggedInUser != null}"
+               th:href="@{'/profile/' + ${loggedInUser.userId}}"
+               class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
             </a>
@@ -616,15 +618,13 @@
 <div class="container">
     <div class="left-panel">
         <div class="job-filters">
-            <a th:href="@{/job/feed(range='past 24 hours', keyword=${keyword},page =0)}"
+            <a th:href="@{/job/feed(range='past 24 hours', keyword=${keyword}, page=0)}"
                th:classappend="${range == 'past 24 hours'} ? 'active' : ''"
                class="filter-pill">Past 24 Hours</a>
-
-            <a th:href="@{/job/feed(range='past 7 days', keyword=${keyword}, page = 0)}"
+            <a th:href="@{/job/feed(range='past 7 days', keyword=${keyword}, page=0)}"
                th:classappend="${range == 'past 7 days'} ? 'active' : ''"
                class="filter-pill">Past 7 Days</a>
-
-            <a th:href="@{/job/feed(range='past 30 days', keyword=${keyword}, page = 0)}"
+            <a th:href="@{/job/feed(range='past 30 days', keyword=${keyword}, page=0)}"
                th:classappend="${range == 'past 30 days'} ? 'active' : ''"
                class="filter-pill">Past 30 Days</a>
         </div>
@@ -634,12 +634,12 @@
                th:href="@{/job/feed(jobId=${job.id}, page=${currentPage}, keyword=${param.keyword})}"
                class="job-item"
                th:classappend="${selectedJob != null and selectedJob.id == job.id} ? 'active' : ''">
-
                 <div class="job-header">
-                    <div class="company-logo" th:text="${job.company.substring(0,1).toUpperCase()}">M</div>
+                    <div class="company-logo"
+                         th:text="${job.company != null and job.company.name != null and !job.company.name.isEmpty()} ? ${job.company.name.substring(0,1).toUpperCase()} : 'N/A'">N/A</div>
                     <div class="job-info">
-                        <div class="job-title" th:text="${job.jobTitle}"> </div>
-                        <div class="company-name" th:text="${job.company}">Microsoft</div>
+                        <div class="job-title" th:text="${job.jobTitle}"></div>
+                        <div class="company-name" th:text="${job.company != null and job.company.name != null} ? ${job.company.name} : 'Unknown Company'">Unknown Company</div>
                         <div class="job-location" th:text="${job.jobLocation}">Sikkim, India (Hybrid)</div>
                         <div class="job-meta">
                             <span th:text="${#temporals.format(job.jobCreatedAt, 'dd MMM yyyy')}">2 weeks ago</span>
@@ -651,11 +651,10 @@
 
         <div class="pagination-container" th:if="${jobs != null and !jobs.isEmpty() and totalPages > 1}">
             <div class="pagination">
-                <a th:href="@{/job/feed(page=${currentPage - 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
+                <a th:href="@{/job/feed(page=${currentPage - 1}, keyword=${param.keyword}, range=${range})}"
                    class="page-btn"
                    th:classappend="${currentPage == 0} ? 'disabled'"
                    th:if="${currentPage > 0}">Previous</a>
-
                 <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                           th:if="${i >= currentPage - 2 and i <= currentPage + 2}">
                     <a th:href="@{/job/feed(page=${i}, keyword=${param.keyword}, range=${range})}"
@@ -663,13 +662,11 @@
                        th:classappend="${i == currentPage} ? 'active'"
                        th:text="${i + 1}">1</a>
                 </th:block>
-
-                <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword}, timeRange=${param.timeRange})}"
+                <a th:href="@{/job/feed(page=${currentPage + 1}, keyword=${param.keyword}, range=${range})}"
                    class="page-btn"
                    th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
                    th:if="${currentPage < totalPages - 1}">Next</a>
             </div>
-
             <div class="pagination-info">
                 Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">10</span>
             </div>
@@ -678,7 +675,8 @@
 
     <div class="right-panel" th:if="${selectedJob != null}">
         <div class="job-details-header">
-            <div class="company-logo-large" th:text="${selectedJob.company.substring(0,1).toUpperCase()}">M</div>
+            <div class="company-logo-large"
+                 th:text="${selectedJob.company != null and selectedJob.company.name != null and !selectedJob.company.name.isEmpty()} ? ${selectedJob.company.name.substring(0,1).toUpperCase()} : 'N/A'">N/A</div>
             <div class="job-details-info">
                 <h1>
                     <a th:href="@{'/job/get/' + ${selectedJob.id}}"
@@ -687,7 +685,8 @@
                         Senior Software Engineer
                     </a>
                 </h1>
-                <div class="job-details-company" th:text="${selectedJob.company}">Microsoft</div>
+                <div class="job-details-company"
+                     th:text="${selectedJob.company != null and selectedJob.company.name != null} ? ${selectedJob.company.name} : 'Unknown Company'">Unknown Company</div>
                 <div class="job-details-location" th:text="${selectedJob.jobLocation}">Sikkim, India • 2 weeks ago</div>
             </div>
         </div>
@@ -700,22 +699,18 @@
                         style="background-color: #28a745; cursor: not-allowed;">
                     Applied ✓
                 </button>
-
                 <a th:if="${appliedJobIds == null or !appliedJobIds.contains(selectedJob.id)}"
                    th:href="@{'/job/apply/' + ${selectedJob.id}}"
                    class="apply-button">
                     Apply
                 </a>
             </div>
-
-
             <div th:if="${loggedInUser != null and selectedJob.user.userId == loggedInUser.userId}">
                 <a th:href="@{'/job/edit/' + ${selectedJob.id}}" class="edit-button">Edit</a>
                 <form th:action="@{'/job/delete/' + ${selectedJob.id}}" method="post" style="display:inline;">
                     <button type="submit" class="delete-button">Delete</button>
                 </form>
             </div>
-
         </div>
 
         <div class="job-insights">
@@ -735,7 +730,6 @@
             <p th:text="${selectedJob.jobDescription}">
                 We are looking for a Senior Software Engineer to join our dynamic team...
             </p>
-
             <div class="skills-container" th:if="${selectedJob.requiredSkills != null and !selectedJob.requiredSkills.isEmpty()}">
                 <h4>Skills Required</h4>
                 <div class="skills-list">

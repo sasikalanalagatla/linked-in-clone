@@ -8,10 +8,15 @@ import java.security.Principal;
 
 public interface JobService {
 
-    Job createJob(Job job, Principal principal);
-    Job getJobById(Long jobId);
-    String deleteJobById(Long jobId);
     Page<Job> getAllJobs(Pageable pageable);
-    void updateJob(Job job,Principal principal);
+
     Page<Job> searchJobs(String keyword, Pageable pageable);
+
+    Job getJobById(Long jobId);
+
+    void createJob(Job job, Principal principal);
+
+    void updateJob(Job updatedJob, Principal principal);
+
+    void deleteJob(Long jobId, Principal principal);
 }
