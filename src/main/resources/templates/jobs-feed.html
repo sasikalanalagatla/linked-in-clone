@@ -588,7 +588,7 @@
                 </div>
                 Notifications
             </a>
-            <a th:href="@{'/profile/1'}" class="nav-item profile-nav">
+            <a th:href="@{'/profile/' + ${loggedInUser.userId}}" class="nav-item profile-nav">
                 <div class="profile-pic"></div>
                 Me
             </a>

@@ -77,7 +77,7 @@ public class PostController {
         }
 
         postRepository.save(post);
-        return "redirect:/profile/" + user.getUserId();
+        return "redirect:/";
     }
 
     @GetMapping("/")
