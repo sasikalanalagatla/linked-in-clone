@@ -3,7 +3,6 @@ package com.org.linkedin.model;
 import com.org.linkedin.enums.JobType;
 import com.org.linkedin.enums.WorkPlaceType;
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -147,7 +146,7 @@ public class Job {
         return company;
     }
 
-    public void setCompany(Company company) {
+    public void setCompany(String company) {
         this.company = company;
     }
 
