@@ -112,19 +112,7 @@
         <textarea id="jobDescription" th:field="*{jobDescription}" rows="8"
                   placeholder="Describe the responsibilities, qualifications, etc." required></textarea>
 
-        <label>Additional Questions</label>
-        <div id="questions-container">
-            <div th:if="${#lists.isEmpty(job.additionalQuestions)}">
-                <p>No questions added yet.</p>
-            </div>
-            <div th:each="q, stat : *{additionalQuestions}" class="question-box">
-                <input type="hidden" th:field="*{additionalQuestions[__${stat.index}__].id}"/>
-                <input type="text" th:field="*{additionalQuestions[__${stat.index}__].question}"
-                       placeholder="Enter a question">
-            </div>
-        </div>
 
-        <button type="submit" name="addQuestion">Add Question</button>
         <button type="submit" name="submitJob">Continue</button>
     </form>
 </div>
