@@ -91,6 +91,15 @@ public class User {
     )
     private List<User> following = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_company_following",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "company_id")
+    )
+    private List<Company> followingCompanies = new ArrayList<>();
+
+    // Getters and Setters
     public Long getUserId() {
         return userId;
     }
@@ -289,5 +298,13 @@ public class User {
 
     public void setFollowing(List<User> following) {
         this.following = following;
+    }
+
+    public List<Company> getFollowingCompanies() {
+        return followingCompanies;
+    }
+
+    public void setFollowingCompanies(List<Company> followingCompanies) {
+        this.followingCompanies = followingCompanies;
     }
 }

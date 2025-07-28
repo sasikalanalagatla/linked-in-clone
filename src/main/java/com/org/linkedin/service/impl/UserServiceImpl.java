@@ -1,6 +1,7 @@
 package com.org.linkedin.service.impl;
 
 import com.org.linkedin.exception.CustomException;
+import com.org.linkedin.model.Company;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.CertificationService;
@@ -23,29 +24,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long userId) {
-        if (userId == null) {
+        if(userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found"));
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found"));
     }
 
     @Override
     public User findByEmail(String email) {
-        if (email == null || email.isEmpty()) {
+        if(email == null || email.isEmpty()) {
             throw new CustomException("INVALID_EMAIL", "Email cannot be null or empty");
         }
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with email " + email + " not found"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with email " + email + " not found"));
     }
 
     @Override
     public void updateUser(User updatedUser) {
-        if (updatedUser == null || updatedUser.getUserId() == null) {
+        if(updatedUser == null || updatedUser.getUserId() == null) {
             throw new CustomException("INVALID_USER", "User data or ID cannot be null");
         }
-        User existingUser = userRepository.findById(updatedUser.getUserId())
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + updatedUser.getUserId() + " not found"));
+        User existingUser = userRepository.findById(updatedUser.getUserId()).orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User with ID " + updatedUser.getUserId() + " not found"));
 
         existingUser.setFullName(updatedUser.getFullName());
         existingUser.setHeadline(updatedUser.getHeadline());
@@ -61,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getFollowers(User user) {
-        if (user == null) {
+        if(user == null) {
             throw new CustomException("INVALID_USER", "User cannot be null");
         }
         List<User> followers = user.getFollowers();
@@ -70,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getFollowing(User user) {
-        if (user == null) {
+        if(user == null) {
             throw new CustomException("INVALID_USER", "User cannot be null");
         }
         List<User> following = user.getFollowing();
@@ -80,5 +78,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> searchByName(String query) {
         return userRepository.findByFullNameContainingIgnoreCase(query);
+    }
+
+    @Override
+    public List<Company> getFollowingCompanies(User user) {
+
+        return user.getFollowingCompanies();
     }
 }

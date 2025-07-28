@@ -304,6 +304,56 @@
             padding: 16px 24px;
             border-bottom: 1px solid #e6e6e6;
         }
+        .pages-section {
+    padding: 24px;
+}
+
+.company-card {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #f3f2ef;
+}
+
+.company-card:last-child {
+    border-bottom: none;
+}
+
+.company-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    margin-right: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    object-fit: cover;
+}
+
+.company-info {
+    flex: 1;
+}
+
+.company-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 2px;
+}
+
+.company-industry {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.company-actions {
+    margin-left: auto;
+}
         .tabs {
             display: flex;
             gap: 32px;
@@ -484,6 +534,181 @@
             }
         }
     </style>
+    <!-- Add this CSS to your style section -->
+    <style>
+        .pages-section {
+            padding: 24px;
+        }
+
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .company-card {
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e6e6e6;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .company-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .company-header {
+            position: relative;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .company-logo-container {
+            position: absolute;
+            bottom: -20px;
+            left: 16px;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e6e6e6;
+        }
+
+        .company-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .company-logo.fallback {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .company-body {
+            padding: 32px 16px 16px;
+        }
+
+        .company-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .company-name:hover {
+            color: #0a66c2;
+            text-decoration: underline;
+        }
+
+        .company-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .company-followers {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+        }
+
+        .company-followers svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 4px;
+            fill: currentColor;
+        }
+
+        .company-industry {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .company-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-company {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid;
+            transition: all 0.2s;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-company-primary {
+            background-color: #0a66c2;
+            color: white;
+            border-color: #0a66c2;
+            margin-right: 8px;
+        }
+
+        .btn-company-primary:hover {
+            background-color: #004182;
+            border-color: #004182;
+        }
+
+        .btn-company-secondary {
+            background-color: transparent;
+            color: #666;
+            border-color: #666;
+        }
+
+        .btn-company-secondary:hover {
+            background-color: #f3f2ef;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-action {
+            color: #0a66c2;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+
 </head>
 <body>
 <div class="navbar">
@@ -599,6 +824,13 @@
             </span>
             <span class="sidebar-count" th:text="${requests != null} ? ${#lists.size(requests)} : 0"></span>
         </a>
+        <a href="#" class="sidebar-item" onclick="showPages()">
+            <span>
+                <span class="icon">🏢</span>
+                Pages
+            </span>
+            <span class="sidebar-count" th:text="${followingCompanies != null} ? ${#lists.size(followingCompanies)} : 0"></span>
+        </a>
         <a th:href="@{/profile/{id}/followers(id=${currentUserId})}" class="sidebar-item" onclick="showFollowers()">
             <span>
                 <span class="icon">👤</span>
@@ -620,6 +852,7 @@
             <div class="tabs">
                 <a href="#" class="tab active" onclick="showInvitations()">Grow</a>
                 <a href="#" class="tab" onclick="showConnections()">Connections</a>
+                <a href="#" class="tab" onclick="showPages()">Pages</a>
             </div>
         </div>
         <section id="invitations-section" class="invitations-section">
@@ -682,6 +915,35 @@
                 </div>
             </div>
         </section>
+
+        <section id="pages-section" class="pages-section" style="display: none;">
+
+            <div th:unless="${followingCompanies == null or #lists.isEmpty(followingCompanies)}" class="company-grid">
+                <div th:each="company : ${followingCompanies}" class="company-card">
+
+                    <div class="company-body">
+                        <a th:href="@{'/company/' + ${company.id}}" class="company-name" th:text="${company.name}"></a>
+
+                        <div class="company-meta">
+                            <div class="company-followers">
+                                <svg viewBox="0 0 16 16">
+                                    <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2-3a2 2 0 11-4 0 2 2 0 014 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                </svg>
+                                <span th:text="${company.followersCount} + ' followers'"></span>
+                            </div>
+                        </div>
+
+                        <div class="company-actions">
+                            <a th:href="@{'/company/' + ${company.id}}" class="btn-company btn-company-primary">View Page</a>
+                            <form th:action="@{/company/unfollow/{companyId}(companyId=${company.id})}" method="post">
+                                <button type="submit" class="btn-company btn-company-secondary">Unfollow</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 </div>
 
@@ -689,23 +951,45 @@
     function showInvitations() {
         document.getElementById('invitations-section').style.display = 'block';
         document.getElementById('connections-section').style.display = 'none';
+        document.getElementById('pages-section').style.display = 'none';
         document.querySelectorAll('.tab')[0].classList.add('active');
         document.querySelectorAll('.tab')[1].classList.remove('active');
+        document.querySelectorAll('.tab')[2].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[0].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[1].classList.add('active');
         document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[4].classList.remove('active');
     }
 
     function showConnections() {
         document.getElementById('invitations-section').style.display = 'none';
         document.getElementById('connections-section').style.display = 'block';
+        document.getElementById('pages-section').style.display = 'none';
         document.querySelectorAll('.tab')[0].classList.remove('active');
         document.querySelectorAll('.tab')[1].classList.add('active');
+        document.querySelectorAll('.tab')[2].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[0].classList.add('active');
         document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[4].classList.remove('active');
+    }
+
+    function showPages() {
+        document.getElementById('invitations-section').style.display = 'none';
+        document.getElementById('connections-section').style.display = 'none';
+        document.getElementById('pages-section').style.display = 'block';
+
+        document.querySelectorAll('.tab')[0].classList.remove('active');
+        document.querySelectorAll('.tab')[1].classList.remove('active');
+        document.querySelectorAll('.tab')[2].classList.add('active');
+
+        document.querySelectorAll('.sidebar-item')[0].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[2].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[4].classList.remove('active');
     }
 
     function showFollowers() {
@@ -713,6 +997,7 @@
         document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[2].classList.add('active');
         document.querySelectorAll('.sidebar-item')[3].classList.remove('active');
+        document.querySelectorAll('.sidebar-item')[4].classList.remove('active');
     }
 
     function showFollowing() {
@@ -720,6 +1005,7 @@
         document.querySelectorAll('.sidebar-item')[1].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[2].classList.remove('active');
         document.querySelectorAll('.sidebar-item')[3].classList.add('active');
+        document.querySelectorAll('.sidebar-item')[4].classList.remove('active');
     }
 </script>
 </body>

@@ -72,7 +72,7 @@ public class ProfileController {
             throw new CustomException("INVALID_USER", "User data or ID cannot be null");
         }
         if (profileImage != null && !profileImage.isEmpty()) {
-            String imageUrl = cloudinaryService.uploadFile(profileImage);
+            String imageUrl = cloudinaryService.uploadMedia(profileImage);
             updatedUser.setProfilePictureUrl(imageUrl);
         }
 

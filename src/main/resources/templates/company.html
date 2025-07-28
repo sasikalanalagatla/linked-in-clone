@@ -479,16 +479,37 @@
     <div th:if="${error != null}" class="error-message" th:text="${error}"></div>
     <div class="company-panel">
         <h2 th:text="${company.name}">Company Name</h2>
-        <div class="company-logo" th:text="${company.name != null and company.name.length() > 0} ? ${company.name.substring(0,1).toUpperCase()} : 'C'">C</div>        <div class="company-info">
-        <p th:if="${company.description}" th:text="${company.description}">No description available</p>
-        <p th:if="${company.location}"><strong>Location:</strong> <span th:text="${company.location}">Not specified</span></p>
-        <p th:if="${company.website}"><strong>Website:</strong> <a th:href="${company.website}" th:text="${company.website}" target="_blank">Not specified</a></p>
-    </div>
-        <div th:if="${loggedInUser != null and company.user != null and loggedInUser.userId == company.user.userId}" style="margin-top: 16px;">
-            <a th:href="@{'/company/edit/' + ${company.id}}" class="apply-button" style="margin-right: 12px;">Edit Company</a>
-            <form th:action="@{'/company/delete/' + ${company.id}}" method="post" style="display:inline;">
-                <button type="submit" class="apply-button" style="background-color: #d32f2f;">Delete Company</button>
+        <div class="company-logo" th:text="${company.name != null and company.name.length() > 0} ? ${company.name.substring(0,1).toUpperCase()} : 'C'">C</div>
+        <div class="company-info">
+            <p th:if="${company.description}" th:text="${company.description}">No description available</p>
+            <p th:if="${company.location}"><strong>Location:</strong> <span th:text="${company.location}">Not specified</span></p>
+            <p th:if="${company.website}"><strong>Website:</strong> <a th:href="${company.website}" th:text="${company.website}" target="_blank">Not specified</a></p>
+        </div>
+
+        <!-- Add Follow Button Here -->
+        <div style="margin-top: 16px; display: flex; gap: 12px;">
+            <form th:if="${loggedInUser != null and !isFollowing}"
+                  th:action="@{'/company/follow/' + ${company.id}}" method="post"
+                  style="display: inline;">
+                <button type="submit" class="apply-button" style="background-color: #0a66c2;">
+                    Follow
+                </button>
             </form>
+
+            <form th:if="${loggedInUser != null and isFollowing}"
+                  th:action="@{'/company/unfollow/' + ${company.id}}" method="post"
+                  style="display: inline;">
+                <button type="submit" class="apply-button" style="background-color: #666;">
+                    Following
+                </button>
+            </form>
+
+            <div th:if="${loggedInUser != null and company.user != null and loggedInUser.userId == company.user.userId}">
+                <a th:href="@{'/company/edit/' + ${company.id}}" class="apply-button">Edit Company</a>
+                <form th:action="@{'/company/delete/' + ${company.id}}" method="post" style="display:inline;">
+                    <button type="submit" class="apply-button" style="background-color: #d32f2f;">Delete Company</button>
+                </form>
+            </div>
         </div>
     </div>
     <div class="jobs-section">

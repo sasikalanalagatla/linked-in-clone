@@ -34,9 +34,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
 
-    public PostController(PostRepository postRepository, UserRepository userRepository,
-                          ReactionService reactionService, CloudinaryService cloudinaryService,
-                          ConnectionRequestService connectionRequestService, PostService postService, UserService userService) {
+    public PostController(PostRepository postRepository, UserRepository userRepository, ReactionService reactionService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService, PostService postService, UserService userService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.reactionService = reactionService;
@@ -57,9 +55,7 @@ public class PostController {
     }
 
     @PostMapping("/post/create")
-    public String createPost(@ModelAttribute("post") Post post,
-                             @RequestParam("imageFile") MultipartFile imageFile,
-                             Principal principal) {
+    public String createPost(@ModelAttribute("post") Post post, @RequestParam("mediaFile") MultipartFile mediaFile, Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
@@ -67,11 +63,11 @@ public class PostController {
         post.setAuthorName(user.getFullName());
         post.setTotalReactions(0);
 
-        if (imageFile != null && !imageFile.isEmpty()) {
+        if(mediaFile != null && !mediaFile.isEmpty()) {
             try {
-                String imageUrl = cloudinaryService.uploadFile(imageFile);
-                post.setImageUrl(imageUrl);
-            } catch (IOException e) {
+                String imageUrl = cloudinaryService.uploadMedia(mediaFile);
+                post.setMediaUrl(imageUrl);
+            } catch(IOException e) {
                 throw new CustomException("IMAGE_UPLOAD_FAILED", "Failed to upload image: " + e.getMessage());
             }
         }
@@ -105,10 +101,9 @@ public class PostController {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+        if(!post.getAuthor().getUserId().equals(user.getUserId())) {
             throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
         }
 
@@ -118,21 +113,17 @@ public class PostController {
     }
 
     @PostMapping("/post/edit/{id}")
-    public String updatePost(@PathVariable Long id,
-                             @ModelAttribute("post") Post updatedPost,
-                             Model model,
-                             Principal principal) {
+    public String updatePost(@PathVariable Long id, @ModelAttribute("post") Post updatedPost, Model model, Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
-        if (updatedPost == null || updatedPost.getPostDescription() == null) {
+        if(updatedPost == null || updatedPost.getPostDescription() == null) {
             throw new CustomException("INVALID_POST", "Post data or description cannot be null");
         }
 
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+        if(!post.getAuthor().getUserId().equals(user.getUserId())) {
             throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
         }
 
@@ -149,10 +140,9 @@ public class PostController {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
-        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
+        if(!post.getAuthor().getUserId().equals(user.getUserId())) {
             throw new CustomException("UNAUTHORIZED", "You can only delete your own posts");
         }
 
@@ -163,16 +153,15 @@ public class PostController {
     @PostMapping("/post/react/{postId}")
     @ResponseBody
     public String reactToPost(@PathVariable Long postId, Principal principal) {
-        if (principal == null) {
+        if(principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
         }
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
 
         String email = principal.getName();
         Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
+        if(userOptional.isEmpty()) {
             throw new CustomException("USER_NOT_FOUND", "User not found");
         }
         User user = userOptional.get();
@@ -213,23 +202,18 @@ public class PostController {
     }
 
     private void validatePrincipal(Principal principal) {
-        if (principal == null) {
+        if(principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
         }
     }
 
     private User getCurrentUser(Principal principal) {
         String email = principal.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found"));
+        return userRepository.findByEmail(email).orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found"));
     }
 
     @GetMapping("/search")
-    public String search(
-            @RequestParam("query") String query,
-            @RequestParam(value = "filter", defaultValue = "all") String filter,
-            Model model
-    ) {
+    public String search(@RequestParam("query") String query, @RequestParam(value = "filter", defaultValue = "all") String filter, Model model) {
         List<User> peopleResults = filter.equals("posts") ? List.of() : userService.searchByName(query);
         List<Post> postResults = filter.equals("people") ? List.of() : postService.searchByContent(query);
 

@@ -256,7 +256,7 @@ public class JobController {
             if (!resumeFile.getContentType().equals("application/pdf")) {
                 throw new CustomException("INVALID_RESUME", "Resume must be a PDF file");
             }
-            String resumeUrl = cloudinaryService.uploadFile(resumeFile);
+            String resumeUrl = cloudinaryService.uploadMedia(resumeFile);
             applyJob.setResumeUrl(resumeUrl);
 
             User user = userRepository.findByEmail(principal.getName())

@@ -82,4 +82,22 @@ public class CompanyServiceImpl implements CompanyService {
 
         companyRepository.deleteById(id);
     }
+
+    public boolean isUserFollowing(User user, Company company) {
+        return company.getFollowers().contains(user);
+    }
+    public void followCompany(User user, Long companyId) {
+        Company company = getCompanyById(companyId);
+        user.getFollowingCompanies().add(company);
+        company.getFollowers().add(user);
+        userRepository.save(user);
+    }
+
+    public void unfollowCompany(User user, Long companyId) {
+        Company company = getCompanyById(companyId);
+        user.getFollowingCompanies().remove(company);
+        company.getFollowers().remove(user);
+        userRepository.save(user);
+    }
+
 }

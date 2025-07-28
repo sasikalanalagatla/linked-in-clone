@@ -1,6 +1,8 @@
 package com.org.linkedin.controller;
 
 import com.org.linkedin.exception.CustomException;
+import com.org.linkedin.model.Comment;
+import com.org.linkedin.model.Company;
 import com.org.linkedin.model.ConnectionRequest;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.UserRepository;
@@ -39,19 +41,19 @@ public class MyNetworkController {
         List<User> connections = connectionRequestService.getConnections(currentUser);
         List<User> followers = userService.getFollowers(currentUser);
         List<User> following = userService.getFollowing(currentUser);
-
+        List<Company> followingCompanies = userService.getFollowingCompanies(currentUser);
         model.addAttribute("requests", pendingRequests != null ? pendingRequests : new ArrayList<>());
         model.addAttribute("connections", connections != null ? connections : new ArrayList<>());
         model.addAttribute("followers", followers != null ? followers : new ArrayList<>());
         model.addAttribute("following", following != null ? following : new ArrayList<>());
         model.addAttribute("currentUserId", currentUser.getUserId());
-
+        model.addAttribute("followingCompanies", followingCompanies);
         return "mynetwork";
     }
 
     @GetMapping("/profile/{id}/followers")
     public String showFollowers(@PathVariable Long id, Model model) {
-        if (id == null) {
+        if(id == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
         User user = userService.getUserById(id);
@@ -63,7 +65,7 @@ public class MyNetworkController {
 
     @GetMapping("/profile/{id}/following")
     public String showFollowing(@PathVariable Long id, Model model) {
-        if (id == null) {
+        if(id == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
         User user = userService.getUserById(id);
@@ -75,14 +77,14 @@ public class MyNetworkController {
 
     @PostMapping("/accept/{requestId}")
     public String acceptConnection(@PathVariable Long requestId, Model model, RedirectAttributes redirectAttributes) {
-        if (requestId == null) {
+        if(requestId == null) {
             throw new CustomException("INVALID_REQUEST_ID", "Request ID cannot be null");
         }
         try {
             connectionRequestService.acceptRequest(requestId);
             redirectAttributes.addFlashAttribute("success", "Connection request accepted successfully!");
             return "redirect:/mynetwork";
-        } catch (CustomException e) {
+        } catch(CustomException e) {
             redirectAttributes.addFlashAttribute("error", "Error accepting connection request: " + e.getMessage());
             return "redirect:/mynetwork";
         }
@@ -90,14 +92,14 @@ public class MyNetworkController {
 
     @PostMapping("/ignore/{requestId}")
     public String ignoreConnection(@PathVariable Long requestId, RedirectAttributes redirectAttributes) {
-        if (requestId == null) {
+        if(requestId == null) {
             throw new CustomException("INVALID_REQUEST_ID", "Request ID cannot be null");
         }
         try {
             connectionRequestService.ignoreRequest(requestId);
             redirectAttributes.addFlashAttribute("success", "Connection request ignored successfully!");
             return "redirect:/mynetwork";
-        } catch (CustomException e) {
+        } catch(CustomException e) {
             redirectAttributes.addFlashAttribute("error", "Error ignoring connection request: " + e.getMessage());
             return "redirect:/mynetwork";
         }
@@ -107,7 +109,7 @@ public class MyNetworkController {
     public String sendConnectionRequest(@PathVariable Long receiverId, Model model, Principal principal, RedirectAttributes redirectAttributes) {
         String email = principal.getName();
         User user = userService.findByEmail(email);
-        if (receiverId == null) {
+        if(receiverId == null) {
             throw new CustomException("INVALID_USER_ID", "Receiver ID cannot be null");
         }
         try {
@@ -116,7 +118,7 @@ public class MyNetworkController {
             connectionRequestService.sendRequest(sender, receiver);
             redirectAttributes.addFlashAttribute("success", "Connection request sent successfully!");
             return "redirect:/profile/" + receiverId;
-        } catch (CustomException e) {
+        } catch(CustomException e) {
             redirectAttributes.addFlashAttribute("error", "Error sending connection request: " + e.getMessage());
             return "redirect:/profile/" + receiverId;
         }

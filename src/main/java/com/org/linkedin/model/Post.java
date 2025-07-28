@@ -18,7 +18,7 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String postDescription;
 
-    private String imageUrl;
+    private String mediaUrl;
 
     private String authorProfileImage;
 
@@ -72,12 +72,16 @@ public class Post {
         this.postDescription = postDescription;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getMediaUrl() {
+        return mediaUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
+    }
+
+    public void getMediaUrl(String mediaUrl) {
+        this.mediaUrl = mediaUrl;
     }
 
     public String getAuthorProfileImage() {

@@ -1,10 +1,370 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f3f2ef;
+      margin: 0;
+      line-height: 1.33;
+      color: #000000e6;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 0;
+      height: 52px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid #00000017;
+    }
+
+    .navbar-container {
+      display: flex;
+      align-items: center;
+      max-width: 1128px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      justify-content: space-between;
+    }
+
+    .navbar .left-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .navbar .logo {
+      height: 34px;
+      width: 34px;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0a66c2;
+      border-radius: 2px;
+    }
+
+    .navbar .logo-text {
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .search-container {
+      position: relative;
+      width: 280px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 6px 8px 6px 40px;
+      border-radius: 4px;
+      border: none;
+      background-color: #edf3f8;
+      font-size: 14px;
+      height: 34px;
+    }
+
+    .search-input::placeholder {
+      color: #666;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #666;
+    }
+
+    .navbar .nav-items {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 12px;
+      text-decoration: none;
+      color: #666;
+      font-size: 12px;
+      font-weight: 400;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: color 0.2s;
+      min-width: 80px;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      color: #000;
+    }
+
+    .nav-item.active {
+      color: #000;
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .nav-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .profile-pic {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin-bottom: 2px;
+    }
+
+    .work-divider {
+      height: 24px;
+      width: 1px;
+      background-color: #00000017;
+      margin: 0 12px;
+    }
+
+    .dropdown {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      border-radius: 8px;
+      border: 1px solid #00000017;
+      z-index: 1001;
+      top: 100%;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #000000e6;
+      font-size: 14px;
+      font-weight: 400;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: #f3f2ef;
+    }
+
+    .dropdown-item svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      fill: currentColor;
+    }
+
+    .dropdown-arrow {
+      margin-left: 4px;
+      transition: transform 0.2s;
+    }
+
+    .dropdown:hover .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .dropdown::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: transparent;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      .navbar .nav-items {
+        gap: 0;
+      }
+
+      .nav-item {
+        min-width: 60px;
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+
+      .search-container {
+        width: 200px;
+      }
+
+      .work-divider {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar .left-section {
+        gap: 4px;
+      }
+
+      .navbar .logo {
+        height: 30px;
+        width: 30px;
+      }
+
+      .search-container {
+        width: 150px;
+      }
+
+      .nav-item {
+        min-width: 50px;
+        font-size: 11px;
+      }
+
+      .nav-icon {
+        width: 20px;
+        height: 20px;
+      }
+
+      .nav-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  </style>
 </head>
 <body>
+<div class="navbar">
+  <div class="navbar-container">
+    <div class="left-section">
+      <div class="logo">
+        <span class="logo-text">in</span>
+      </div>
+      <div class="search-container">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 1 1 11 0z"/>
+        </svg>
+        <form th:action="@{/chat}" method="get">
+          <input type="text" class="search-input" name="userSearchQuery" th:value="${userSearchQuery}" placeholder="Search">
+        </form>
+      </div>
+    </div>
+
+    <div class="nav-items">
+      <a href="#" th:href="@{/}" class="nav-item">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M23 9v2h-2v7a3 3 0 01-3 3h-4v-6h-4v6H6a3 3 0 01-3-3v-7H1V9l11-7z"></path>
+          </svg>
+        </div>
+        Home
+      </a>
+      <a href="#" th:href="@{/mynetwork}" class="nav-item">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 16v6H3v-6a3 3 0 013-3h3a3 3 0 013 3zm5.5-3A3.5 3.5 0 1014 9.5a3.5 3.5 0 003.5 3.5zm1 2h-2a2.5 2.5 0 00-2.5 2.5V22h7v-4.5A2.5 2.5 0 0018.5 15zM7.5 2A4.5 4.5 0 1012 6.5 4.49 4.49 0 007.5 2z"></path>
+          </svg>
+        </div>
+        My Network
+      </a>
+      <a href="#" th:href="@{/job/feed}" class="nav-item">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"></path>
+          </svg>
+        </div>
+        Jobs
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M16 4H8a7 7 0 000 14h4v4l8.16-5.39A6.78 6.78 0 0023 11a7 7 0 00-7-7zm-8 8.25A1.25 1.25 0 119.25 11 1.25 1.25 0 018 12.25zm4 0A1.25 1.25 0 1113.25 11 1.25 1.25 0 0112 12.25zm4 0A1.25 1.25 0 1117.25 11 1.25 1.25 0 0116 12.25z"></path>
+          </svg>
+        </div>
+        Messaging
+      </a>
+      <a href="#" class="nav-item">
+        <div class="nav-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22a2.02 2.02 0 002-2H10a2.02 2.02 0 002 2zm7-7.5V9c0-3.07-1.64-5.64-4.5-6.32V2c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C8.63 3.36 7 5.92 7 9v5.5l-2 2V18h14v-1.5l-2-2z"></path>
+          </svg>
+        </div>
+        Notifications
+      </a>
+      <a href="#" th:href="@{'/profile/'+ ${sender.userId}}" class="nav-item profile-nav">
+        <div class="profile-pic"></div>
+        Me
+      </a>
+      <div class="work-divider"></div>
+      <div class="dropdown">
+        <a href="#" class="nav-item">
+          <div class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3h4v4H3zm7 4h4V3h-4zm7-4v4h4V3zM3 14h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4zM3 21h4v-4H3zm7 0h4v-4h-4zm7 0h4v-4h-4z"></path>
+            </svg>
+          </div>
+          Work
+          <svg class="dropdown-arrow" width="8" height="5" viewBox="0 0 8 5" fill="currentColor">
+            <path d="M0 0l4 4 4-4H0z"/>
+          </svg>
+        </a>
+        <div class="dropdown-content">
+          <a th:href="@{/company/add}" class="dropdown-item">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            Add Company
+          </a>
+          <a th:href="@{/job/add}" class="dropdown-item">
+            <svg viewBox="0 0 24 24">
+              <path d="M17 6V5a3 3 0 00-3-3h-4a3 3 0 00-3 3v1H2v4a3 3 0 003 3h14a3 3 0 003-3V6zM9 5a1 1 0 011-1h4a1 1 0 011 1v1H9zm10 9a4 4 0 003-1.38V17a3 3 0 01-3 3H5a3 3 0 01-3-3v-4.38A4 4 0 005 14z"/>
+            </svg>
+            Add Job
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
