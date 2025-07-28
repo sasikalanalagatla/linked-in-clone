@@ -6,6 +6,7 @@ public class UserDTO {
     private String email;
     private String profilePictureUrl;
 
+
     public UserDTO(Long userId, String fullName, String email, String profilePictureUrl) {
         this.userId = userId;
         this.fullName = fullName;
