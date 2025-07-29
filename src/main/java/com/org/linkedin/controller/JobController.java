@@ -2,9 +2,9 @@ package com.org.linkedin.controller;
 
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.*;
-import com.org.linkedin.repository.*;
 import com.org.linkedin.service.impl.CloudinaryService;
 import com.org.linkedin.service.impl.JobServiceImpl;
+import com.org.linkedin.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,28 +25,14 @@ public class JobController {
 
     private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 
-    private final SkillRepository skillRepository;
     private final JobServiceImpl jobServiceImpl;
-    private final JobRepository jobRepository;
-    private final UserRepository userRepository;
-    private final ApplyJobRepository applyJobRepository;
+    private final UserServiceImpl userServiceImpl;
     private final CloudinaryService cloudinaryService;
-    private final CompanyRepository companyRepository;
 
-    public JobController(SkillRepository skillRepository,
-                         JobServiceImpl jobServiceImpl,
-                         JobRepository jobRepository,
-                         UserRepository userRepository,
-                         ApplyJobRepository applyJobRepository,
-                         CloudinaryService cloudinaryService,
-                         CompanyRepository companyRepository) {
-        this.skillRepository = skillRepository;
+    public JobController(JobServiceImpl jobServiceImpl, UserServiceImpl userServiceImpl, CloudinaryService cloudinaryService) {
         this.jobServiceImpl = jobServiceImpl;
-        this.jobRepository = jobRepository;
-        this.userRepository = userRepository;
-        this.applyJobRepository = applyJobRepository;
+        this.userServiceImpl = userServiceImpl;
         this.cloudinaryService = cloudinaryService;
-        this.companyRepository = companyRepository;
     }
 
     @GetMapping("/job/feed")
@@ -73,11 +59,11 @@ public class JobController {
             }
 
             if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
-                jobPage = jobRepository.filterAndSearch(keyword, createdAfter, pageable);
+                jobPage = jobServiceImpl.filterAndSearchJobs(keyword, createdAfter, pageable);
             } else if (keyword != null && !keyword.isEmpty()) {
                 jobPage = jobServiceImpl.searchJobs(keyword, pageable);
             } else if (createdAfter != null) {
-                jobPage = jobRepository.filterByCreatedAt(createdAfter, pageable);
+                jobPage = jobServiceImpl.filterByCreatedAt(createdAfter, pageable);
             } else {
                 jobPage = jobServiceImpl.getAllJobs(pageable);
             }
@@ -97,10 +83,9 @@ public class JobController {
             model.addAttribute("selectedJob", selectedJob);
 
             if (principal != null) {
-                User user = userRepository.findByEmail(principal.getName())
-                        .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found with email: " + principal.getName()));
+                User user = userServiceImpl.findByEmail(principal.getName());
                 model.addAttribute("loggedInUser", user);
-                Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserUserId(user.getUserId());
+                Set<Long> appliedJobIds = jobServiceImpl.getAppliedJobIdsByUserId(user.getUserId());
                 model.addAttribute("appliedJobIds", appliedJobIds);
             }
 
@@ -120,8 +105,8 @@ public class JobController {
             job.setAdditionalQuestions(new ArrayList<>());
             job.getAdditionalQuestions().add(new AdditionalQuestion());
             model.addAttribute("job", job);
-            List<Skill> skills = skillRepository.findAll();
-            List<Company> companies = companyRepository.findAll();
+            List<Skill> skills = jobServiceImpl.getAllSkills();
+            List<Company> companies = jobServiceImpl.getAllCompanies();
             model.addAttribute("skills", skills != null ? skills : new ArrayList<>());
             model.addAttribute("companies", companies != null ? companies : new ArrayList<>());
             return "add-job";
@@ -146,15 +131,15 @@ public class JobController {
             if (result.hasErrors()) {
                 logger.warn("Validation errors: {}", result.getAllErrors());
                 model.addAttribute("error", "Validation failed: " + result.getAllErrors());
-                model.addAttribute("skills", skillRepository.findAll());
-                model.addAttribute("companies", companyRepository.findAll());
+                model.addAttribute("skills", jobServiceImpl.getAllSkills());
+                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
                 return "add-job";
             }
             if (addQuestion != null) {
                 job.getAdditionalQuestions().add(new AdditionalQuestion());
                 model.addAttribute("job", job);
-                model.addAttribute("skills", skillRepository.findAll());
-                model.addAttribute("companies", companyRepository.findAll());
+                model.addAttribute("skills", jobServiceImpl.getAllSkills());
+                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
                 return "add-job";
             }
 
@@ -171,8 +156,8 @@ public class JobController {
             logger.error("Error in /job/create: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             model.addAttribute("job", job);
-            model.addAttribute("skills", skillRepository.findAll());
-            model.addAttribute("companies", companyRepository.findAll());
+            model.addAttribute("skills", jobServiceImpl.getAllSkills());
+            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
             return "add-job";
         }
     }
@@ -192,8 +177,7 @@ public class JobController {
             model.addAttribute("job", job);
 
             if (principal != null) {
-                User user = userRepository.findByEmail(principal.getName())
-                        .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found with email: " + principal.getName()));
+                User user = userServiceImpl.findByEmail(principal.getName());
                 model.addAttribute("loggedInUser", user);
             }
 
@@ -258,12 +242,11 @@ public class JobController {
             String resumeUrl = cloudinaryService.uploadFile(resumeFile);
             applyJob.setResumeUrl(resumeUrl);
 
-            User user = userRepository.findByEmail(principal.getName())
-                    .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found with email: " + principal.getName()));
+            User user = userServiceImpl.findByEmail(principal.getName());
             applyJob.setUser(user);
             applyJob.setJob(job);
 
-            applyJobRepository.save(applyJob);
+            jobServiceImpl.applyForJob(applyJob);
             return "redirect:/job/feed?jobId=" + jobId;
         } catch (CustomException e) {
             logger.error("Error in /job/apply/{}: {}", jobId, e.getMessage());
@@ -302,8 +285,8 @@ public class JobController {
             logger.info("Accessing /job/edit/{}", id);
             Job job = jobServiceImpl.getJobById(id);
             model.addAttribute("job", job);
-            model.addAttribute("skills", skillRepository.findAll());
-            model.addAttribute("companies", companyRepository.findAll());
+            model.addAttribute("skills", jobServiceImpl.getAllSkills());
+            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
             return "edit-job";
         } catch (CustomException e) {
             logger.error("Error in /job/edit/{}: {}", id, e.getMessage());
@@ -325,8 +308,8 @@ public class JobController {
             if (result.hasErrors()) {
                 logger.warn("Validation errors: {}", result.getAllErrors());
                 model.addAttribute("error", "Validation failed: " + result.getAllErrors());
-                model.addAttribute("skills", skillRepository.findAll());
-                model.addAttribute("companies", companyRepository.findAll());
+                model.addAttribute("skills", jobServiceImpl.getAllSkills());
+                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
                 return "edit-job";
             }
 
@@ -342,7 +325,6 @@ public class JobController {
 
             if (updatedJob.getAdditionalQuestions() != null) {
                 existingJob.getAdditionalQuestions().clear();
-
                 for (AdditionalQuestion question : updatedJob.getAdditionalQuestions()) {
                     if (question.getQuestion() != null && !question.getQuestion().trim().isEmpty()) {
                         question.setJob(existingJob);
@@ -357,8 +339,8 @@ public class JobController {
             logger.error("Error in /job/update: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             model.addAttribute("job", updatedJob);
-            model.addAttribute("skills", skillRepository.findAll());
-            model.addAttribute("companies", companyRepository.findAll());
+            model.addAttribute("skills", jobServiceImpl.getAllSkills());
+            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
             return "edit-job";
         }
     }
@@ -376,8 +358,7 @@ public class JobController {
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view posted jobs");
             }
-            User user = userRepository.findByEmail(principal.getName())
-                    .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found with email: " + principal.getName()));
+            User user = userServiceImpl.findByEmail(principal.getName());
 
             String validatedSortBy = sortBy;
             if (!Arrays.asList("jobCreatedAt", "jobTitle", "company").contains(sortBy)) {
@@ -389,11 +370,11 @@ public class JobController {
                     Sort.by(validatedSortBy).ascending();
 
             Pageable pageable = PageRequest.of(page, size, sort);
-            Page<Job> postedJobsPage = jobRepository.findByUserUserId(user.getUserId(), pageable);
+            Page<Job> postedJobsPage = jobServiceImpl.getPostedJobsByUserId(user.getUserId(), pageable);
 
             List<Job> jobsWithCounts = postedJobsPage.getContent().stream()
                     .map(job -> {
-                        Long applicationsCount = applyJobRepository.countByJobId(job.getId());
+                        Long applicationsCount = jobServiceImpl.countApplicationsByJobId(job.getId());
                         job.setApplicationsCount(applicationsCount);
                         return job;
                     })
@@ -429,8 +410,7 @@ public class JobController {
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view applied jobs");
             }
-            User user = userRepository.findByEmail(principal.getName())
-                    .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found with email: " + principal.getName()));
+            User user = userServiceImpl.findByEmail(principal.getName());
 
             String validatedSortBy = sortBy;
             if (!Arrays.asList("appliedAt", "job.jobTitle", "job.company").contains(sortBy)) {
@@ -442,7 +422,7 @@ public class JobController {
                     Sort.by(validatedSortBy).ascending();
 
             Pageable pageable = PageRequest.of(page, size, sort);
-            Page<ApplyJob> appliedJobsPage = applyJobRepository.findByUserUserId(user.getUserId(), pageable);
+            Page<ApplyJob> appliedJobsPage = jobServiceImpl.getAppliedJobsByUserId(user.getUserId(), pageable);
 
             model.addAttribute("appliedJobs", appliedJobsPage.getContent());
             model.addAttribute("currentPage", page);

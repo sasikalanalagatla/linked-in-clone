@@ -1,11 +1,15 @@
 package com.org.linkedin.service.impl;
 
 import com.org.linkedin.exception.CustomException;
-import com.org.linkedin.model.Job;
+import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Company;
+import com.org.linkedin.model.Job;
+import com.org.linkedin.model.Skill;
 import com.org.linkedin.model.User;
+import com.org.linkedin.repository.ApplyJobRepository;
 import com.org.linkedin.repository.CompanyRepository;
 import com.org.linkedin.repository.JobRepository;
+import com.org.linkedin.repository.SkillRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.JobService;
 import org.springframework.data.domain.Page;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -21,11 +27,17 @@ public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final ApplyJobRepository applyJobRepository;
+    private final SkillRepository skillRepository;
 
-    public JobServiceImpl(JobRepository jobRepository, UserRepository userRepository, CompanyRepository companyRepository) {
+    public JobServiceImpl(JobRepository jobRepository, UserRepository userRepository,
+                          CompanyRepository companyRepository, ApplyJobRepository applyJobRepository,
+                          SkillRepository skillRepository) {
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
+        this.applyJobRepository = applyJobRepository;
+        this.skillRepository = skillRepository;
     }
 
     @Override
@@ -105,6 +117,54 @@ public class JobServiceImpl implements JobService {
             throw new CustomException("UNAUTHORIZED", "User not authorized to delete this job");
         }
         jobRepository.delete(job);
+    }
+
+    @Override
+    public Page<Job> filterAndSearchJobs(String keyword, LocalDateTime createdAfter, Pageable pageable) {
+        return jobRepository.filterAndSearch(keyword, createdAfter, pageable);
+    }
+
+    @Override
+    public Page<Job> filterByCreatedAt(LocalDateTime createdAfter, Pageable pageable) {
+        return jobRepository.filterByCreatedAt(createdAfter, pageable);
+    }
+
+    @Override
+    public Set<Long> getAppliedJobIdsByUserId(Long userId) {
+        return applyJobRepository.findAppliedJobIdsByUserUserId(userId);
+    }
+
+    @Override
+    public Page<ApplyJob> getAppliedJobsByUserId(Long userId, Pageable pageable) {
+        return applyJobRepository.findByUserUserId(userId, pageable);
+    }
+
+    @Override
+    public Page<Job> getPostedJobsByUserId(Long userId, Pageable pageable) {
+        return jobRepository.findByUserUserId(userId, pageable);
+    }
+
+    @Override
+    public Long countApplicationsByJobId(Long jobId) {
+        return applyJobRepository.countByJobId(jobId);
+    }
+
+    @Override
+    public void applyForJob(ApplyJob applyJob) {
+        if (applyJob == null) {
+            throw new CustomException("INVALID_APPLICATION", "Job application cannot be null");
+        }
+        applyJobRepository.save(applyJob);
+    }
+
+    @Override
+    public List<Skill> getAllSkills() {
+        return skillRepository.findAll();
+    }
+
+    @Override
+    public List<Company> getAllCompanies() {
+        return companyRepository.findAll();
     }
 
     private void validateJob(Job job) {

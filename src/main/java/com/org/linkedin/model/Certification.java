@@ -26,7 +26,8 @@ public class Certification {
 
     public Certification() {}
 
-    public Certification(User user, String certificationName, String issuingOrganization, LocalDate issueDate, LocalDate expirationDate, String certificationImageUrl) {
+    public Certification(User user, String certificationName, String issuingOrganization, LocalDate issueDate,
+                         LocalDate expirationDate, String certificationImageUrl) {
         this.user = user;
         this.certificationName = certificationName;
         this.issuingOrganization = issuingOrganization;

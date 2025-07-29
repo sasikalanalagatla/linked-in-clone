@@ -3,7 +3,6 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.ConnectionRequest;
 import com.org.linkedin.model.User;
-import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ConnectionRequestService;
 import com.org.linkedin.service.FollowService;
 import com.org.linkedin.service.UserService;
@@ -21,13 +20,13 @@ public class MyNetworkController {
 
     private final ConnectionRequestService connectionRequestService;
     private final UserService userService;
-    private final UserRepository userRepository;
     private final FollowService followService;
 
-    public MyNetworkController(ConnectionRequestService connectionRequestService, UserService userService, UserRepository userRepository, FollowService followService) {
+    public MyNetworkController(ConnectionRequestService connectionRequestService,
+                               UserService userService,
+                               FollowService followService) {
         this.connectionRequestService = connectionRequestService;
         this.userService = userService;
-        this.userRepository = userRepository;
         this.followService = followService;
     }
 
@@ -124,7 +123,8 @@ public class MyNetworkController {
 
     @PostMapping("/follow/{userId}")
     public String followUser(@PathVariable Long userId, Principal principal) {
-        Long currentUserId = userRepository.findByEmail(principal.getName()).get().getUserId();
+        User currentUser = userService.findByEmail(principal.getName());
+        Long currentUserId = currentUser.getUserId();
         followService.followUser(currentUserId, userId);
         return "redirect:/profile/" + userId;
     }
