@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class ProjectController {
 
-    @Autowired
-    private ProjectService projectService;
+
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
 
     @GetMapping("/add/project/{userId}")
     public String showAddProjectForm(@PathVariable Long userId, Model model) {

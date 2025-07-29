@@ -17,14 +17,10 @@ import java.util.Optional;
 @Controller
 public class UserController {
 
-    private final UserService userService;
-    private final CloudinaryService cloudinaryService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, CloudinaryService cloudinaryService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.cloudinaryService = cloudinaryService;
+    public UserController( UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }

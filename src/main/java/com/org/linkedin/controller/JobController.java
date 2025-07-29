@@ -158,7 +158,6 @@ public class JobController {
                 return "add-job";
             }
 
-            // Safely remove empty questions
             job.getAdditionalQuestions().removeIf(
                     question -> question.getQuestion() == null || question.getQuestion().trim().isEmpty()
             );
@@ -331,10 +330,8 @@ public class JobController {
                 return "edit-job";
             }
 
-            // Get the existing job from database to preserve the collection
             Job existingJob = jobServiceImpl.getJobById(updatedJob.getId());
 
-            // Update the basic fields
             existingJob.setJobTitle(updatedJob.getJobTitle());
             existingJob.setCompany(updatedJob.getCompany());
             existingJob.setJobLocation(updatedJob.getJobLocation());
@@ -343,12 +340,9 @@ public class JobController {
             existingJob.setJobWorkPlaceTypes(updatedJob.getJobWorkPlaceTypes());
             existingJob.setRecruiterEmail(updatedJob.getRecruiterEmail());
 
-            // Handle additional questions if they exist
             if (updatedJob.getAdditionalQuestions() != null) {
-                // Clear existing questions (this will trigger orphan removal properly)
                 existingJob.getAdditionalQuestions().clear();
 
-                // Add new questions
                 for (AdditionalQuestion question : updatedJob.getAdditionalQuestions()) {
                     if (question.getQuestion() != null && !question.getQuestion().trim().isEmpty()) {
                         question.setJob(existingJob);

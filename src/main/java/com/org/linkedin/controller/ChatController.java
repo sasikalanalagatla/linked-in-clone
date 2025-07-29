@@ -17,17 +17,18 @@ import java.security.Principal;
 @RequestMapping("/chat")
 public class ChatController {
 
-    @Autowired
-    private ChatService chatService;
+    private final ChatService chatService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final UserServiceImpl userService;
+    private final ConnectionRequestImpl connectionRequest;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Autowired
-    private ConnectionRequestImpl connectionRequest;
+    public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate, UserServiceImpl userService,
+                          ConnectionRequestImpl connectionRequest) {
+        this.chatService = chatService;
+        this.messagingTemplate = messagingTemplate;
+        this.userService = userService;
+        this.connectionRequest = connectionRequest;
+    }
 
     @MessageMapping("/chat")
     public void processMessage(ChatMessage chatMessage) {

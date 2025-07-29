@@ -35,7 +35,6 @@ public class VideoCallController {
     }
     @MessageMapping("/video.signal")
     public void handleVideoSignal(VideoSignalMessage message) {
-        // Only allow signaling after call is accepted
         if (!"call_request".equals(message.getType())) {
             Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
             if (senderOptional.isPresent()) {
@@ -60,7 +59,6 @@ public class VideoCallController {
             User receiver = receiverOptional.get();
             message.setSenderName(sender.getFullName());
 
-            // Only send notifications for call requests/responses
             messagingTemplate.convertAndSendToUser(
                     message.getReceiverId(),
                     "/queue/call",
@@ -68,7 +66,6 @@ public class VideoCallController {
             );
 
             if ("call_request".equals(message.getType())) {
-                // Save chat message for the call request
                 ChatMessage callMessage = new ChatMessage();
                 callMessage.setContent("📞 Incoming video call");
                 callMessage.setType("video_call_request");

@@ -14,11 +14,9 @@ import java.util.Map;
 public class CommentController {
 
     private final CommentService commentService;
-    private final PostService postService;
 
-    public CommentController(CommentService commentService, PostService postService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.postService = postService;
     }
 
     @GetMapping("/posts/{postId}/comments")

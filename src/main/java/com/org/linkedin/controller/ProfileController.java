@@ -22,14 +22,13 @@ public class ProfileController {
     private final UserServiceImpl userService;
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public ProfileController(UserServiceImpl userService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService, UserRepository userRepository) {
+    public ProfileController(UserServiceImpl userService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService) {
         this.userService = userService;
         this.cloudinaryService = cloudinaryService;
         this.connectionRequestService = connectionRequestService;
-        this.userRepository = userRepository;
+
     }
 
     @GetMapping("/profile/{userId}")
