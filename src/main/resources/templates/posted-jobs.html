@@ -27,7 +27,6 @@
         </a>
       </div>
 
-      <!-- Sorting Form -->
       <div class="mb-4">
         <form th:action="@{/job/posted}" method="get">
           <div class="row g-2 align-items-center">
@@ -63,7 +62,6 @@
         <a th:href="@{/job/add}" class="btn btn-primary mt-2">Post a Job</a>
       </div>
 
-      <!-- Posted Jobs List -->
       <div th:unless="${postedJobs.empty}">
         <div class="mb-3">
                       <span class="badge bg-primary fs-6">
@@ -135,7 +133,7 @@
           </div>
         </div>
 
-        <!-- Pagination Controls -->
+
         <nav aria-label="Page navigation" class="mt-4">
           <ul class="pagination">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">

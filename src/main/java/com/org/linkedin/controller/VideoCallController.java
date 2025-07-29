@@ -1,7 +1,7 @@
 package com.org.linkedin.controller;
 
-import com.org.linkedin.configuration.VideoSignalMessage;
-import com.org.linkedin.configuration.CallNotificationMessage;
+import com.org.linkedin.dto.VideoSignalMessage;
+import com.org.linkedin.dto.CallNotificationMessage;
 import com.org.linkedin.model.User;
 import com.org.linkedin.model.ChatMessage;
 import com.org.linkedin.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Controller
