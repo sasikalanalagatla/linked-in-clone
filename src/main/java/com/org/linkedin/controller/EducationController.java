@@ -3,6 +3,7 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Education;
 import com.org.linkedin.model.User;
+import com.org.linkedin.service.EducationService;
 import com.org.linkedin.service.UserService;
 import com.org.linkedin.service.impl.EducationServiceImpl;
 import org.springframework.stereotype.Controller;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class EducationController {
 
-    private final EducationServiceImpl educationService;
+    private final EducationService educationService;
     private final UserService userService;
 
-    public EducationController(EducationServiceImpl educationService, UserService userService) {
+    public EducationController(EducationService educationService, UserService userService) {
         this.educationService = educationService;
         this.userService = userService;
     }

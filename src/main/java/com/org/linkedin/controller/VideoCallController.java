@@ -42,6 +42,7 @@ public class VideoCallController {
                         message
                 );
             } catch (Exception e) {
+                System.out.println("Video signal handling failed");
             }
         }
     }
@@ -59,11 +60,12 @@ public class VideoCallController {
             );
             if ("call_request".equals(message.getType())) {
                 ChatMessage callMessage = new ChatMessage();
-                callMessage.setContent("📞 Incoming video call");
+                callMessage.setContent("Incoming video call");
                 callMessage.setType("video_call_request");
                 chatService.saveMessage(callMessage);
             }
         } catch (Exception e) {
+            System.out.println("Call notification handling failed");
         }
     }
 

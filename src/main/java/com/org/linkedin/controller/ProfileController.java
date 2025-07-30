@@ -21,7 +21,6 @@ public class ProfileController {
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
 
-    @Autowired
     public ProfileController(UserService userService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService) {
         this.userService = userService;
         this.cloudinaryService = cloudinaryService;

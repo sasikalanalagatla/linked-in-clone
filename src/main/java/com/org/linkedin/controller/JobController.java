@@ -5,6 +5,7 @@ import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.JobService;
+import com.org.linkedin.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +21,11 @@ import java.util.Map;
 public class JobController {
 
     private final JobService jobService;
+    private final UserService userService;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, UserService userService) {
         this.jobService = jobService;
+        this.userService = userService;
     }
 
     @GetMapping("/job/feed")
@@ -208,7 +211,8 @@ public class JobController {
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view posted jobs");
             }
-            User user = jobService.getJobById(1L).getUser();
+
+            User user = userService.findByEmail(principal.getName());
             model.addAllAttributes(jobService.getPostedJobsDetails(user.getUserId(), page, size, sortBy, sortDir));
             return "posted-jobs";
         } catch (CustomException e) {
@@ -228,7 +232,7 @@ public class JobController {
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view applied jobs");
             }
-            User user = jobService.getJobById(1L).getUser();
+            User user = userService.findByEmail(principal.getName());
             model.addAllAttributes(jobService.getAppliedJobsDetails(user.getUserId(), page, size, sortBy, sortDir));
             return "applied-jobs";
         } catch (CustomException e) {

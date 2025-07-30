@@ -19,7 +19,8 @@ public class ConnectionRequestController {
     private final UserService userService;
     private final FollowService followService;
 
-    public ConnectionRequestController(ConnectionRequestService connectionRequestService, UserService userService, FollowService followService) {
+    public ConnectionRequestController(ConnectionRequestService connectionRequestService, UserService userService,
+                                       FollowService followService) {
         this.connectionRequestService = connectionRequestService;
         this.userService = userService;
         this.followService = followService;

@@ -14,22 +14,22 @@ public interface ConnectionRequestRepository extends JpaRepository<ConnectionReq
     List<ConnectionRequest> findByReceiverAndStatus(User receiver, String status);
 
     @Query("SELECT cr FROM ConnectionRequest cr WHERE " +
-            "((cr.sender = :user1 AND cr.receiver = :user2) OR " +
-            "(cr.sender = :user2 AND cr.receiver = :user1))")
-    Optional<ConnectionRequest> findConnectionBetweenUsers(@Param("user1") User user1, @Param("user2") User user2);
+            "((cr.sender = :requestSender AND cr.receiver = :requestReceiver) OR " +
+            "(cr.sender = :requestReceiver AND cr.receiver = :requestSender))")
+    Optional<ConnectionRequest> findConnectionBetweenUsers(@Param("requestSender") User requestSender,
+                                                           @Param("requestReceiver") User requestReceiver);
 
-    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :user OR cr.receiver = :user) AND cr.status = " +
-            "'ACCEPTED')")
+    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :user OR cr.receiver = :user) AND cr.status = 'ACCEPTED')")
     List<ConnectionRequest> findAcceptedConnectionsForUser(@Param("user") User user);
 
-    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :user1 AND cr.receiver = :user2) OR (cr.sender = " +
-            ":user2 AND cr.receiver = :user1)) AND cr.status = 'PENDING'")
-    Optional<ConnectionRequest> findPendingConnectionBetweenUsers(@Param("user1") User user1,
-                                                                  @Param("user2") User user2);
+    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :requestSender AND cr.receiver = :requestReceiver) OR " +
+            "(cr.sender = :requestReceiver AND cr.receiver = :requestSender)) AND cr.status = 'PENDING'")
+    Optional<ConnectionRequest> findPendingConnectionBetweenUsers(@Param("requestSender") User requestSender,
+                                                                  @Param("requestReceiver") User requestReceiver);
 
-    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :user1 AND cr.receiver = :user2) OR " +
-            "(cr.sender = :user2 AND cr.receiver = :user1)) AND cr.status = 'ACCEPTED'")
-    Optional<ConnectionRequest> findAcceptedConnectionBetweenUsers(@Param("user1") User user1,
-                                                                   @Param("user2") User user2);
+    @Query("SELECT cr FROM ConnectionRequest cr WHERE ((cr.sender = :requestSender AND cr.receiver = :requestReceiver) OR " +
+            "(cr.sender = :requestReceiver AND cr.receiver = :requestSender)) AND cr.status = 'ACCEPTED'")
+    Optional<ConnectionRequest> findAcceptedConnectionBetweenUsers(@Param("requestSender") User requestSender,
+                                                                   @Param("requestReceiver") User requestReceiver);
 
 }

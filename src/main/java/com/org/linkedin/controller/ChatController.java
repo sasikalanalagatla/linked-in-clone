@@ -178,6 +178,7 @@ public class ChatController {
         }
     }
 
+
     private void validatePrincipal(Principal principal) {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
@@ -233,7 +234,7 @@ public class ChatController {
         if (content == null || content.trim().isEmpty()) {
             throw new CustomException("INVALID_CONTENT", "Message content cannot be empty");
         }
-        if (content.length() > 1000) {
+        if (content.length() > 1000) { // Assuming max message length
             throw new CustomException("INVALID_CONTENT", "Message content too long");
         }
     }
@@ -254,7 +255,7 @@ public class ChatController {
         chatMessage.setContent(content.trim());
         chatMessage.setSender(sender);
         chatMessage.setReceiver(receiver);
-        chatMessage.setTimestamp(LocalDateTime.now());
+        chatMessage.setTimestamp(java.time.LocalDateTime.now());
         return chatMessage;
     }
 

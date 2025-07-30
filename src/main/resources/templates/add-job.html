@@ -88,20 +88,21 @@
         <label for="jobLocation">Location</label>
         <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India" required>
 
+
         <select id="jobTypes" th:field="*{jobTypes}" required>
             <option value="" disabled selected>Select job type</option>
-            <option value="Full-Time">Full-Time</option>
-            <option value="Part-Time">Part-Time</option>
-            <option value="Internship">Internship</option>
-            <option value="Contract">Contract</option>
-            <option value="Freelance">Freelance</option>
+            <option value="FULL_TIME">Full-Time</option>
+            <option value="PART_TIME">Part-Time</option>
+            <option value="INTERNSHIP">Internship</option>
+            <option value="CONTRACT">Contract</option>
+            <option value="FREELANCE">Freelance</option>
         </select>
 
         <select id="jobWorkPlaceTypes" th:field="*{jobWorkPlaceTypes}" required>
             <option value="" disabled selected>Select workplace type</option>
-            <option value="On-Site">On-Site</option>
-            <option value="Remote">Remote</option>
-            <option value="Hybrid">Hybrid</option>
+            <option value="ONSITE">On-Site</option>
+            <option value="REMOTE">Remote</option>
+            <option value="HYBRID">Hybrid</option>
         </select>
 
         <label for="recruiterEmail">Recruiter Email</label>
