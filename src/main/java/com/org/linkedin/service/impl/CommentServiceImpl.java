@@ -36,12 +36,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public boolean hasMore(Long postId, int page, int size) {
-        long total = commentRepository.countCommentsByPostId(postId);
-        return (page + 1) * size < total;
-    }
-
-    @Override
     public Comment addComment(Long postId, String text) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));

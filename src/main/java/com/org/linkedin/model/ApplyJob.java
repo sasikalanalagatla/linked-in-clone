@@ -1,7 +1,7 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,21 +21,15 @@ public class ApplyJob {
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    @Column
     private String resumeUrl;
 
-    @Column
+    @CreationTimestamp
     private LocalDateTime appliedAt;
 
     @ElementCollection
     @CollectionTable(name = "apply_job_answers", joinColumns = @JoinColumn(name = "apply_job_id"))
     @Column(name = "answer")
     private List<String> additionalQuestionAnswers = new ArrayList<>();
-
-    @PrePersist
-    protected void onCreate() {
-        this.appliedAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;

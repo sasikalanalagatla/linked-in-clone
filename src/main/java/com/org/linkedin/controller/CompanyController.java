@@ -101,7 +101,7 @@ public class CompanyController {
     public String updateCompany(@PathVariable("id") Long id, @ModelAttribute("company") Company company,
                                 Principal principal, Model model) {
         try {
-            companyService.updateCompany(id, company, principal);
+            companyService.updateCompany(company, principal);
             return "redirect:/company/" + id;
         } catch (CustomException e) {
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());

@@ -15,7 +15,7 @@ public class Reaction {
     @ManyToOne
     private Post post;
 
-    @Column(name = "reaction_type", nullable = false)
+    @Column(nullable = false)
     private String reactionType;
 
     public Reaction() {

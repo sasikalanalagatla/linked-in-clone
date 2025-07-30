@@ -1,7 +1,6 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 @Entity
 public class AdditionalQuestion {

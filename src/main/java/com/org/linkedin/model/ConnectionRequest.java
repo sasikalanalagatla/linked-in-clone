@@ -10,9 +10,11 @@ public class ConnectionRequest {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "sender_user_id")
     private User sender;
 
     @ManyToOne
+    @JoinColumn(name = "receiver_user_id")
     private User receiver;
 
     private String status;

@@ -1,6 +1,7 @@
 package com.org.linkedin.exception;
 
 public class ErrorResponse {
+
     private String statusCode;
     private String message;
     private String timestamp;

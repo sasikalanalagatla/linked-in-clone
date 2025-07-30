@@ -2,31 +2,34 @@ package com.org.linkedin.service.impl;
 
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Company;
+import com.org.linkedin.model.Job;
 import com.org.linkedin.model.User;
+import com.org.linkedin.repository.ApplyJobRepository;
 import com.org.linkedin.repository.CompanyRepository;
 import com.org.linkedin.repository.JobRepository;
-import com.org.linkedin.repository.ApplyJobRepository;
+import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.CompanyService;
-import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final ApplyJobRepository applyJobRepository;
 
     public CompanyServiceImpl(CompanyRepository companyRepository,
-                              UserService userService,
+                              UserRepository userRepository,
                               JobRepository jobRepository,
                               ApplyJobRepository applyJobRepository) {
         this.companyRepository = companyRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.applyJobRepository = applyJobRepository;
     }
@@ -36,41 +39,37 @@ public class CompanyServiceImpl implements CompanyService {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in to create a company");
         }
-        if (company == null) {
-            throw new CustomException("INVALID_COMPANY", "Company cannot be null");
-        }
-        User user = userService.findByEmail(principal.getName());
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new CustomException("NOT_FOUND", "User not found"));
         company.setUser(user);
         return companyRepository.save(company);
     }
 
+    public String createCompany(Company company, Principal principal, Model model) {
+        try {
+            createCompany(company, principal);
+            return "redirect:/company/" + company.getId();
+        } catch (CustomException e) {
+            model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
+            model.addAttribute("company", company);
+            return "company-form";
+        }
+    }
+
     @Override
     public Company getCompanyById(Long id) throws CustomException {
-        if (id == null) {
-            throw new CustomException("INVALID_ID", "Company ID cannot be null");
-        }
         return companyRepository.findById(id)
                 .orElseThrow(() -> new CustomException("NOT_FOUND", "Company not found"));
     }
 
     @Override
-    public List<Company> getAllCompanies() {
-        return companyRepository.findAll();
-    }
-
-    @Override
-    public Company updateCompany(Long id, Company company, Principal principal) throws CustomException {
+    public Company updateCompany(Company company, Principal principal) throws CustomException {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in to edit a company");
         }
-        if (id == null) {
-            throw new CustomException("INVALID_ID", "Company ID cannot be null");
-        }
-        if (company == null) {
-            throw new CustomException("INVALID_COMPANY", "Company cannot be null");
-        }
-        User user = userService.findByEmail(principal.getName());
-        Company existingCompany = companyRepository.findById(id)
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new CustomException("NOT_FOUND", "User not found"));
+        Company existingCompany = companyRepository.findById(company.getId())
                 .orElseThrow(() -> new CustomException("NOT_FOUND", "Company not found"));
 
         if (!existingCompany.getUser().getUserId().equals(user.getUserId())) {
@@ -90,10 +89,8 @@ public class CompanyServiceImpl implements CompanyService {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in to delete a company");
         }
-        if (id == null) {
-            throw new CustomException("INVALID_ID", "Company ID cannot be null");
-        }
-        User user = userService.findByEmail(principal.getName());
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new CustomException("NOT_FOUND", "User not found"));
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new CustomException("NOT_FOUND", "Company not found"));
 

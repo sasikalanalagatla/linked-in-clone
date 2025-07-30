@@ -37,8 +37,4 @@ public class ReactionServiceImpl implements ReactionService {
         postRepository.save(post);
     }
 
-    @Override
-    public boolean hasUserLikedPost(Post post, User user) {
-        return reactionRepository.existsByUserAndPost(user, post);
-    }
 }

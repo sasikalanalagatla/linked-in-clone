@@ -7,6 +7,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface ChatService {
+
     void saveMessage(ChatMessage chatMessage);
     List<ChatMessage> getChatHistory(String user1Email, String user2Email);
     void processMessage(ChatMessage chatMessage, SimpMessagingTemplate messagingTemplate);

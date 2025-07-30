@@ -1,6 +1,8 @@
 package com.org.linkedin.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,14 +16,18 @@ public class ChatMessage {
     private String receiverEmail;
     private String content;
 
-    private String type = "text";
+    @Column(columnDefinition = "TEXT")
+    private String type;
 
+    @CreationTimestamp
     private LocalDateTime timestamp;
 
     @ManyToOne
+    @JoinColumn(name = "sender_user_id")
     private User sender;
 
     @ManyToOne
+    @JoinColumn(name = "receiver_user_id")
     private User receiver;
 
     public Long getId() {

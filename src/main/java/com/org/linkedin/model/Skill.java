@@ -10,9 +10,6 @@ public class Skill {
 
     private String skillName;
 
-    public Skill() {
-    }
-
     public Long getSkillId() {
         return skillId;
     }

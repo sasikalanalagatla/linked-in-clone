@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface JobService {
+
     Page<Job> getAllJobs(Pageable pageable);
     Page<Job> searchJobs(String keyword, Pageable pageable);
     Job getJobById(Long jobId);

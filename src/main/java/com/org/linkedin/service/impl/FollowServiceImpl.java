@@ -37,28 +37,4 @@ public class FollowServiceImpl implements FollowService {
             userRepository.save(follower.get());
         }
     }
-
-    @Override
-    public List<User> getFollowers(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
-        }
-        return user.get().getFollowers();
-    }
-
-    @Override
-    public List<User> getFollowing(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
-        }
-        return user.get().getFollowing();
-    }
 }

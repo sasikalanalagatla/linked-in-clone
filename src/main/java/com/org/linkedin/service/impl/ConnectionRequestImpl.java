@@ -106,14 +106,6 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
     }
 
     @Override
-    public Optional<ConnectionRequest> getRequestById(Long requestId) {
-        if (requestId == null) {
-            throw new CustomException("INVALID_REQUEST_ID", "Request ID cannot be null");
-        }
-        return connectionRequestRepository.findById(requestId);
-    }
-
-    @Override
     public String getConnectionStatus(User loggedInUser, User profileUser) {
         if (loggedInUser.getUserId().equals(profileUser.getUserId())) {
             return "SELF";

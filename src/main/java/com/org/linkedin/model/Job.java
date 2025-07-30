@@ -3,6 +3,7 @@ package com.org.linkedin.model;
 import com.org.linkedin.enums.JobType;
 import com.org.linkedin.enums.WorkPlaceType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,11 +32,7 @@ public class Job {
 
     private String recruiterEmail;
 
-    @Column
     private String experienceLevel;
-
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ApplyJob> applyJobList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -46,12 +43,15 @@ public class Job {
     private Company company;
 
     @Column(updatable = false)
+    @CreationTimestamp
     private LocalDateTime jobCreatedAt;
 
-    @Column
     private boolean jobPostEdited;
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<ApplyJob> applyJobList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<AdditionalQuestion> additionalQuestions = new ArrayList<>();
 
     @ManyToMany
@@ -64,11 +64,6 @@ public class Job {
 
     @Transient
     private Long applicationsCount;
-
-    @PrePersist
-    protected void onCreate() {
-        this.jobCreatedAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -146,7 +141,7 @@ public class Job {
         return company;
     }
 
-    public void setCompany(String company) {
+    public void setCompany(Company company) {
         this.company = company;
     }
 

@@ -13,7 +13,6 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
 
-    @Column
     private String commentContent;
 
     @ManyToOne
@@ -23,7 +22,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-
 
     @CreationTimestamp
     private LocalDateTime commentCreatedAt;

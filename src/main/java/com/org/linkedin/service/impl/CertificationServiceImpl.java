@@ -18,14 +18,6 @@ public class CertificationServiceImpl implements CertificationService {
     }
 
     @Override
-    public List<Certification> getCertificationsByUserId(Long userId) {
-        if (userId == null) {
-            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
-        }
-        return certificationRepository.findByUserUserId(userId);
-    }
-
-    @Override
     public Certification getCertificationById(Long certificationId) {
         if (certificationId == null) {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");

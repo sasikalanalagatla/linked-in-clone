@@ -143,7 +143,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> loadMorePosts(int page, Principal principal, Pageable pageable) {
         validatePrincipal(principal);
-        getCurrentUser(principal); // Validate user exists
+        getCurrentUser(principal);
         Page<Post> postPage = findAll(pageable);
         postPage.getContent().forEach(post -> post.setTotalReactions(post.getReactions().size()));
         return postPage;
