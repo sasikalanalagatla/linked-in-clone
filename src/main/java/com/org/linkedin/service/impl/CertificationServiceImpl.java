@@ -6,7 +6,6 @@ import com.org.linkedin.repository.CertificationRepository;
 import com.org.linkedin.service.CertificationService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class CertificationServiceImpl implements CertificationService {
@@ -27,11 +26,11 @@ public class CertificationServiceImpl implements CertificationService {
     }
 
     @Override
-    public Certification saveCertification(Certification certification) {
+    public void saveCertification(Certification certification) {
         if (certification == null) {
             throw new CustomException("INVALID_CERTIFICATION", "Certification data cannot be null");
         }
-        return certificationRepository.save(certification);
+        certificationRepository.save(certification);
     }
 
     @Override

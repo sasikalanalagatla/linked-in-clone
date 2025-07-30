@@ -3,7 +3,6 @@ package com.org.linkedin.service.impl;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.UserRepository;
-import com.org.linkedin.service.CertificationService;
 import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +13,9 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final CertificationService certificationService;
 
-    public UserServiceImpl(UserRepository userRepository, CertificationService certificationService) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.certificationService = certificationService;
     }
 
     @Override

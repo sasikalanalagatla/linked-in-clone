@@ -113,19 +113,4 @@ public class EducationController {
         }
     }
 
-    @GetMapping("/delete/education/{educationId}")
-    public String deleteEducationGet(@PathVariable("educationId") Long educationId, Model model) {
-        try {
-            if (educationId == null) {
-                throw new CustomException("INVALID_EDUCATION_ID", "Education ID cannot be null");
-            }
-            Education education = educationService.getEducationById(educationId);
-            Long userId = education.getUser().getUserId();
-            educationService.deleteEducation(educationId);
-            return "redirect:/profile/" + userId;
-        } catch (CustomException e) {
-            model.addAttribute("error", "Error deleting education: " + e.getMessage());
-            return "error";
-        }
-    }
 }

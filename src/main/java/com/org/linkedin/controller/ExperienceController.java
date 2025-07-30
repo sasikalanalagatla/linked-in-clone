@@ -114,9 +114,4 @@ public class ExperienceController {
             return "error";
         }
     }
-
-    @GetMapping("/delete/experience/{experienceId}")
-    public String deleteExperienceGet(@PathVariable Long experienceId, Model model) {
-        return deleteExperience(experienceId, model);
-    }
 }

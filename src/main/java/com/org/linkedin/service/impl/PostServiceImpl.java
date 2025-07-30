@@ -4,7 +4,6 @@ import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Post;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.PostRepository;
-import com.org.linkedin.service.ConnectionRequestService;
 import com.org.linkedin.service.PostService;
 import com.org.linkedin.service.ReactionService;
 import com.org.linkedin.service.UserService;
@@ -130,8 +129,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> viewAllPosts(Principal principal) {
         validatePrincipal(principal);
-        User user = getCurrentUser(principal);
-
         List<Post> posts = postRepository.findAll();
         posts.forEach(post -> post.setTotalReactions(post.getReactions().size()));
         return posts;
@@ -140,7 +137,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> loadMorePosts(int page, Principal principal, Pageable pageable) {
         validatePrincipal(principal);
-        getCurrentUser(principal);
         Page<Post> postPage = findAll(pageable);
         postPage.getContent().forEach(post -> post.setTotalReactions(post.getReactions().size()));
         return postPage;

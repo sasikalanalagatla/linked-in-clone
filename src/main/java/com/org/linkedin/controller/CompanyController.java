@@ -3,7 +3,6 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Company;
 import com.org.linkedin.service.CompanyService;
-import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

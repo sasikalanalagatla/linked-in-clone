@@ -6,7 +6,6 @@ import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.FollowService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service

@@ -52,13 +52,15 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new CustomException("NOT_FOUND", "Company not found"));
     }
 
+    @Override
     public Map<String, Object> getCompanyDetails(Long id, Principal principal) throws CustomException {
         Company company = getCompanyById(id);
         List<Job> jobs = jobRepository.findByCompanyId(id);
-        jobs.forEach(job -> {
+
+        for (Job job : jobs) {
             Long applicationsCount = applyJobRepository.countByJobId(job.getId());
             job.setApplicationsCount(applicationsCount);
-        });
+        }
 
         Map<String, Object> modelAttributes = new HashMap<>();
         modelAttributes.put("company", company);
@@ -68,6 +70,7 @@ public class CompanyServiceImpl implements CompanyService {
             User user = userRepository.findByEmail(principal.getName())
                     .orElseThrow(() -> new CustomException("NOT_FOUND", "User not found"));
             modelAttributes.put("loggedInUser", user);
+
             Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserUserId(user.getUserId());
             modelAttributes.put("appliedJobIds", appliedJobIds);
         }

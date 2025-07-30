@@ -50,7 +50,7 @@ public class VideoCallController {
     public void handleCallNotification(CallNotificationMessage message) {
         try {
             User sender = userService.getUserById(Long.parseLong(message.getSenderId()));
-            User receiver = userService.getUserById(Long.parseLong(message.getReceiverId()));
+            userService.getUserById(Long.parseLong(message.getReceiverId()));
             message.setSenderName(sender.getFullName());
             messagingTemplate.convertAndSendToUser(
                     message.getReceiverId(),

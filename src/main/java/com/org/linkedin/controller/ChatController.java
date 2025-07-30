@@ -27,14 +27,14 @@ public class ChatController {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
     private final UserService userService;
-    private final ConnectionRequestService connectionRequest;
+    private final ConnectionRequestService connectionRequestService;
 
     public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate,
                           UserService userService, ConnectionRequestService connectionRequest) {
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
         this.userService = userService;
-        this.connectionRequest = connectionRequest;
+        this.connectionRequestService = connectionRequest;
     }
 
     @MessageMapping("/chat")
@@ -209,7 +209,7 @@ public class ChatController {
 
     private List<User> loadUserConnections(User loggedInUser) {
         try {
-            List<User> connections = connectionRequest.getConnections(loggedInUser);
+            List<User> connections = connectionRequestService.getConnections(loggedInUser);
             return connections != null ? connections : new ArrayList<>();
         } catch (Exception e) {
             System.err.println("Error loading connections: " + e.getMessage());

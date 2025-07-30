@@ -2,7 +2,6 @@ package com.org.linkedin.controller;
 
 import com.org.linkedin.model.Comment;
 import com.org.linkedin.service.CommentService;
-import com.org.linkedin.service.PostService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +22,8 @@ public class CommentController {
     public String getCommentFragment(@PathVariable Long postId,
                                      @RequestParam(defaultValue = "0") int page,
                                      Model model) {
-        System.out.println("Fetching comments for postId = " + postId);
 
         List<Comment> comments = commentService.getComments(postId, page, 5);
-        for(Comment comment : comments){
-            System.out.println(comment.getCommentId() + " " + comment.getCommentContent());
-        }
         model.addAttribute("comments", comments);
         return "fragments/commentList :: commentList(comments=${comments})";
     }
