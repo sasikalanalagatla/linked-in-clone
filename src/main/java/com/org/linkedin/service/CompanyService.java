@@ -10,6 +10,6 @@ public interface CompanyService {
     Company createCompany(Company company, Principal principal) throws CustomException;
     Company getCompanyById(Long id) throws CustomException;
     List<Company> getAllCompanies();
-    Company updateCompany(Company company, Principal principal) throws CustomException;
+    Company updateCompany(Long id, Company company, Principal principal) throws CustomException;
     void deleteCompany(Long id, Principal principal) throws CustomException;
 }

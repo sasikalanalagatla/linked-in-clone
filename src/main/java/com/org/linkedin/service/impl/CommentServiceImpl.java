@@ -7,9 +7,6 @@ import com.org.linkedin.repository.CommentRepository;
 import com.org.linkedin.repository.PostRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.CommentService;
-import com.org.linkedin.service.PostService;
-import com.org.linkedin.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,9 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CommentServiceImpl implements CommentService {

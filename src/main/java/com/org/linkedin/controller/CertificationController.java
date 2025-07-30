@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class CertificationController {
 
     private final CertificationService certificationService;
-
     private final UserService userService;
 
     public CertificationController(CertificationService certificationService, UserService userService) {
@@ -72,7 +71,8 @@ public class CertificationController {
     }
 
     @PostMapping("/edit/{id}")
-    public String updateCertification(@PathVariable Long id, @ModelAttribute Certification certification, @RequestParam Long userId, Model model) {
+    public String updateCertification(@PathVariable Long id, @ModelAttribute Certification certification,
+                                      @RequestParam Long userId, Model model) {
         if (id == null) {
             throw new CustomException("INVALID_CERTIFICATION_ID", "Certification ID cannot be null");
         }

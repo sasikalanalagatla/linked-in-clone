@@ -4,7 +4,6 @@ import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Post;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.PostRepository;
-import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.ConnectionRequestService;
 import com.org.linkedin.service.PostService;
 import com.org.linkedin.service.ReactionService;
@@ -12,33 +11,29 @@ import com.org.linkedin.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ReactionService reactionService;
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
-    private final UserService userService;
 
-    public PostServiceImpl(PostRepository postRepository, UserRepository userRepository,
+    public PostServiceImpl(PostRepository postRepository, UserService userService,
                            ReactionService reactionService, CloudinaryService cloudinaryService,
-                           ConnectionRequestService connectionRequestService, UserService userService) {
+                           ConnectionRequestService connectionRequestService) {
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.reactionService = reactionService;
         this.cloudinaryService = cloudinaryService;
         this.connectionRequestService = connectionRequestService;
-        this.userService = userService;
     }
 
     @Override
@@ -54,16 +49,8 @@ public class PostServiceImpl implements PostService {
         return postRepository.findByPostDescriptionContainingIgnoreCase(query);
     }
 
-    public String showCreatePostForm(Model model, Principal principal) {
-        validatePrincipal(principal);
-        User user = getCurrentUser(principal);
-
-        model.addAttribute("post", new Post());
-        model.addAttribute("authorName", user.getFullName());
-        return "create_post";
-    }
-
-    public String createPost(Post post, MultipartFile imageFile, Principal principal) {
+    @Override
+    public Post createPost(Post post, MultipartFile imageFile, Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
@@ -80,45 +67,11 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        postRepository.save(post);
-        return "redirect:/";
+        return postRepository.save(post);
     }
 
-    public String getPostFeed(Model model, Principal principal, Pageable pageable) {
-        validatePrincipal(principal);
-        User user = getCurrentUser(principal);
-
-        Page<Post> postPage = findAll(pageable);
-        List<Post> posts = postPage.getContent();
-
-        List<User> connections = connectionRequestService.getConnections(user);
-        Integer totalConnection = connections.size();
-
-        model.addAttribute("user", user);
-        model.addAttribute("currentUserId", user.getUserId());
-        model.addAttribute("totalConnection", totalConnection);
-        model.addAttribute("posts", posts);
-
-        return "home-page";
-    }
-
-    public String editPostForm(Long id, Model model, Principal principal) {
-        validatePrincipal(principal);
-        User user = getCurrentUser(principal);
-
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-
-        if (!post.getAuthor().getUserId().equals(user.getUserId())) {
-            throw new CustomException("UNAUTHORIZED", "You can only edit your own posts");
-        }
-
-        model.addAttribute("post", post);
-        model.addAttribute("authorName", post.getAuthorName());
-        return "edit_post";
-    }
-
-    public String updatePost(Long id, Post updatedPost, Model model, Principal principal) {
+    @Override
+    public Post updatePost(Long id, Post updatedPost, Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
@@ -136,12 +89,11 @@ public class PostServiceImpl implements PostService {
         post.setPostDescription(updatedPost.getPostDescription());
         post.setEdited(true);
         post.setTotalReactions(post.getReactions().size());
-        postRepository.save(post);
-
-        return "redirect:/profile/" + user.getUserId();
+        return postRepository.save(post);
     }
 
-    public String deletePost(Long id, Model model, Principal principal) {
+    @Override
+    public void deletePost(Long id, Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
@@ -153,23 +105,24 @@ public class PostServiceImpl implements PostService {
         }
 
         postRepository.deleteById(id);
-        return "redirect:/profile/" + user.getUserId();
     }
 
-    public String reactToPost(Long postId, Principal principal) {
-        if (principal == null) {
-            throw new CustomException("UNAUTHORIZED", "User must be logged in");
+    @Override
+    public Post getPostById(Long id) {
+        if (id == null) {
+            throw new CustomException("INVALID_POST_ID", "Post ID cannot be null");
         }
+        return postRepository.findById(id)
+                .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
+    }
+
+    @Override
+    public String reactToPost(Long postId, Principal principal) {
+        validatePrincipal(principal);
+        User user = getCurrentUser(principal);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException("POST_NOT_FOUND", "Post not found"));
-
-        String email = principal.getName();
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isEmpty()) {
-            throw new CustomException("USER_NOT_FOUND", "User not found");
-        }
-        User user = userOptional.get();
 
         reactionService.toggleReaction(user, post);
         post.setTotalReactions(post.getReactions().size());
@@ -177,42 +130,23 @@ public class PostServiceImpl implements PostService {
         return "Reaction updated";
     }
 
-    public String viewAllPosts(Model model, Principal principal) {
+    @Override
+    public List<Post> viewAllPosts(Principal principal) {
         validatePrincipal(principal);
         User user = getCurrentUser(principal);
 
         List<Post> posts = postRepository.findAll();
         posts.forEach(post -> post.setTotalReactions(post.getReactions().size()));
-
-        model.addAttribute("posts", posts);
-        model.addAttribute("currentUserId", user.getUserId());
-        return "post_list";
+        return posts;
     }
 
-    public String loadMorePosts(int page, Model model, Principal principal, Pageable pageable) {
+    @Override
+    public Page<Post> loadMorePosts(int page, Principal principal, Pageable pageable) {
         validatePrincipal(principal);
-        User user = getCurrentUser(principal);
-
+        getCurrentUser(principal); // Validate user exists
         Page<Post> postPage = findAll(pageable);
-        List<Post> posts = postPage.getContent();
-
-        posts.forEach(post -> post.setTotalReactions(post.getReactions().size()));
-
-        model.addAttribute("posts", posts);
-        model.addAttribute("currentUserId", user.getUserId());
-        return "partials/postCards :: postList";
-    }
-
-    public String search(String query, String filter, Model model) {
-        List<User> peopleResults = filter.equals("posts") ? List.of() : userService.searchByName(query);
-        List<Post> postResults = filter.equals("people") ? List.of() : searchByContent(query);
-
-        model.addAttribute("query", query);
-        model.addAttribute("filter", filter);
-        model.addAttribute("peopleResults", peopleResults);
-        model.addAttribute("postResults", postResults);
-
-        return "search";
+        postPage.getContent().forEach(post -> post.setTotalReactions(post.getReactions().size()));
+        return postPage;
     }
 
     private void validatePrincipal(Principal principal) {
@@ -223,7 +157,6 @@ public class PostServiceImpl implements PostService {
 
     private User getCurrentUser(Principal principal) {
         String email = principal.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND", "User not found"));
+        return userService.findByEmail(email);
     }
 }

@@ -4,7 +4,6 @@ import com.org.linkedin.dto.VideoSignalMessage;
 import com.org.linkedin.dto.CallNotificationMessage;
 import com.org.linkedin.model.User;
 import com.org.linkedin.model.ChatMessage;
-import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.impl.UserServiceImpl;
 import com.org.linkedin.service.impl.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.security.Principal;
-import java.util.Optional;
 
 @Controller
 public class VideoCallController {
@@ -23,40 +21,38 @@ public class VideoCallController {
     private final SimpMessagingTemplate messagingTemplate;
     private final UserServiceImpl userService;
     private final ChatServiceImpl chatService;
-    private final UserRepository userRepository;
 
     public VideoCallController(SimpMessagingTemplate messagingTemplate,
                                UserServiceImpl userService,
-                               ChatServiceImpl chatService, UserRepository userRepository) {
+                               ChatServiceImpl chatService) {
         this.messagingTemplate = messagingTemplate;
         this.userService = userService;
         this.chatService = chatService;
-        this.userRepository = userRepository;
     }
+
     @MessageMapping("/video.signal")
     public void handleVideoSignal(VideoSignalMessage message) {
         if (!"call_request".equals(message.getType())) {
-            Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
-            if (senderOptional.isPresent()) {
-                message.setSenderName(senderOptional.get().getFullName());
-            }
+            try {
+                User sender = userService.getUserById(Long.parseLong(message.getSenderId()));
+                message.setSenderName(sender.getFullName());
 
-            messagingTemplate.convertAndSendToUser(
-                    message.getReceiverId(),
-                    "/queue/video",
-                    message
-            );
+                messagingTemplate.convertAndSendToUser(
+                        message.getReceiverId(),
+                        "/queue/video",
+                        message
+                );
+            } catch (Exception e) {
+            }
         }
     }
 
     @MessageMapping("/call.notify")
     public void handleCallNotification(CallNotificationMessage message) {
-        Optional<User> senderOptional = userRepository.findById(Long.parseLong(message.getSenderId()));
-        Optional<User> receiverOptional = userRepository.findById(Long.parseLong(message.getReceiverId()));
+        try {
+            User sender = userService.getUserById(Long.parseLong(message.getSenderId()));
+            User receiver = userService.getUserById(Long.parseLong(message.getReceiverId()));
 
-        if (senderOptional.isPresent() && receiverOptional.isPresent()) {
-            User sender = senderOptional.get();
-            User receiver = receiverOptional.get();
             message.setSenderName(sender.getFullName());
 
             messagingTemplate.convertAndSendToUser(
@@ -71,8 +67,10 @@ public class VideoCallController {
                 callMessage.setType("video_call_request");
                 chatService.saveMessage(callMessage);
             }
+        } catch (Exception e) {
         }
     }
+
     @GetMapping("/video-call/{receiverId}")
     public String showVideoCallPage(@PathVariable String receiverId, Model model, Principal principal) {
         String email = principal.getName();
