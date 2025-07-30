@@ -1,27 +1,22 @@
 package com.org.linkedin.controller;
 
 import com.org.linkedin.model.User;
-import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.UserService;
-import com.org.linkedin.service.impl.CloudinaryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.security.Principal;
-import java.util.Optional;
 
 @Controller
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController( UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -35,24 +30,31 @@ public class UserController {
                               @RequestParam("password") String password,
                               Model model,
                               HttpSession session) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        User user = optionalUser.orElse(null);
-
-        if (user == null || !user.getPassword().equals(password)) {
+        try {
+            User user = userService.findByEmail(email);
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                model.addAttribute("error", "Invalid email or password");
+                return "login";
+            }
+            session.setAttribute("loggedInUser", user);
+            return "redirect:/";
+        } catch (Exception e) {
             model.addAttribute("error", "Invalid email or password");
             return "login";
         }
-
-        session.setAttribute("loggedInUser", user);
-        return "redirect:/";
     }
 
     @GetMapping("/user/profile")
     public String viewProfile(Model model, Principal principal) {
-        String email = principal.getName();
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        model.addAttribute("user", optionalUser.orElse(null));
-        return "user-profile";
+        try {
+            String email = principal.getName();
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+            return "user-profile";
+        } catch (Exception e) {
+            model.addAttribute("user", null);
+            return "user-profile";
+        }
     }
 
     @GetMapping("/signup")
@@ -64,7 +66,7 @@ public class UserController {
     @PostMapping("/register")
     public String signupSubmit(@ModelAttribute("user") User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        userService.updateUser(user);
         return "redirect:/login";
     }
 }

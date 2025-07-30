@@ -4,7 +4,7 @@ import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Skill;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.SkillService;
-import com.org.linkedin.service.impl.UserServiceImpl;
+import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +16,9 @@ import java.security.Principal;
 public class SkillController {
 
     private final SkillService skillService;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
-    public SkillController(SkillService skillService, UserServiceImpl userService) {
+    public SkillController(SkillService skillService, UserService userService) {
         this.skillService = skillService;
         this.userService = userService;
     }

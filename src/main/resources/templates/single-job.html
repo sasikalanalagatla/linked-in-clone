@@ -356,12 +356,7 @@
                 <td th:text="${applicant.user != null ? applicant.user.email : 'N/A'}">Email</td>
                 <td th:text="${applicant.user != null ? applicant.user.phoneNumber : 'N/A'}">Mobile</td>
                 <td>
-                    <a th:href="${applicant?.resumeUrl ?: '#'}" target="_blank">View</a>                </td>
-                <td>
-                    <ul style="padding-left: 16px; margin: 0;">
-                        <li th:each="ans : ${applicant?.additionalQuestionAnswers ?: {}}"
-                            th:text="${ans ?: 'N/A'}">Answer</li>
-                    </ul>
+                    <a th:href="${applicant?.resumeUrl ?: '#'}" target="_blank">View</a>
                 </td>
             </tr>
             </tbody>

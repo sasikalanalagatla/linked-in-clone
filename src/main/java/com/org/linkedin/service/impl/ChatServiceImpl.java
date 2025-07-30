@@ -12,7 +12,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -42,20 +44,72 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatMessage> getChatHistory(String user1Email, String user2Email) {
-        if (user1Email == null || user2Email == null) {
+    public List<ChatMessage> getChatHistory(String senderEmail, String receiverEmail) {
+        if (senderEmail == null || receiverEmail == null) {
             throw new CustomException("INVALID_EMAIL", "User emails cannot be null");
         }
 
-        List<ChatMessage> list1 = chatMessageRepository.findBySenderEmailAndReceiverEmailOrderByTimestamp(user1Email, user2Email);
-        List<ChatMessage> list2 = chatMessageRepository.findBySenderEmailAndReceiverEmailOrderByTimestamp(user2Email, user1Email);
+        List<ChatMessage> chatHistory = chatMessageRepository.findChatHistoryBetweenUsers(senderEmail, receiverEmail);
 
-        populateUserObjects(list1);
-        populateUserObjects(list2);
+        populateUserObjects(chatHistory);
 
-        list1.addAll(list2);
-        list1.sort((m1, m2) -> m1.getTimestamp().compareTo(m2.getTimestamp()));
-        return list1 != null ? list1 : new ArrayList<>();
+        return chatHistory != null ? chatHistory : new ArrayList<>();
+    }
+
+    private List<ChatMessage> getChatHistoryWithSeparateQueries(String senderEmail, String receiverEmail) {
+        List<ChatMessage> senderToReceiver = chatMessageRepository.findBySenderEmailAndReceiverEmail(senderEmail, receiverEmail);
+
+        List<ChatMessage> receiverToSender = chatMessageRepository.findBySenderEmailAndReceiverEmail(receiverEmail, senderEmail);
+
+        populateUserObjects(senderToReceiver);
+        populateUserObjects(receiverToSender);
+
+        List<ChatMessage> combinedHistory = new ArrayList<>();
+        combinedHistory.addAll(senderToReceiver);
+        combinedHistory.addAll(receiverToSender);
+
+        return combinedHistory.stream()
+                .sorted(Comparator.comparing(ChatMessage::getTimestamp))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChatMessage> getChatHistoryWithPagination(String senderEmail, String receiverEmail, int limit, int offset) {
+        if (senderEmail == null || receiverEmail == null) {
+            throw new CustomException("INVALID_EMAIL", "User emails cannot be null");
+        }
+
+        List<ChatMessage> fullHistory = getChatHistory(senderEmail, receiverEmail);
+
+        int startIndex = Math.max(0, offset);
+        int endIndex = Math.min(fullHistory.size(), offset + limit);
+
+        if (startIndex >= fullHistory.size()) {
+            return new ArrayList<>();
+        }
+
+        return fullHistory.subList(startIndex, endIndex);
+    }
+
+    @Override
+    public List<ChatMessage> getRecentMessagesForUser(String userEmail, int limit) {
+        if (userEmail == null) {
+            throw new CustomException("INVALID_EMAIL", "User email cannot be null");
+        }
+
+        List<ChatMessage> sentMessages = chatMessageRepository.findBySenderEmailOrderByTimestampDesc(userEmail);
+        List<ChatMessage> receivedMessages = chatMessageRepository.findByReceiverEmailOrderByTimestampDesc(userEmail);
+
+        List<ChatMessage> allMessages = new ArrayList<>();
+        allMessages.addAll(sentMessages);
+        allMessages.addAll(receivedMessages);
+
+        populateUserObjects(allMessages);
+
+        return allMessages.stream()
+                .sorted(Comparator.comparing(ChatMessage::getTimestamp).reversed())
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,36 +134,41 @@ public class ChatServiceImpl implements ChatService {
         User sender = userService.findByEmail(principal.getName());
         User receiver = userService.findByEmail(receiverEmail);
 
-        ChatMessage callMessage = new ChatMessage();
-        callMessage.setSender(sender);
-        callMessage.setReceiver(receiver);
-        callMessage.setSenderEmail(sender.getEmail());
-        callMessage.setReceiverEmail(receiverEmail);
-        callMessage.setContent("📹 Video call request");
-        callMessage.setType("video_call_request");
-        callMessage.setTimestamp(LocalDateTime.now());
+        ChatMessage callMessage = createVideoCallMessage(sender, receiver);
 
         saveMessage(callMessage);
         messagingTemplate.convertAndSend("/topic/messages/" + receiverEmail, callMessage);
     }
 
+    private ChatMessage createVideoCallMessage(User sender, User receiver) {
+        ChatMessage callMessage = new ChatMessage();
+        callMessage.setSender(sender);
+        callMessage.setReceiver(receiver);
+        callMessage.setSenderEmail(sender.getEmail());
+        callMessage.setReceiverEmail(receiver.getEmail());
+        callMessage.setContent("📹 Video call request");
+        callMessage.setType("video_call_request");
+        callMessage.setTimestamp(LocalDateTime.now());
+        return callMessage;
+    }
+
     private void populateUserObjects(List<ChatMessage> messages) {
+        if (messages == null || messages.isEmpty()) {
+            return;
+        }
+
         for (ChatMessage msg : messages) {
-            if (msg.getSender() == null && msg.getSenderEmail() != null) {
-                try {
+            try {
+                if (msg.getSender() == null && msg.getSenderEmail() != null) {
                     User sender = userService.findByEmail(msg.getSenderEmail());
                     msg.setSender(sender);
-                } catch (Exception e) {
-                    System.err.println("Could not find sender for email: " + msg.getSenderEmail());
                 }
-            }
-            if (msg.getReceiver() == null && msg.getReceiverEmail() != null) {
-                try {
+                if (msg.getReceiver() == null && msg.getReceiverEmail() != null) {
                     User receiver = userService.findByEmail(msg.getReceiverEmail());
                     msg.setReceiver(receiver);
-                } catch (Exception e) {
-                    System.err.println("Could not find receiver for email: " + msg.getReceiverEmail());
                 }
+            } catch (Exception e) {
+                System.err.println("Error populating user objects for message ID " + msg.getId() + ": " + e.getMessage());
             }
         }
     }

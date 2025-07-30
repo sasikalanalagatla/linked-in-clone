@@ -40,10 +40,10 @@ public class Post {
 
     private String authorName;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<Reaction> reactions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST})
     private List<Comment> comments = new ArrayList<>();
 
     private Integer totalReactions = 0;

@@ -88,18 +88,20 @@
         <label for="jobLocation">Location</label>
         <input type="text" id="jobLocation" th:field="*{jobLocation}" placeholder="e.g. Bangalore, India" required>
 
-        <label for="jobTypes">Job Type</label>
         <select id="jobTypes" th:field="*{jobTypes}" required>
             <option value="" disabled selected>Select job type</option>
-            <option th:each="type : ${T(com.org.linkedin.enums.JobType).values()}"
-                    th:value="${type}" th:text="${type}">Job Type</option>
+            <option value="Full-Time">Full-Time</option>
+            <option value="Part-Time">Part-Time</option>
+            <option value="Internship">Internship</option>
+            <option value="Contract">Contract</option>
+            <option value="Freelance">Freelance</option>
         </select>
 
-        <label for="jobWorkPlaceTypes">Workplace Type</label>
         <select id="jobWorkPlaceTypes" th:field="*{jobWorkPlaceTypes}" required>
             <option value="" disabled selected>Select workplace type</option>
-            <option th:each="type : ${T(com.org.linkedin.enums.WorkPlaceType).values()}"
-                    th:value="${type}" th:text="${type}">Workplace</option>
+            <option value="On-Site">On-Site</option>
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
         </select>
 
         <label for="recruiterEmail">Recruiter Email</label>

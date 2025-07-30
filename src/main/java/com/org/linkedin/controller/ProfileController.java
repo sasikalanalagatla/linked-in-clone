@@ -3,8 +3,8 @@ package com.org.linkedin.controller;
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.ConnectionRequestService;
+import com.org.linkedin.service.UserService;
 import com.org.linkedin.service.impl.CloudinaryService;
-import com.org.linkedin.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,12 +17,12 @@ import java.security.Principal;
 @Controller
 public class ProfileController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final CloudinaryService cloudinaryService;
     private final ConnectionRequestService connectionRequestService;
 
     @Autowired
-    public ProfileController(UserServiceImpl userService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService) {
+    public ProfileController(UserService userService, CloudinaryService cloudinaryService, ConnectionRequestService connectionRequestService) {
         this.userService = userService;
         this.cloudinaryService = cloudinaryService;
         this.connectionRequestService = connectionRequestService;

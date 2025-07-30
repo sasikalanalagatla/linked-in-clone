@@ -37,7 +37,7 @@ public class CommentController {
     public String addComment(@PathVariable Long postId,
                              @RequestBody Map<String, String> payload) {
         String text = payload.get("text");
-        Comment comment = commentService.addComment(postId, text);
+        commentService.addComment(postId, text);
         return "redirect:/posts/{postId}/comments";
     }
 }

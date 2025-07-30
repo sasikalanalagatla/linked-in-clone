@@ -5,19 +5,24 @@ import com.org.linkedin.model.ConnectionRequest;
 import com.org.linkedin.model.User;
 import com.org.linkedin.repository.ConnectionRequestRepository;
 import com.org.linkedin.service.ConnectionRequestService;
+import com.org.linkedin.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class ConnectionRequestImpl implements ConnectionRequestService {
+public class ConnectionRequestServiceImpl implements ConnectionRequestService {
 
     private final ConnectionRequestRepository connectionRequestRepository;
+    private final UserService userService;
 
-    public ConnectionRequestImpl(ConnectionRequestRepository connectionRequestRepository) {
+    public ConnectionRequestServiceImpl(ConnectionRequestRepository connectionRequestRepository, UserService userService) {
         this.connectionRequestRepository = connectionRequestRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -125,5 +130,61 @@ public class ConnectionRequestImpl implements ConnectionRequestService {
             return "CONNECTED";
         }
         return "NONE";
+    }
+
+    @Override
+    public Map<String, Object> getNetworkDetails(User currentUser) {
+        if (currentUser == null) {
+            throw new CustomException("INVALID_USER", "User cannot be null");
+        }
+        Map<String, Object> modelAttributes = new HashMap<>();
+        List<ConnectionRequest> pendingRequests = getPendingRequests(currentUser);
+        List<User> connections = getConnections(currentUser);
+        List<User> followers = userService.getFollowers(currentUser);
+        List<User> following = userService.getFollowing(currentUser);
+
+        modelAttributes.put("requests", pendingRequests != null ? pendingRequests : new ArrayList<>());
+        modelAttributes.put("connections", connections != null ? connections : new ArrayList<>());
+        modelAttributes.put("followers", followers != null ? followers : new ArrayList<>());
+        modelAttributes.put("following", following != null ? following : new ArrayList<>());
+        modelAttributes.put("currentUserId", currentUser.getUserId());
+
+        return modelAttributes;
+    }
+
+    @Override
+    public Map<String, Object> getFollowersDetails(Long userId) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        User user = userService.getUserById(userId);
+        Map<String, Object> modelAttributes = new HashMap<>();
+        List<User> followers = userService.getFollowers(user);
+        modelAttributes.put("followers", followers != null ? followers : new ArrayList<>());
+        modelAttributes.put("currentUserId", userId);
+        return modelAttributes;
+    }
+
+    @Override
+    public Map<String, Object> getFollowingDetails(Long userId) {
+        if (userId == null) {
+            throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
+        }
+        User user = userService.getUserById(userId);
+        Map<String, Object> modelAttributes = new HashMap<>();
+        List<User> following = userService.getFollowing(user);
+        modelAttributes.put("following", following != null ? following : new ArrayList<>());
+        modelAttributes.put("currentUserId", userId);
+        return modelAttributes;
+    }
+
+    @Override
+    public void sendConnectionRequest(Long senderId, Long receiverId) {
+        if (senderId == null || receiverId == null) {
+            throw new CustomException("INVALID_USER_ID", "Sender or receiver ID cannot be null");
+        }
+        User sender = userService.getUserById(senderId);
+        User receiver = userService.getUserById(receiverId);
+        sendRequest(sender, receiver);
     }
 }

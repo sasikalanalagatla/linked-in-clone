@@ -140,11 +140,6 @@
         <label>Mobile Number</label>
         <input type="text" th:field="*{user.phoneNumber}"/>
 
-        <div th:each="question, iterStat : ${job.additionalQuestions}" class="question-block">
-            <label th:text="${question.questionText}"></label>
-            <textarea th:field="*{additionalQuestionAnswers[__${iterStat.index}__]}" rows="3"></textarea>
-        </div>
-
         <label>Upload Resume (PDF/DOC)</label>
         <input type="file" name="resumeFile" accept=".pdf,.doc,.docx" required/>
 

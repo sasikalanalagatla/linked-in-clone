@@ -24,16 +24,13 @@ public class PostServiceImpl implements PostService {
     private final UserService userService;
     private final ReactionService reactionService;
     private final CloudinaryService cloudinaryService;
-    private final ConnectionRequestService connectionRequestService;
 
     public PostServiceImpl(PostRepository postRepository, UserService userService,
-                           ReactionService reactionService, CloudinaryService cloudinaryService,
-                           ConnectionRequestService connectionRequestService) {
+                           ReactionService reactionService, CloudinaryService cloudinaryService) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.reactionService = reactionService;
         this.cloudinaryService = cloudinaryService;
-        this.connectionRequestService = connectionRequestService;
     }
 
     @Override

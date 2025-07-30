@@ -47,7 +47,7 @@ public class EducationController {
             if (education == null) {
                 throw new CustomException("INVALID_EDUCATION", "Education data cannot be null");
             }
-            Education savedEducation = educationService.addEducation(userId, education);
+            educationService.addEducation(userId, education);
             return "redirect:/profile/" + userId;
         } catch (CustomException e) {
             User user = userService.getUserById(userId);

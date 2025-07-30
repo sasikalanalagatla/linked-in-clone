@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class ApplyJob {
@@ -25,11 +23,6 @@ public class ApplyJob {
 
     @CreationTimestamp
     private LocalDateTime appliedAt;
-
-    @ElementCollection
-    @CollectionTable(name = "apply_job_answers", joinColumns = @JoinColumn(name = "apply_job_id"))
-    @Column(name = "answer")
-    private List<String> additionalQuestionAnswers = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -71,11 +64,4 @@ public class ApplyJob {
         this.appliedAt = appliedAt;
     }
 
-    public List<String> getAdditionalQuestionAnswers() {
-        return additionalQuestionAnswers;
-    }
-
-    public void setAdditionalQuestionAnswers(List<String> additionalQuestionAnswers) {
-        this.additionalQuestionAnswers = additionalQuestionAnswers;
-    }
 }

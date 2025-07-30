@@ -1,7 +1,5 @@
 package com.org.linkedin.model;
 
-import com.org.linkedin.enums.JobType;
-import com.org.linkedin.enums.WorkPlaceType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -24,11 +22,9 @@ public class Job {
 
     private String jobLocation;
 
-    @Enumerated(EnumType.STRING)
-    private JobType jobTypes;
+    private String jobTypes;
 
-    @Enumerated(EnumType.STRING)
-    private WorkPlaceType jobWorkPlaceTypes;
+    private String jobWorkPlaceTypes;
 
     private String recruiterEmail;
 
@@ -48,11 +44,8 @@ public class Job {
 
     private boolean jobPostEdited;
 
-    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private List<ApplyJob> applyJobList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "job", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<AdditionalQuestion> additionalQuestions = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -97,19 +90,19 @@ public class Job {
         this.jobLocation = jobLocation;
     }
 
-    public JobType getJobTypes() {
+    public String getJobTypes() {
         return jobTypes;
     }
 
-    public void setJobTypes(JobType jobTypes) {
+    public void setJobTypes(String jobTypes) {
         this.jobTypes = jobTypes;
     }
 
-    public WorkPlaceType getJobWorkPlaceTypes() {
+    public String getJobWorkPlaceTypes() {
         return jobWorkPlaceTypes;
     }
 
-    public void setJobWorkPlaceTypes(WorkPlaceType jobWorkPlaceTypes) {
+    public void setJobWorkPlaceTypes(String jobWorkPlaceTypes) {
         this.jobWorkPlaceTypes = jobWorkPlaceTypes;
     }
 
@@ -159,14 +152,6 @@ public class Job {
 
     public void setJobPostEdited(boolean jobPostEdited) {
         this.jobPostEdited = jobPostEdited;
-    }
-
-    public List<AdditionalQuestion> getAdditionalQuestions() {
-        return additionalQuestions;
-    }
-
-    public void setAdditionalQuestions(List<AdditionalQuestion> additionalQuestions) {
-        this.additionalQuestions = additionalQuestions;
     }
 
     public Set<Skill> getRequiredSkills() {

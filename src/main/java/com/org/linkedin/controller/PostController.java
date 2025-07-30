@@ -4,8 +4,8 @@ import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Post;
 import com.org.linkedin.model.User;
 import com.org.linkedin.service.ConnectionRequestService;
+import com.org.linkedin.service.PostService;
 import com.org.linkedin.service.UserService;
-import com.org.linkedin.service.impl.PostServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +21,11 @@ import java.util.List;
 @Controller
 public class PostController {
 
-    private final PostServiceImpl postService;
+    private final PostService postService;
     private final UserService userService;
     private final ConnectionRequestService connectionRequestService;
 
-    public PostController(PostServiceImpl postService, UserService userService,
+    public PostController(PostService postService, UserService userService,
                           ConnectionRequestService connectionRequestService) {
         this.postService = postService;
         this.userService = userService;

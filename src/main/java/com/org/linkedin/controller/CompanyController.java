@@ -2,34 +2,21 @@ package com.org.linkedin.controller;
 
 import com.org.linkedin.exception.CustomException;
 import com.org.linkedin.model.Company;
-import com.org.linkedin.model.Job;
-import com.org.linkedin.model.User;
-import com.org.linkedin.repository.ApplyJobRepository;
-import com.org.linkedin.repository.JobRepository;
+import com.org.linkedin.service.CompanyService;
 import com.org.linkedin.service.UserService;
-import com.org.linkedin.service.impl.CompanyServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Set;
 
 @Controller
 public class CompanyController {
 
-    private final CompanyServiceImpl companyService;
-    private final UserService userService;
-    private final JobRepository jobRepository;
-    private final ApplyJobRepository applyJobRepository;
+    private final CompanyService companyService;
 
-    public CompanyController(CompanyServiceImpl companyService, UserService userService,
-                             JobRepository jobRepository, ApplyJobRepository applyJobRepository) {
+    public CompanyController(CompanyService companyService) {
         this.companyService = companyService;
-        this.userService = userService;
-        this.jobRepository = jobRepository;
-        this.applyJobRepository = applyJobRepository;
     }
 
     @GetMapping("/company/add")
@@ -61,20 +48,7 @@ public class CompanyController {
     @GetMapping("/company/{id}")
     public String getCompanyById(@PathVariable("id") Long id, Model model, Principal principal) {
         try {
-            Company company = companyService.getCompanyById(id);
-            List<Job> jobs = jobRepository.findByCompanyId(id);
-            jobs.forEach(job -> {
-                Long applicationsCount = applyJobRepository.countByJobId(job.getId());
-                job.setApplicationsCount(applicationsCount);
-            });
-            model.addAttribute("company", company);
-            model.addAttribute("jobs", jobs);
-            if (principal != null) {
-                User user = userService.findByEmail(principal.getName());
-                model.addAttribute("loggedInUser", user);
-                Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserUserId(user.getUserId());
-                model.addAttribute("appliedJobIds", appliedJobIds);
-            }
+            model.addAllAttributes(companyService.getCompanyDetails(id, principal));
             return "company";
         } catch (CustomException e) {
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());

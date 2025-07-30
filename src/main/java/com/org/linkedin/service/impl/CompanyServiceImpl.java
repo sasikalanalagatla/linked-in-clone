@@ -10,10 +10,11 @@ import com.org.linkedin.repository.JobRepository;
 import com.org.linkedin.repository.UserRepository;
 import com.org.linkedin.service.CompanyService;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -45,21 +46,33 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.save(company);
     }
 
-    public String createCompany(Company company, Principal principal, Model model) {
-        try {
-            createCompany(company, principal);
-            return "redirect:/company/" + company.getId();
-        } catch (CustomException e) {
-            model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
-            model.addAttribute("company", company);
-            return "company-form";
-        }
-    }
-
     @Override
     public Company getCompanyById(Long id) throws CustomException {
         return companyRepository.findById(id)
                 .orElseThrow(() -> new CustomException("NOT_FOUND", "Company not found"));
+    }
+
+    public Map<String, Object> getCompanyDetails(Long id, Principal principal) throws CustomException {
+        Company company = getCompanyById(id);
+        List<Job> jobs = jobRepository.findByCompanyId(id);
+        jobs.forEach(job -> {
+            Long applicationsCount = applyJobRepository.countByJobId(job.getId());
+            job.setApplicationsCount(applicationsCount);
+        });
+
+        Map<String, Object> modelAttributes = new HashMap<>();
+        modelAttributes.put("company", company);
+        modelAttributes.put("jobs", jobs);
+
+        if (principal != null) {
+            User user = userRepository.findByEmail(principal.getName())
+                    .orElseThrow(() -> new CustomException("NOT_FOUND", "User not found"));
+            modelAttributes.put("loggedInUser", user);
+            Set<Long> appliedJobIds = applyJobRepository.findAppliedJobIdsByUserUserId(user.getUserId());
+            modelAttributes.put("appliedJobIds", appliedJobIds);
+        }
+
+        return modelAttributes;
     }
 
     @Override

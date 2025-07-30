@@ -1,38 +1,28 @@
 package com.org.linkedin.controller;
 
 import com.org.linkedin.exception.CustomException;
-import com.org.linkedin.model.*;
-import com.org.linkedin.service.impl.CloudinaryService;
-import com.org.linkedin.service.impl.JobServiceImpl;
-import com.org.linkedin.service.impl.UserServiceImpl;
+import com.org.linkedin.model.ApplyJob;
+import com.org.linkedin.model.Job;
+import com.org.linkedin.model.User;
+import com.org.linkedin.service.JobService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Map;
 
 @Controller
 public class JobController {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobController.class);
+    private final JobService jobService;
 
-    private final JobServiceImpl jobServiceImpl;
-    private final UserServiceImpl userServiceImpl;
-    private final CloudinaryService cloudinaryService;
-
-    public JobController(JobServiceImpl jobServiceImpl, UserServiceImpl userServiceImpl, CloudinaryService cloudinaryService) {
-        this.jobServiceImpl = jobServiceImpl;
-        this.userServiceImpl = userServiceImpl;
-        this.cloudinaryService = cloudinaryService;
+    public JobController(JobService jobService) {
+        this.jobService = jobService;
     }
 
     @GetMapping("/job/feed")
@@ -44,54 +34,9 @@ public class JobController {
                           Model model,
                           Principal principal) {
         try {
-            logger.info("Accessing /job/feed with keyword: {}, range: {}, jobId: {}, page: {}, size: {}",
-                    keyword, range, jobId, page, size);
-            Pageable pageable = PageRequest.of(page, size, Sort.by("jobCreatedAt").descending());
-            Page<Job> jobPage;
-
-            LocalDateTime createdAfter = null;
-            if ("past 24 hours".equalsIgnoreCase(range)) {
-                createdAfter = LocalDateTime.now().minusHours(24);
-            } else if ("past 7 days".equalsIgnoreCase(range)) {
-                createdAfter = LocalDateTime.now().minusDays(7);
-            } else if ("past 30 days".equalsIgnoreCase(range)) {
-                createdAfter = LocalDateTime.now().minusDays(30);
-            }
-
-            if (keyword != null && !keyword.isEmpty() && createdAfter != null) {
-                jobPage = jobServiceImpl.filterAndSearchJobs(keyword, createdAfter, pageable);
-            } else if (keyword != null && !keyword.isEmpty()) {
-                jobPage = jobServiceImpl.searchJobs(keyword, pageable);
-            } else if (createdAfter != null) {
-                jobPage = jobServiceImpl.filterByCreatedAt(createdAfter, pageable);
-            } else {
-                jobPage = jobServiceImpl.getAllJobs(pageable);
-            }
-
-            List<Job> jobs = jobPage.getContent();
-            model.addAttribute("jobs", jobs);
-            model.addAttribute("keyword", keyword);
-            model.addAttribute("range", range);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", jobPage.getTotalPages());
-            model.addAttribute("size", size);
-
-            Job selectedJob = (jobId != null)
-                    ? jobServiceImpl.getJobById(jobId)
-                    : jobs.isEmpty() ? null : jobs.get(0);
-
-            model.addAttribute("selectedJob", selectedJob);
-
-            if (principal != null) {
-                User user = userServiceImpl.findByEmail(principal.getName());
-                model.addAttribute("loggedInUser", user);
-                Set<Long> appliedJobIds = jobServiceImpl.getAppliedJobIdsByUserId(user.getUserId());
-                model.addAttribute("appliedJobIds", appliedJobIds);
-            }
-
+            model.addAllAttributes(jobService.getJobFeedDetails(keyword, range, jobId, page, size, principal));
             return "jobs-feed";
         } catch (CustomException e) {
-            logger.error("Error in /job/feed: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -99,20 +44,13 @@ public class JobController {
 
     @GetMapping("/job/add")
     public String showForm(Model model) {
-        logger.info("Accessing /job/add");
         try {
-            Job job = new Job();
-            job.setAdditionalQuestions(new ArrayList<>());
-            job.getAdditionalQuestions().add(new AdditionalQuestion());
-            model.addAttribute("job", job);
-            List<Skill> skills = jobServiceImpl.getAllSkills();
-            List<Company> companies = jobServiceImpl.getAllCompanies();
-            model.addAttribute("skills", skills != null ? skills : new ArrayList<>());
-            model.addAttribute("companies", companies != null ? companies : new ArrayList<>());
+            model.addAttribute("job", new Job());
+            model.addAttribute("skills", jobService.getAllSkills());
+            model.addAttribute("companies", jobService.getAllCompanies());
             return "add-job";
-        } catch (Exception e) {
-            logger.error("Error in /job/add: {}", e.getMessage());
-            model.addAttribute("error", "SYSTEM_ERROR: Failed to load job form");
+        } catch (CustomException e) {
+            model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
     }
@@ -123,41 +61,30 @@ public class JobController {
                              @RequestParam(required = false) String addQuestion,
                              Model model,
                              Principal principal) {
-        logger.info("Processing /job/create, addQuestion: {}", addQuestion);
         try {
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to create a job");
             }
             if (result.hasErrors()) {
-                logger.warn("Validation errors: {}", result.getAllErrors());
                 model.addAttribute("error", "Validation failed: " + result.getAllErrors());
-                model.addAttribute("skills", jobServiceImpl.getAllSkills());
-                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+                model.addAttribute("skills", jobService.getAllSkills());
+                model.addAttribute("companies", jobService.getAllCompanies());
                 return "add-job";
             }
             if (addQuestion != null) {
-                job.getAdditionalQuestions().add(new AdditionalQuestion());
                 model.addAttribute("job", job);
-                model.addAttribute("skills", jobServiceImpl.getAllSkills());
-                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+                model.addAttribute("skills", jobService.getAllSkills());
+                model.addAttribute("companies", jobService.getAllCompanies());
                 return "add-job";
             }
 
-            job.getAdditionalQuestions().removeIf(
-                    question -> question.getQuestion() == null || question.getQuestion().trim().isEmpty()
-            );
-            for (AdditionalQuestion question : job.getAdditionalQuestions()) {
-                question.setJob(job);
-            }
-
-            jobServiceImpl.createJob(job, principal);
+            jobService.createJob(job, principal);
             return "redirect:/job/feed";
         } catch (CustomException e) {
-            logger.error("Error in /job/create: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             model.addAttribute("job", job);
-            model.addAttribute("skills", jobServiceImpl.getAllSkills());
-            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+            model.addAttribute("skills", jobService.getAllSkills());
+            model.addAttribute("companies", jobService.getAllCompanies());
             return "add-job";
         }
     }
@@ -167,23 +94,13 @@ public class JobController {
                              Model model,
                              Principal principal) {
         try {
-            logger.info("Accessing /job/get/{}", jobId);
-            Job job = jobServiceImpl.getJobById(jobId);
-
-            if (job.getApplyJobList() == null) {
-                job.setApplyJobList(new ArrayList<>());
-            }
-
+            Job job = jobService.getJobById(jobId);
             model.addAttribute("job", job);
-
             if (principal != null) {
-                User user = userServiceImpl.findByEmail(principal.getName());
-                model.addAttribute("loggedInUser", user);
+                model.addAttribute("loggedInUser", jobService.getJobById(jobId).getUser());
             }
-
             return "single-job";
         } catch (CustomException e) {
-            logger.error("Error in /job/get/{}: {}", jobId, e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -192,22 +109,9 @@ public class JobController {
     @GetMapping("/job/apply/{jobId}")
     public String showApplyForm(@PathVariable Long jobId, Model model) {
         try {
-            logger.info("Accessing /job/apply/{}", jobId);
-            Job job = jobServiceImpl.getJobById(jobId);
-            ApplyJob applyJob = new ApplyJob();
-            applyJob.setAdditionalQuestionAnswers(new ArrayList<>());
-
-            if (job.getAdditionalQuestions() != null) {
-                for (int i = 0; i < job.getAdditionalQuestions().size(); i++) {
-                    applyJob.getAdditionalQuestionAnswers().add("");
-                }
-            }
-
-            model.addAttribute("applyJob", applyJob);
-            model.addAttribute("job", job);
+            model.addAllAttributes(jobService.getJobApplyForm(jobId));
             return "job-apply-form";
         } catch (CustomException e) {
-            logger.error("Error in /job/apply/{}: {}", jobId, e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -219,61 +123,34 @@ public class JobController {
                                   BindingResult result,
                                   @RequestParam("resumeFile") MultipartFile resumeFile,
                                   Principal principal,
-                                  Model model) {
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
         try {
-            logger.info("Processing /job/apply/{}", jobId);
-            if (principal == null) {
-                throw new CustomException("UNAUTHORIZED", "User must be logged in to apply for a job");
-            }
-            Job job = jobServiceImpl.getJobById(jobId);
             if (result.hasErrors()) {
-                logger.warn("Validation errors: {}", result.getAllErrors());
                 model.addAttribute("error", "Validation failed: " + result.getAllErrors());
-                model.addAttribute("applyJob", applyJob);
-                model.addAttribute("job", job);
+                model.addAllAttributes(jobService.getJobApplyForm(jobId));
                 return "job-apply-form";
             }
-            if (resumeFile == null || resumeFile.isEmpty()) {
-                throw new CustomException("INVALID_RESUME", "Resume file is required");
-            }
-            if (!resumeFile.getContentType().equals("application/pdf")) {
-                throw new CustomException("INVALID_RESUME", "Resume must be a PDF file");
-            }
-            String resumeUrl = cloudinaryService.uploadFile(resumeFile);
-            applyJob.setResumeUrl(resumeUrl);
-
-            User user = userServiceImpl.findByEmail(principal.getName());
-            applyJob.setUser(user);
-            applyJob.setJob(job);
-
-            jobServiceImpl.applyForJob(applyJob);
-            return "redirect:/job/feed?jobId=" + jobId;
+            Map<String, Object> resultMap = jobService.submitJobApplication(jobId, applyJob, resumeFile, principal);
+            redirectAttributes.addFlashAttribute("success", "Job application submitted successfully!");
+            return "redirect:" + resultMap.get("redirect");
         } catch (CustomException e) {
-            logger.error("Error in /job/apply/{}: {}", jobId, e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
-            model.addAttribute("applyJob", applyJob);
-            model.addAttribute("job", jobServiceImpl.getJobById(jobId));
-            return "job-apply-form";
-        } catch (IOException e) {
-            logger.error("IO Error in /job/apply/{}: {}", jobId, e.getMessage());
-            model.addAttribute("error", "SYSTEM_ERROR: Failed to upload resume");
-            model.addAttribute("applyJob", applyJob);
-            model.addAttribute("job", jobServiceImpl.getJobById(jobId));
+            model.addAllAttributes(jobService.getJobApplyForm(jobId));
             return "job-apply-form";
         }
     }
 
     @PostMapping("/job/delete/{jobId}")
-    public String deleteJobById(@PathVariable("jobId") Long jobId, Principal principal, Model model) {
+    public String deleteJobById(@PathVariable("jobId") Long jobId, Principal principal, Model model, RedirectAttributes redirectAttributes) {
         try {
-            logger.info("Processing /job/delete/{}", jobId);
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to delete a job");
             }
-            jobServiceImpl.deleteJob(jobId, principal);
+            jobService.deleteJob(jobId, principal);
+            redirectAttributes.addFlashAttribute("success", "Job deleted successfully!");
             return "redirect:/job/feed";
         } catch (CustomException e) {
-            logger.error("Error in /job/delete/{}: {}", jobId, e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -282,14 +159,11 @@ public class JobController {
     @GetMapping("/job/edit/{id}")
     public String editJobForm(@PathVariable Long id, Model model) {
         try {
-            logger.info("Accessing /job/edit/{}", id);
-            Job job = jobServiceImpl.getJobById(id);
-            model.addAttribute("job", job);
-            model.addAttribute("skills", jobServiceImpl.getAllSkills());
-            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+            model.addAttribute("job", jobService.getJobById(id));
+            model.addAttribute("skills", jobService.getAllSkills());
+            model.addAttribute("companies", jobService.getAllCompanies());
             return "edit-job";
         } catch (CustomException e) {
-            logger.error("Error in /job/edit/{}: {}", id, e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -299,48 +173,26 @@ public class JobController {
     public String updateJob(@Valid @ModelAttribute("job") Job updatedJob,
                             BindingResult result,
                             Principal principal,
-                            Model model) {
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
         try {
-            logger.info("Processing /job/update for job ID: {}", updatedJob.getId());
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to update a job");
             }
             if (result.hasErrors()) {
-                logger.warn("Validation errors: {}", result.getAllErrors());
                 model.addAttribute("error", "Validation failed: " + result.getAllErrors());
-                model.addAttribute("skills", jobServiceImpl.getAllSkills());
-                model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+                model.addAttribute("skills", jobService.getAllSkills());
+                model.addAttribute("companies", jobService.getAllCompanies());
                 return "edit-job";
             }
-
-            Job existingJob = jobServiceImpl.getJobById(updatedJob.getId());
-
-            existingJob.setJobTitle(updatedJob.getJobTitle());
-            existingJob.setCompany(updatedJob.getCompany());
-            existingJob.setJobLocation(updatedJob.getJobLocation());
-            existingJob.setJobDescription(updatedJob.getJobDescription());
-            existingJob.setJobTypes(updatedJob.getJobTypes());
-            existingJob.setJobWorkPlaceTypes(updatedJob.getJobWorkPlaceTypes());
-            existingJob.setRecruiterEmail(updatedJob.getRecruiterEmail());
-
-            if (updatedJob.getAdditionalQuestions() != null) {
-                existingJob.getAdditionalQuestions().clear();
-                for (AdditionalQuestion question : updatedJob.getAdditionalQuestions()) {
-                    if (question.getQuestion() != null && !question.getQuestion().trim().isEmpty()) {
-                        question.setJob(existingJob);
-                        existingJob.getAdditionalQuestions().add(question);
-                    }
-                }
-            }
-
-            jobServiceImpl.updateJob(existingJob, principal);
+            jobService.updateJob(updatedJob, principal);
+            redirectAttributes.addFlashAttribute("success", "Job updated successfully!");
             return "redirect:/job/feed";
         } catch (CustomException e) {
-            logger.error("Error in /job/update: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             model.addAttribute("job", updatedJob);
-            model.addAttribute("skills", jobServiceImpl.getAllSkills());
-            model.addAttribute("companies", jobServiceImpl.getAllCompanies());
+            model.addAttribute("skills", jobService.getAllSkills());
+            model.addAttribute("companies", jobService.getAllCompanies());
             return "edit-job";
         }
     }
@@ -353,45 +205,13 @@ public class JobController {
                                 Model model,
                                 Principal principal) {
         try {
-            logger.info("Accessing /job/posted with page: {}, size: {}, sortBy: {}, sortDir: {}",
-                    page, size, sortBy, sortDir);
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view posted jobs");
             }
-            User user = userServiceImpl.findByEmail(principal.getName());
-
-            String validatedSortBy = sortBy;
-            if (!Arrays.asList("jobCreatedAt", "jobTitle", "company").contains(sortBy)) {
-                validatedSortBy = "jobCreatedAt";
-            }
-
-            Sort sort = sortDir.equalsIgnoreCase("desc") ?
-                    Sort.by(validatedSortBy).descending() :
-                    Sort.by(validatedSortBy).ascending();
-
-            Pageable pageable = PageRequest.of(page, size, sort);
-            Page<Job> postedJobsPage = jobServiceImpl.getPostedJobsByUserId(user.getUserId(), pageable);
-
-            List<Job> jobsWithCounts = postedJobsPage.getContent().stream()
-                    .map(job -> {
-                        Long applicationsCount = jobServiceImpl.countApplicationsByJobId(job.getId());
-                        job.setApplicationsCount(applicationsCount);
-                        return job;
-                    })
-                    .toList();
-
-            model.addAttribute("postedJobs", jobsWithCounts);
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", postedJobsPage.getTotalPages());
-            model.addAttribute("totalElements", postedJobsPage.getTotalElements());
-            model.addAttribute("sortBy", sortBy);
-            model.addAttribute("sortDir", sortDir);
-            model.addAttribute("size", size);
-            model.addAttribute("loggedInUser", user);
-
+            User user = jobService.getJobById(1L).getUser();
+            model.addAllAttributes(jobService.getPostedJobsDetails(user.getUserId(), page, size, sortBy, sortDir));
             return "posted-jobs";
         } catch (CustomException e) {
-            logger.error("Error in /job/posted: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
@@ -405,37 +225,13 @@ public class JobController {
                                  Model model,
                                  Principal principal) {
         try {
-            logger.info("Accessing /job/applied with page: {}, size: {}, sortBy: {}, sortDir: {}",
-                    page, size, sortBy, sortDir);
             if (principal == null) {
                 throw new CustomException("UNAUTHORIZED", "User must be logged in to view applied jobs");
             }
-            User user = userServiceImpl.findByEmail(principal.getName());
-
-            String validatedSortBy = sortBy;
-            if (!Arrays.asList("appliedAt", "job.jobTitle", "job.company").contains(sortBy)) {
-                validatedSortBy = "appliedAt";
-            }
-
-            Sort sort = sortDir.equalsIgnoreCase("desc") ?
-                    Sort.by(validatedSortBy).descending() :
-                    Sort.by(validatedSortBy).ascending();
-
-            Pageable pageable = PageRequest.of(page, size, sort);
-            Page<ApplyJob> appliedJobsPage = jobServiceImpl.getAppliedJobsByUserId(user.getUserId(), pageable);
-
-            model.addAttribute("appliedJobs", appliedJobsPage.getContent());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("totalPages", appliedJobsPage.getTotalPages());
-            model.addAttribute("totalElements", appliedJobsPage.getTotalElements());
-            model.addAttribute("sortBy", sortBy);
-            model.addAttribute("sortDir", sortDir);
-            model.addAttribute("size", size);
-            model.addAttribute("loggedInUser", user);
-
+            User user = jobService.getJobById(1L).getUser();
+            model.addAllAttributes(jobService.getAppliedJobsDetails(user.getUserId(), page, size, sortBy, sortDir));
             return "applied-jobs";
         } catch (CustomException e) {
-            logger.error("Error in /job/applied: {}", e.getMessage());
             model.addAttribute("error", e.getErrorCode() + ": " + e.getMessage());
             return "error";
         }
