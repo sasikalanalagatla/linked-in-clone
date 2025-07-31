@@ -22,7 +22,7 @@ public class EducationServiceImpl implements EducationService {
     }
 
     @Override
-    public Education addEducation(Long userId, Education education) {
+    public void addEducation(Long userId, Education education) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
@@ -34,7 +34,7 @@ public class EducationServiceImpl implements EducationService {
             throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
         }
         education.setUser(user.get());
-        return educationRepository.save(education);
+        educationRepository.save(education);
     }
 
     @Override

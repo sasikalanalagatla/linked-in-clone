@@ -9,6 +9,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface PostService {
+
     Page<Post> findAll(Pageable pageable);
     List<Post> searchByContent(String query);
     Post createPost(Post post, MultipartFile imageFile, Principal principal);

@@ -22,7 +22,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public Experience addExperience(Long userId, Experience experience) {
+    public void addExperience(Long userId, Experience experience) {
         if (userId == null) {
             throw new CustomException("INVALID_USER_ID", "User ID cannot be null");
         }
@@ -34,7 +34,7 @@ public class ExperienceServiceImpl implements ExperienceService {
             throw new CustomException("USER_NOT_FOUND", "User with ID " + userId + " not found");
         }
         experience.setUser(user.get());
-        return experienceRepository.save(experience);
+        experienceRepository.save(experience);
     }
 
     @Override

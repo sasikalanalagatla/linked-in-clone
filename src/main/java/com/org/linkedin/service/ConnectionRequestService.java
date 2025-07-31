@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ConnectionRequestService {
+
     void sendRequest(User sender, User receiver);
     void acceptRequest(Long requestId);
     void ignoreRequest(Long requestId);

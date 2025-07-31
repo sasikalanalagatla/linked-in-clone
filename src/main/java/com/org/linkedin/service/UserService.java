@@ -11,4 +11,4 @@ public interface UserService {
     List<User> getFollowers(User user);
     List<User> getFollowing(User user);
     List<User> searchByName(String query);
-    }
+}

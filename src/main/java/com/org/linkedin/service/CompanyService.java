@@ -6,6 +6,7 @@ import java.security.Principal;
 import java.util.Map;
 
 public interface CompanyService {
+
     Company createCompany(Company company, Principal principal) throws CustomException;
     Company getCompanyById(Long id) throws CustomException;
     Map<String, Object> getCompanyDetails(Long id, Principal principal) throws CustomException;

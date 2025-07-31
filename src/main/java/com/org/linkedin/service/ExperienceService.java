@@ -4,7 +4,7 @@ import com.org.linkedin.model.Experience;
 
 public interface ExperienceService {
 
-    Experience addExperience(Long userId, Experience experience);
+    void addExperience(Long userId, Experience experience);
     Experience updateExperience(Long experienceId, Experience updatedExperience);
     void deleteExperience(Long experienceId);
     Experience getExperienceById(Long id);
