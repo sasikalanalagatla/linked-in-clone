@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
-    List<ChatMessage> findBySenderEmailAndReceiverEmail(String senderEmail, String receiverEmail);
-
     @Query("SELECT cm FROM ChatMessage cm WHERE " +
             "(cm.senderEmail = :user1 AND cm.receiverEmail = :user2) OR " +
             "(cm.senderEmail = :user2 AND cm.receiverEmail = :user1) " +

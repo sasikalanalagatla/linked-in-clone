@@ -12,9 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChatServiceImpl implements ChatService {
@@ -56,25 +54,9 @@ public class ChatServiceImpl implements ChatService {
         return chatHistory != null ? chatHistory : new ArrayList<>();
     }
 
-    private List<ChatMessage> getChatHistoryWithSeparateQueries(String senderEmail, String receiverEmail) {
-        List<ChatMessage> senderToReceiver = chatMessageRepository.findBySenderEmailAndReceiverEmail(senderEmail, receiverEmail);
-
-        List<ChatMessage> receiverToSender = chatMessageRepository.findBySenderEmailAndReceiverEmail(receiverEmail, senderEmail);
-
-        populateUserObjects(senderToReceiver);
-        populateUserObjects(receiverToSender);
-
-        List<ChatMessage> combinedHistory = new ArrayList<>();
-        combinedHistory.addAll(senderToReceiver);
-        combinedHistory.addAll(receiverToSender);
-
-        return combinedHistory.stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp))
-                .collect(Collectors.toList());
-    }
-
     @Override
-    public List<ChatMessage> getChatHistoryWithPagination(String senderEmail, String receiverEmail, int limit, int offset) {
+    public List<ChatMessage> getChatHistoryWithPagination(String senderEmail, String receiverEmail,
+                                                          int limit, int offset) {
         if (senderEmail == null || receiverEmail == null) {
             throw new CustomException("INVALID_EMAIL", "User emails cannot be null");
         }
@@ -106,10 +88,13 @@ public class ChatServiceImpl implements ChatService {
 
         populateUserObjects(allMessages);
 
-        return allMessages.stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp).reversed())
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<ChatMessage> recentMessages = new ArrayList<>();
+        int size = Math.min(limit, allMessages.size());
+        for (int i = 0; i < size; i++) {
+            recentMessages.add(allMessages.get(i));
+        }
+
+        return recentMessages;
     }
 
     @Override
@@ -123,7 +108,8 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void sendVideoCallRequest(String receiverEmail, Principal principal, SimpMessagingTemplate messagingTemplate) {
+    public void sendVideoCallRequest(String receiverEmail, Principal principal,
+                                     SimpMessagingTemplate messagingTemplate) {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
         }

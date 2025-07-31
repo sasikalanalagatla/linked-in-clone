@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -177,30 +178,6 @@ public class ChatController {
         }
     }
 
-    @PostMapping("/api/mark-read")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> markMessagesAsRead(
-            @RequestParam String senderEmail,
-            Principal principal) {
-
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            validatePrincipal(principal);
-
-            response.put("success", true);
-            response.put("message", "Messages marked as read");
-
-            return ResponseEntity.ok(response);
-
-        } catch (CustomException e) {
-            response.put("success", false);
-            response.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-
     private void validatePrincipal(Principal principal) {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
@@ -256,7 +233,7 @@ public class ChatController {
         if (content == null || content.trim().isEmpty()) {
             throw new CustomException("INVALID_CONTENT", "Message content cannot be empty");
         }
-        if (content.length() > 1000) { // Assuming max message length
+        if (content.length() > 1000) {
             throw new CustomException("INVALID_CONTENT", "Message content too long");
         }
     }
@@ -277,7 +254,7 @@ public class ChatController {
         chatMessage.setContent(content.trim());
         chatMessage.setSender(sender);
         chatMessage.setReceiver(receiver);
-        chatMessage.setTimestamp(java.time.LocalDateTime.now());
+        chatMessage.setTimestamp(LocalDateTime.now());
         return chatMessage;
     }
 
