@@ -1,7 +1,7 @@
 package com.org.linkedin.controller;
 
-import com.org.linkedin.message.VideoSignalMessage;
-import com.org.linkedin.message.CallNotificationMessage;
+import com.org.linkedin.connection.VideoSignalMessage;
+import com.org.linkedin.connection.CallNotificationMessage;
 import com.org.linkedin.model.User;
 import com.org.linkedin.model.ChatMessage;
 import com.org.linkedin.service.ChatService;

@@ -15,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,16 +57,46 @@ public class ChatController {
             User loggedInUser = userService.findByEmail(principal.getName());
             String senderEmail = loggedInUser.getEmail();
 
-            List<User> connections = loadUserConnections(loggedInUser);
+            List<User> connections;
+            try {
+                connections = connectionRequestService.getConnections(loggedInUser);
+                if (connections == null) {
+                    connections = new ArrayList<>();
+                }
+            } catch (Exception e) {
+                throw new CustomException("CONNECTION_LOAD_FAILED", "Error loading connections: " + e.getMessage());
+            }
 
             model.addAttribute("connections", connections);
             model.addAttribute("senderEmail", senderEmail);
             model.addAttribute("sender", loggedInUser);
 
-            if (isValidReceiverEmail(receiverEmail)) {
-                loadChatData(receiverEmail, senderEmail, page, size, model);
+            if (receiverEmail != null && !receiverEmail.trim().isEmpty()) {
+                try {
+                    model.addAttribute("receiverEmail", receiverEmail);
+
+                    User receiver = userService.findByEmail(receiverEmail);
+                    model.addAttribute("receiver", receiver);
+
+                    List<ChatMessage> history;
+                    if (page > 0 || size != 50) {
+                        int offset = page * size;
+                        history = chatService.getChatHistoryWithPagination(senderEmail, receiverEmail, size, offset);
+                    } else {
+                        history = chatService.getChatHistory(senderEmail, receiverEmail);
+                    }
+
+                    model.addAttribute("chatHistory", history != null ? history : new ArrayList<>());
+                    model.addAttribute("currentPage", page);
+                    model.addAttribute("pageSize", size);
+
+                } catch (Exception e) {
+                    throw new CustomException("CHAT_HISTORY_LOAD_FAILED", "Error loading chat data: " + e.getMessage());
+                }
             } else {
-                setEmptyChatData(model);
+                model.addAttribute("chatHistory", new ArrayList<>());
+                model.addAttribute("currentPage", 0);
+                model.addAttribute("pageSize", 50);
             }
 
             return "chat";
@@ -85,14 +114,31 @@ public class ChatController {
                               @RequestParam String content,
                               Model model) {
         try {
-            validateMessageContent(content);
+            if (content == null || content.trim().isEmpty()) {
+                throw new CustomException("INVALID_CONTENT", "Message content cannot be empty");
+            }
+            if (content.length() > 1000) {
+                throw new CustomException("INVALID_CONTENT", "Message content too long");
+            }
 
             User sender = userService.getUserById(senderId);
             User receiver = userService.findByEmail(receiverEmail);
 
-            validateUsers(sender, receiver);
+            if (sender == null) {
+                throw new CustomException("INVALID_USER", "Sender not found");
+            }
+            if (receiver == null) {
+                throw new CustomException("INVALID_USER", "Receiver not found");
+            }
 
-            ChatMessage chatMessage = createChatMessage(sender, receiver, content);
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setSenderEmail(sender.getEmail());
+            chatMessage.setReceiverEmail(receiver.getEmail());
+            chatMessage.setContent(content.trim());
+            chatMessage.setSender(sender);
+            chatMessage.setReceiver(receiver);
+            chatMessage.setTimestamp(java.time.LocalDateTime.now());
+
             chatService.saveMessage(chatMessage);
 
             messagingTemplate.convertAndSend("/topic/messages/" + receiverEmail, chatMessage);
@@ -183,80 +229,6 @@ public class ChatController {
         if (principal == null) {
             throw new CustomException("UNAUTHORIZED", "User must be logged in");
         }
-    }
-
-    private List<User> loadUserConnections(User loggedInUser) {
-        try {
-            List<User> connections = connectionRequestService.getConnections(loggedInUser);
-            return connections != null ? connections : new ArrayList<>();
-        } catch (Exception e) {
-            System.err.println("Error loading connections: " + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    private boolean isValidReceiverEmail(String receiverEmail) {
-        return receiverEmail != null && !receiverEmail.trim().isEmpty();
-    }
-
-    private void loadChatData(String receiverEmail, String senderEmail, int page, int size, Model model) {
-        try {
-            model.addAttribute("receiverEmail", receiverEmail);
-
-            User receiver = userService.findByEmail(receiverEmail);
-            model.addAttribute("receiver", receiver);
-
-            List<ChatMessage> history;
-            if (page > 0 || size != 50) {
-                int offset = page * size;
-                history = chatService.getChatHistoryWithPagination(senderEmail, receiverEmail, size, offset);
-            } else {
-                history = chatService.getChatHistory(senderEmail, receiverEmail);
-            }
-
-            model.addAttribute("chatHistory", history != null ? history : new ArrayList<>());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("pageSize", size);
-
-        } catch (Exception e) {
-            System.err.println("Error loading chat data: " + e.getMessage());
-            setEmptyChatData(model);
-        }
-    }
-
-    private void setEmptyChatData(Model model) {
-        model.addAttribute("chatHistory", new ArrayList<>());
-        model.addAttribute("currentPage", 0);
-        model.addAttribute("pageSize", 50);
-    }
-
-    private void validateMessageContent(String content) {
-        if (content == null || content.trim().isEmpty()) {
-            throw new CustomException("INVALID_CONTENT", "Message content cannot be empty");
-        }
-        if (content.length() > 1000) { // Assuming max message length
-            throw new CustomException("INVALID_CONTENT", "Message content too long");
-        }
-    }
-
-    private void validateUsers(User sender, User receiver) {
-        if (sender == null) {
-            throw new CustomException("INVALID_USER", "Sender not found");
-        }
-        if (receiver == null) {
-            throw new CustomException("INVALID_USER", "Receiver not found");
-        }
-    }
-
-    private ChatMessage createChatMessage(User sender, User receiver, String content) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSenderEmail(sender.getEmail());
-        chatMessage.setReceiverEmail(receiver.getEmail());
-        chatMessage.setContent(content.trim());
-        chatMessage.setSender(sender);
-        chatMessage.setReceiver(receiver);
-        chatMessage.setTimestamp(java.time.LocalDateTime.now());
-        return chatMessage;
     }
 
     private String handleChatPageError(CustomException e, Model model) {

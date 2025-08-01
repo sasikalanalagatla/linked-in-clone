@@ -36,16 +36,4 @@ public class GlobalExceptionHandler {
         return mav;
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ModelAndView handleAccessDeniedException(AccessDeniedException accessDeniedException) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                "ACCESS_DENIED",
-                "You do not have permission to access this resource",
-                LocalDateTime.now().toString()
-        );
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("error", errorResponse);
-        mav.setViewName("error");
-        return mav;
-    }
 }

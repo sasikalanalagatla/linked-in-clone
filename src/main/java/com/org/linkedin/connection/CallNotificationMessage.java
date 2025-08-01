@@ -1,20 +1,19 @@
-package com.org.linkedin.message;
+package com.org.linkedin.connection;
 
-public class VideoSignalMessage {
+public class CallNotificationMessage {
 
     private String type;
     private String senderId;
     private String receiverId;
-    private String payload;
     private String senderName;
 
-    public VideoSignalMessage() {}
+    public CallNotificationMessage() {}
 
-    public VideoSignalMessage(String type, String senderId, String receiverId, String payload) {
+    public CallNotificationMessage(String type, String senderId, String receiverId, String senderName) {
         this.type = type;
         this.senderId = senderId;
         this.receiverId = receiverId;
-        this.payload = payload;
+        this.senderName = senderName;
     }
 
     public String getType() {
@@ -39,14 +38,6 @@ public class VideoSignalMessage {
 
     public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
-    }
-
-    public String getPayload() {
-        return payload;
-    }
-
-    public void setPayload(String payload) {
-        this.payload = payload;
     }
 
     public String getSenderName() {
