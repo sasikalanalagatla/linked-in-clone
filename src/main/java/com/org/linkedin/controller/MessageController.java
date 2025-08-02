@@ -22,15 +22,15 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/chat")
-public class ChatController {
+public class MessageController {
 
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
     private final UserService userService;
     private final ConnectionRequestService connectionRequestService;
 
-    public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate,
-                          UserService userService, ConnectionRequestService connectionRequest) {
+    public MessageController(ChatService chatService, SimpMessagingTemplate messagingTemplate,
+                             UserService userService, ConnectionRequestService connectionRequest) {
         this.chatService = chatService;
         this.messagingTemplate = messagingTemplate;
         this.userService = userService;

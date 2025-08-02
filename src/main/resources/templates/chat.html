@@ -1076,7 +1076,6 @@
   const callerName = document.getElementById('callerName');
   const chatMessages = document.getElementById('chatMessages');
 
-  // Initialize WebSocket connection
   function initWebSocket() {
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
@@ -1084,12 +1083,10 @@
     stompClient.connect({}, function (frame) {
       console.log('Connected to WebSocket: ' + frame);
 
-      // Subscribe to personal message topic
       stompClient.subscribe('/topic/messages/' + userEmail, function (message) {
         const msg = JSON.parse(message.body);
         console.log('Received message:', msg);
 
-        // Check if it's a video call request
         if (msg.type === 'video_call_request') {
           showIncomingCallNotification(msg.sender.fullName, msg.sender.userId);
         } else {
@@ -1097,14 +1094,12 @@
         }
       });
 
-      // Subscribe to video call signals
       stompClient.subscribe('/user/' + currentUserId + '/queue/video', function (message) {
         const signal = JSON.parse(message.body);
         console.log('Received video signal:', signal);
         handleVideoSignal(signal);
       });
 
-      // Subscribe to call notifications (backup method)
       stompClient.subscribe('/user/' + currentUserId + '/queue/call', function (message) {
         const callData = JSON.parse(message.body);
         console.log('Received call notification:', callData);
@@ -1113,7 +1108,6 @@
     });
   }
 
-  // Display message in chat
   function displayMessage(msg, isSent) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
@@ -1148,7 +1142,6 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Video call functions
   async function initPeerConnection() {
     peerConnection = new RTCPeerConnection(servers);
 
@@ -1197,7 +1190,6 @@
 
       sendVideoSignal("offer", peerConnection.localDescription);
 
-      // Send call notification - this should trigger the notification on receiver's side
       sendCallNotification('video_call_request');
 
       console.log('Call notification sent');

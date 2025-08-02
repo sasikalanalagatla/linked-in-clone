@@ -4,7 +4,6 @@ import com.org.linkedin.model.ApplyJob;
 import com.org.linkedin.model.Company;
 import com.org.linkedin.model.Job;
 import com.org.linkedin.model.Skill;
-import com.org.linkedin.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
